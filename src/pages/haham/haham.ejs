@@ -1,0 +1,95 @@
+<% layout('../_common/layouts/general') %>
+<script type="text/javascript" src="<%- assetVersion('/hahamjs/helper.js') %>"></script>
+<script type="text/javascript" src="<%- assetVersion('/hahamjs/form-elements.js') %>"></script>
+<script type="text/javascript" src="<%- assetVersion('/hahamjs/grid-elements.js') %>"></script>
+
+<script type="text/javascript" src="<%- assetVersion('/hahamjs/haham.js') %>"></script>
+
+<style type="text/css">
+	
+</style>
+
+<div id="mainCtrl" class="px-0">
+	<form></form>
+</div>
+<script type="text/javascript">
+
+	function sayfaBul(){
+		document.title=hashObj.title + ' - GanyGO'
+		$('#pageTitle').html(`<i class="${hashObj.icon}"></i> ${hashObj.breadCrumbsHtml}`)
+		var sayfa=getPropertyByKeyPath(global.pages,hashObj.pathKey)
+		if(!sayfa)
+			return null
+		var resp
+		switch(hashObj.func){
+			case 'edit':
+			resp=sayfa.edit || sayfa.form
+			break
+			case 'view':
+			resp=sayfa.view || sayfa.edit || sayfa.form || null
+			break
+			case 'print':
+			resp=sayfa.print || sayfa.edit || sayfa.form || null
+			break
+			case 'addnew':
+			resp=sayfa.addnew || sayfa.form || null
+			break
+
+			case '':
+			case 'index':
+			resp= sayfa.index || null
+			break
+			default:
+			resp=sayfa[hashObj.func] || null
+			break
+		}
+		return resp
+	}
+	
+	function sayfayiAcalim(){
+		if((hashObj.query.mid || '')!=''){
+			$(`#leftMenu a`).removeClass('active')
+			$(`#leftMenu #menu${hashObj.query.mid.replaceAll('.','-')}`).addClass('active')
+		}
+		toggleMenu()
+		var sayfa=sayfaBul()
+		if(sayfa){
+			generatePage('#mainCtrl form',sayfa)
+			// frm.build(sayfa,'mainCtrl')
+			// $('#mainCtrl').html(JSON.stringify(sayfa))
+		}else{
+			$('#mainCtrl form').html('sayfa bulunamadi')
+		}
+	}
+	
+
+	if(window.location.hash==''){
+		window.location.hash='/dashboard/main'
+		
+	}
+
+	$(document).ready(()=>{
+		
+
+		anotherViewStyle('mainCtrl')
+		sayfayiAcalim()
+		window.onhashchange=()=>{
+			hashObj=getHashObject()
+			anotherViewStyle('mainCtrl')
+
+			$('#mainCtrl form').html('loading...')
+			sayfayiAcalim()
+
+		}
+	})
+
+
+	function toggleMenu(status){
+		if(status=='show'){
+			$('#layoutSidenav_nav').toggle(0)
+		}else if(window.innerWidth<1000){
+			$('#layoutSidenav_nav').hide()
+			
+		}
+	}
+</script>
