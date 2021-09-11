@@ -1,9 +1,5 @@
 <% layout('../_common/layouts/general') %>
-<script type="text/javascript" src="<%- assetVersion('/hahamjs/helper.js') %>"></script>
-<script type="text/javascript" src="<%- assetVersion('/hahamjs/form-elements.js') %>"></script>
-<script type="text/javascript" src="<%- assetVersion('/hahamjs/grid-elements.js') %>"></script>
 
-<script type="text/javascript" src="<%- assetVersion('/hahamjs/haham.js') %>"></script>
 
 <style type="text/css">
 	
@@ -54,9 +50,9 @@
 		toggleMenu()
 		var sayfa=sayfaBul()
 		if(sayfa){
+		
 			generatePage('#mainCtrl form',sayfa)
-			// frm.build(sayfa,'mainCtrl')
-			// $('#mainCtrl').html(JSON.stringify(sayfa))
+		
 		}else{
 			$('#mainCtrl form').html('sayfa bulunamadi')
 		}

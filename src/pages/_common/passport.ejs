@@ -50,11 +50,9 @@
 		localStorage.setItem('global',JSON.stringify(data || {}))
 
 		var q=getAllUrlParams()
-		
+	setTimeout(()=>{
 		window.location.href='/haham#/dashboard/main?mid=0'
-		// window.location.href='/haham#/despatch/outbox?mid=1.2'
-		// window.location.href='/haham#/inventory/inventory-fiches?mid=4.2'
-
+},400)
 	}
 	
 

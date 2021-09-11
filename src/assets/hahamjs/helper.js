@@ -6,7 +6,7 @@ var global={
 	databases:[],
 	dbId:'',
 	dbName:'',
-	sessionId:'',
+	// sessionId:'',
 	token:'',
 	ispiyonServiceUrl:'',
 	settings:[],
@@ -27,8 +27,6 @@ initGlobals()
 initIspiyonService()
 
 var hashObj=getHashObject()
-console.log(`hashObj:`,hashObj)
-
 
 function getHashObject(){
 	if(window.location.hash=='')
@@ -67,7 +65,6 @@ function getHashObject(){
 	}
 	var p=getPageInfos(h)
 	h=Object.assign({},h,p)
-	console.log(`h.module:`,h.module)
 	h['settings']=getPageSettings(h.module)
 
 	return h
@@ -672,7 +669,7 @@ function getRemoteData(item,cb){
 	if(filterString!=''){
 		url+=`${url.indexOf('?')>-1?'&':'?'}${filterString}`
 	}
-	
+		
 	$.ajax({
 		url:url,
 		type:item.dataSource.method || 'GET',
@@ -680,13 +677,16 @@ function getRemoteData(item,cb){
 		success: function(result) {
 			if(result.success==undefined){
 				if(Array.isArray(result)){
-					data.docs=result
-					data.paging={
-						page:1,
-						pageCount:1,
-						pageSize:10,
-						recordCount:result.length
-					}
+					data=result
+					// data.docs=[]
+					// result.forEach((e)=>data.docs.push(e))
+					
+					// data.paging={
+					// 	page:1,
+					// 	pageCount:1,
+					// 	pageSize:10,
+					// 	recordCount:result.length
+					// }
 				}else{
 					data=result
 				}
@@ -699,6 +699,7 @@ function getRemoteData(item,cb){
 			}
 		},
 		error:function(err){
+			console.log(`getRemoteData error err:`,err)
 			cb(err)
 		}
 	})
@@ -1000,8 +1001,6 @@ function getUrlParameter(name,query=null) {
 }
 
 function generateLeftMenu(leftMenu){
-	console.log(`generateLeftMenu: hashObj`,hashObj)
-	console.log(`generateLeftMenu: leftMenu`,leftMenu)
 	var mid=hashObj.query.mid || '0'
 
 	var s=``

@@ -3,6 +3,7 @@ module.exports = (app) => {
 	firstRoutes(app)
 
 	setRoutes(app, '/api/:func/:param1/:param2/:param3', localApi)
+	setRoutes(app, '/dbapi/:func/:param1/:param2/:param3', localDbApi)
 
 	pageRoutes(app)
 
@@ -18,36 +19,29 @@ module.exports = (app) => {
 
 function firstRoutes(app) {
 	app.all('/', (req, res, next) => {
-		if(req.session.elvanDalton) {
+		if(req.session.token) {
 			res.redirect('/haham#/dashboard/main?mid=0')
 		} else {
 			res.redirect('/login')
 		}
 	})
 
-	// app.all('/changedb', function(req, res) {
-	// 	if(req.query.sid) {
-	// 		req.session.elvanDalton = req.query.sid
-	// 	}
-	// 	if(!req.session.elvanDalton) {
-	// 		res.redirect('/login')
-	// 	} else {
-	// 		var referer = req.query.r || req.headers.referer
-	// 		sessionHelper.changeDb(req, req.query.db, (err, sessionDoc) => {
-	// 			if(!err) {
-	// 				getInitializeData(sessionDoc, req, res, (err, data) => {
-	// 					if(!err) {
-	// 						res.render('_common/passport', { data: data })
-	// 					} else {
-	// 						errorPage(req, res, err)
-	// 					}
-	// 				})
-	// 			} else {
-	// 				errorPage(req, res, err)
-	// 			}
-	// 		})
-	// 	}
-	// })
+	app.all('/changedb', function(req, res) {
+		if(req.query.token) {
+			req.session.token = req.query.token
+		}
+		if(!req.session.token) {
+			res.redirect('/login')
+		} else {
+			loginHelper.changeDb(req, res, (err) => {
+				if(err) {
+					errorPage(req, res, err)
+				} else {
+					res.redirect('/')
+				}
+			})
+		}
+	})
 
 	app.all('/login', function(req, res) {
 		try {
@@ -60,20 +54,11 @@ function firstRoutes(app) {
 				req.session.role = auth.role || 'user'
 				req.session.token = auth.token || ''
 
-				api({ endpoint: '/mydbdefines', token: auth.token }, (err, resp) => {
-
-					if(!err) {
-						req.session.databases = resp.data
-
-						loginHelper.getInitializeData(req, res, (err, data) => {
-							if(!err) {
-								res.render('_common/passport', { data: data })
-							} else {
-								errorPage(req, res, err)
-							}
-						})
-					} else {
+				loginHelper.changeDb(req, res, (err) => {
+					if(err) {
 						errorPage(req, res, err)
+					} else {
+						res.redirect('/')
 					}
 				})
 
@@ -86,16 +71,15 @@ function firstRoutes(app) {
 
 	app.all('/logout', function(req, res) {
 		if((req.session.token || '') == '') {
-			res.redirect('/login')
+			res.redirect('/')
 		} else {
 			req.session.token = null
-			res.redirect('/login')
+			req.session.dbId = ''
+			req.session.dbName = ''
+			res.redirect('/')
 		}
 	})
 
-	app.all('/api/initialize', function(req, res) {
-		getJSONPages(req, res)
-	})
 }
 
 function setRoutes(app, route, cb1, cb2) {
@@ -116,7 +100,7 @@ function setRoutes(app, route, cb1, cb2) {
 	})
 }
 
-function localApi(req, res, next) {
+function localApi(req, res) {
 	api(req, (err, data) => {
 		if(err) {
 			res.status(200).json({ success: false, error: err })
@@ -124,7 +108,24 @@ function localApi(req, res, next) {
 			res.status(200).json(data)
 		}
 	})
+}
 
+function localDbApi(req, res) {
+		
+	if(!(req.session || {}).dbId)
+		return res.status(200).json({ success: false, error: {code:'SESSION_NOT_FOUND',message:'Oturum sonlandırılmış'} })
+	let endpoint = `/${req.session.dbId}`
+	Object.keys(req.params || {}).forEach((key, index) => {
+		endpoint += '/' + req.params[key]
+	})
+	req.endpoint=endpoint
+	api(req, (err, data) => {
+		if(err) {
+			res.status(200).json({ success: false, error: err })
+		} else {
+			res.status(200).json(data)
+		}
+	})
 }
 
 function pageRoutes(app) {
@@ -166,9 +167,10 @@ function pageRoutes(app) {
 }
 
 function setGeneralParams(req, res, data, cb) {
-	data.base_uri=config.base_uri
+	data.base_uri = config.base_uri
 	data.session = req.session || {}
-	data.dbName = 'merhabadb'
+	data.dbId = (req.session || {}).dbId || ''
+	data.dbName = (req.session || {}).dbName || ''
 	data.token = req.session.token || ''
 	data.name = req.session.name || ''
 	data.lastName = req.session.lastName || ''

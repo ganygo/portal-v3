@@ -4,7 +4,8 @@ module.exports = (req, cb) => {
 	var endpoint = ''
 	let url = config.api.url
 	req = req || {}
-	if(req.url) {
+
+	if((req.url || '').substr(0,4)=='http') {
 		url = req.url
 	} else if(req.endpoint) {
 		url+=req.endpoint
@@ -26,14 +27,15 @@ module.exports = (req, cb) => {
 	data = Object.assign({}, data, req.body || {})
 
 	var options = {
-		method: req.method,
+		method: req.method || 'GET',
 		headers: headers,
 		rejectUnauthorized: false,
 		dataType: 'json',
-		dataAsQueryString: req.method == 'GET' ? true : false,
+		dataAsQueryString: (req.method || 'GET') == 'GET' ? true : false,
 		data: data
 	}
 
+	console.log(`${url} options:`,options)
 	urllib.request(url, options, (error, body, response) => {
 		if(!error) {
 			if(typeof body == 'string') {

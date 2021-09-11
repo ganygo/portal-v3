@@ -1,7 +1,7 @@
 
 let lastRecordRow={}
 
-function poc_Grid(parentId,item,bRoot,insideOfModal,cb){
+function grid(parentId,item,bRoot,insideOfModal,cb){
 	item=gridDefaults(item,bRoot,insideOfModal)
 
 	let s=``
@@ -90,7 +90,6 @@ function poc_Grid(parentId,item,bRoot,insideOfModal,cb){
 			})
 		})
 	})
-	
 }
 
 
@@ -159,7 +158,7 @@ function gridButtonPanel(parentId,item,bRoot,insideOfModal,cb){
 				item.panelButtons[key].href=`javascript:runPanelButtons('${item.panelButtons[key].dataSource.url}','${item.panelButtons[key].dataSource.method}')`
 			}
 
-			poc_Button(parentId,item.panelButtons[key],()=>{
+			frm_Button(parentId,item.panelButtons[key],()=>{
 				index++
 				setTimeout(calistir,0,cb1)
 			})
@@ -175,7 +174,6 @@ function gridButtonPanel(parentId,item,bRoot,insideOfModal,cb){
 		cb()
 	}
 }
-
 
 function gridBody(parentId,item,bRoot,insideOfModal,cb){
 	
@@ -261,7 +259,7 @@ function gridYeniSatir(parentId,insideOfModal){
 		if(field.visible===false){
 			td.classList.add('hidden')
 		}else{
-			poc_generateControl(`${parentId} table #${td.id}`,field,{},false,insideOfModal,()=>{})
+			generateControl(`${parentId} table #${td.id}`,field,{},false,insideOfModal,()=>{})
 		}
 	})
 
@@ -338,7 +336,6 @@ function gridSatirVazgec(tableId,rowId,rowIndex,insideOfModal){
 	gridBody(`${tableId}`,table.item,false,insideOfModal,()=>{})
 }
 
-
 function gridSatirDuzenle(tableId,rowIndex, insideOfModal){
 	let table=document.querySelector(tableId)
 	let thead=document.querySelector(`${tableId} thead`)
@@ -390,7 +387,7 @@ function gridSatirDuzenle(tableId,rowIndex, insideOfModal){
 				}
 				data.value=listObjectToObject(data.value)
 
-				poc_generateControl(`${tableId} #${td.id}`,field,data.value,false,insideOfModal,()=>{})
+				generateControl(`${tableId} #${td.id}`,field,data.value,false,insideOfModal,()=>{})
 			}
 		})
 
@@ -401,7 +398,6 @@ function gridSatirDuzenle(tableId,rowIndex, insideOfModal){
 		`
 	}
 }
-
 
 
 function gridBody_Cell(field,listItem,bRoot,insideOfModal){
@@ -770,7 +766,7 @@ function gridFilterRow(parentId,item,bRoot,insideOfModal,cb){
 function filterControl(parentId,filterRowDivId,field,cb){
 	switch(field.type.toLowerCase()){
 		case 'lookup':
-		poc_Lookup(parentId,field,()=>{
+		frm_Lookup(parentId,field,()=>{
 			$(`#${field.id}`).on('change',(e)=>{
 				keyupTimer=0
 				runFilter(filterRowDivId,field.prefix)
@@ -779,7 +775,7 @@ function filterControl(parentId,filterRowDivId,field,cb){
 		})
 		break
 		case 'remotelookup':
-		poc_RemoteLookup(parentId,field,()=>{
+		frm_RemoteLookup(parentId,field,()=>{
 			$(`#${field.id}-autocomplete-text`).on('change',(e)=>{
 				keyupTimer=0
 				runFilter(filterRowDivId,field.prefix)
@@ -788,7 +784,7 @@ function filterControl(parentId,filterRowDivId,field,cb){
 		})
 		break
 		case 'boolean':
-		poc_CheckBoxLookup(parentId,field,()=>{
+		frm_CheckBoxLookup(parentId,field,()=>{
 			$(`#${field.id}`).on('change',(e)=>{
 				keyupTimer=0
 				runFilter(filterRowDivId,field.prefix)
@@ -797,7 +793,7 @@ function filterControl(parentId,filterRowDivId,field,cb){
 		})
 		break
 		case 'date':
-		poc_DateBox(parentId,field,()=>{
+		frm_DateBox(parentId,field,()=>{
 			$(`#${field.id}`).on('change',(e)=>{
 				keyupTimer=0
 				runFilter(filterRowDivId,field.prefix)
@@ -806,7 +802,7 @@ function filterControl(parentId,filterRowDivId,field,cb){
 		})
 		break
 		case 'time':
-		poc_TimeBox(parentId,field,()=>{
+		frm_TimeBox(parentId,field,()=>{
 			$(`#${field.id}`).on('change',(e)=>{
 				keyupTimer=0
 				runFilter(filterRowDivId,field.prefix)
@@ -815,7 +811,7 @@ function filterControl(parentId,filterRowDivId,field,cb){
 		})
 		break
 		case 'number':
-		poc_TextBox(parentId,field,()=>{
+		frm_TextBox(parentId,field,()=>{
 			$(`#${field.id}`).on('keyup',(e)=>{
 				setTimeout(()=>{
 					keyupTimer=1
@@ -826,7 +822,7 @@ function filterControl(parentId,filterRowDivId,field,cb){
 		})
 		break
 		case 'money':
-		poc_TextBox(parentId,field,()=>{
+		frm_TextBox(parentId,field,()=>{
 			$(`#${field.id}`).on('keyup',(e)=>{
 				setTimeout(()=>{
 					keyupTimer=1
@@ -837,7 +833,7 @@ function filterControl(parentId,filterRowDivId,field,cb){
 		})
 		break
 		default:
-		poc_TextBox(parentId,field,()=>{
+		frm_TextBox(parentId,field,()=>{
 			$(`#${field.id}`).on('keyup',(e)=>{
 				setTimeout(()=>{
 					keyupTimer=1
@@ -1009,7 +1005,6 @@ function gridDefaults(item,bRoot,insideOfModal){
 	}
 
 	item.value=objectArrayControl(item.value)
-
 	return item
 }
 
@@ -1062,7 +1057,7 @@ function gridModalEditRow(tableId,rowIndex, insideOfModal){
 	}
 	
 
-	poc_generateControl(`#modalRow .modal-body`,gridLine,gridLine.value,false,true,()=>{
+	generateControl(`#modalRow .modal-body`,gridLine,gridLine.value,false,true,()=>{
 		editRowCalculation(`#modalRow .modal-body`, '', table.item.fields)
 	})
 
@@ -1075,7 +1070,6 @@ function gridModalEditRow(tableId,rowIndex, insideOfModal){
 
 	$(`#modalRow`).modal('show')
 }
-
 
 
 function gridModalOK(tableId,rowIndex,insideOfModal){

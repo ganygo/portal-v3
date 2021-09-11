@@ -1,110 +1,152 @@
 {
-	"index":[
-		{
-			"type":"label",
-			"title":"Portal güncellemeleri",
-			"noGroup":true,
-			"class":"text-success bold ms-3"
+	"index": [{
+			"type": "label",
+			"title": "Portal güncellemeleri",
+			"noGroup": true,
+			"class": "text-success bold mt-4 ms-3"
 		},
 		{
 			"type": "grid",
-			"fields":{
-				"committer.login":{"title":"Düzenleyen","type":"string", "width":"100px"},
-				"commit.committer.date":{"title":"Tarih","type":"fromNow", "width":"150px"},
-				"commit.message":{"title":"Açıklama","type":"string"}
+			"fields": {
+				"committer.login": {
+					"title": "Düzenleyen",
+					"type": "string",
+					"width": "100px"
+				},
+				"commit.committer.date": {
+					"title": "Tarih",
+					"type": "fromNow",
+					"width": "150px"
+				},
+				"commit.message": {
+					"title": "Açıklama",
+					"type": "string"
+				}
 			},
-			"options":{
-				"filter":false,
-				"show":{
-					"infoRow":false,
-					"header":true
+			"options": {
+				"filter": false,
+				"show": {
+					"infoRow": false,
+					"header": true
 				}
 			},
 			"dataSource": {
-				"type":"remote",
-				"method":"GET",
-				"url":"https://api.github.com/repos/ganygo/portal/commits?page=1&per_page=5"
+				"type": "remote",
+				"method": "GET",
+				"url": "https://api.github.com/repos/shamancoders/portal-v3/commits?page=1&per_page=5"
 			}
 		},
 		{
-			"type":"label",
-			"title":"REST API güncellemeleri",
-			"noGroup":true,
-			"class":"text-primary bold mt-4 ms-3"
+			"type": "label",
+			"title": "REST API güncellemeleri",
+			"noGroup": true,
+			"class": "text-primary bold mt-4 ms-3"
+		},
+		{
+			"type": "grid",
+			"fields": {
+				"committer.login": {
+					"title": "Düzenleyen",
+					"type": "string",
+					"width": "100px"
+				},
+				"commit.committer.date": {
+					"title": "Tarih",
+					"type": "fromNow",
+					"width": "150px"
+				},
+				"commit.message": {
+					"title": "Açıklama",
+					"type": "string"
+				}
+			},
+			"options": {
+				"filter": false,
+				"show": {
+					"infoRow": false,
+					"header": true
+				}
+			},
+			"dataSource": {
+				"type": "remote",
+				"method": "GET",
+				"url": "https://api.github.com/repos/shamancoders/portal-api/commits?page=1&per_page=5"
+			}
+		},
+		{
+			"type": "label",
+			"title": "Yazarkasa servis güncellemeleri",
+			"noGroup": true,
+			"class": "text-success bold mt-4 ms-3"
 		},
 		{
 
 			"type": "grid",
-			"fields":{
-				"committer.login":{"title":"Düzenleyen","type":"string", "width":"100px"},
-				"commit.committer.date":{"title":"Tarih","type":"fromNow", "width":"150px"},
-				"commit.message":{"title":"Açıklama","type":"string"}
+			"fields": {
+				"committer.login": {
+					"title": "Düzenleyen",
+					"type": "string",
+					"width": "100px"
+				},
+				"commit.committer.date": {
+					"title": "Tarih",
+					"type": "fromNow",
+					"width": "150px"
+				},
+				"commit.message": {
+					"title": "Açıklama",
+					"type": "string"
+				}
 			},
-			"options":{
-				"filter":false,
-				"show":{
-					"infoRow":false,
-					"header":true
+			"options": {
+				"filter": false,
+				"show": {
+					"infoRow": false,
+					"header": true
 				}
 			},
 			"dataSource": {
-				"type":"remote",
-				"method":"GET",
-				"url":"https://api.github.com/repos/ganygo/api/commits?page=1&per_page=5"
+				"type": "remote",
+				"method": "GET",
+				"url": "https://api.github.com/repos/shamancoders/portal-service-posDevice/commits?page=1&per_page=5"
 			}
 		},
 		{
-			"type":"label",
-			"title":"Yazarkasa servis güncellemeleri",
-			"noGroup":true,
-			"class":"text-success bold mt-4 ms-3"
+			"type": "label",
+			"title": "E-Integration servis güncellemeleri",
+			"noGroup": true,
+			"class": "text-primary bold mt-4 ms-3"
 		},
 		{
 
 			"type": "grid",
-			"fields":{
-				"committer.login":{"title":"Düzenleyen","type":"string", "width":"100px"},
-				"commit.committer.date":{"title":"Tarih","type":"fromNow", "width":"150px"},
-				"commit.message":{"title":"Açıklama","type":"string"}
+			"fields": {
+				"committer.login": {
+					"title": "Düzenleyen",
+					"type": "string",
+					"width": "100px"
+				},
+				"commit.committer.date": {
+					"title": "Tarih",
+					"type": "fromNow",
+					"width": "150px"
+				},
+				"commit.message": {
+					"title": "Açıklama",
+					"type": "string"
+				}
 			},
-			"options":{
-				"filter":false,
-				"show":{
-					"infoRow":false,
-					"header":true
+			"options": {
+				"filter": false,
+				"show": {
+					"infoRow": false,
+					"header": true
 				}
 			},
 			"dataSource": {
-				"type":"remote",
-				"method":"GET",
-				"url":"https://api.github.com/repos/ganygo/posDevice/commits?page=1&per_page=5"
-			}
-		},
-		{
-			"type":"label",
-			"title":"E-Integration servis güncellemeleri",
-			"noGroup":true,
-			"class":"text-primary bold mt-4 ms-3"
-		},
-		{
-
-			"type": "grid",
-			"fields":{
-				"committer.login":{"title":"Düzenleyen","type":"string", "width":"100px"},
-				"commit.committer.date":{"title":"Tarih","type":"fromNow", "width":"150px"},
-				"commit.message":{"title":"Açıklama","type":"string"}
-			},
-			"options":{
-				"filter":false,
-				"show":{
-					"infoRow":false,
-					"header":true
-				}
-			},
-			"dataSource": {
-				"type":"remote",
-				"method":"GET",
-				"url":"https://api.github.com/repos/ganygo/eIntegration/commits?page=1&per_page=5"
+				"type": "remote",
+				"method": "GET",
+				"url": "https://api.github.com/repos/shamancoders/portal-service-eIntegration/commits?page=1&per_page=5"
 			}
 		}
 	]

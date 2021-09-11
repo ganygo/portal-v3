@@ -1,47 +1,38 @@
 <!DOCTYPE html>
 <html lang="tr">
-    <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="" />
-        <meta name="author" content="" />
-        <title>GanyGO</title>
-       
-       	<link rel="icon" href="data:image/png;base64,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" type="image/png">
 
-        <link rel="stylesheet" type="text/css" href="/vendor/css/fontawesome.v5.8.2.min.css">
-        <link rel="stylesheet" type="text/css" href="/vendor/css/ganyfonts.css">
-        <link rel="stylesheet" type="text/css" href="/vendor/css/jquery-ui.v1.12.1.min.css">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+	<meta name="description" content="" />
+	<meta name="author" content="" />
+	<title>GanyGO</title>
+	<link rel="icon" href="data:image/png;base64,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" type="image/png">
+	<link rel="stylesheet" type="text/css" href="/vendor/css/fontawesome.v5.8.2.min.css">
+	<link rel="stylesheet" type="text/css" href="/vendor/css/ganyfonts.css">
+	<link rel="stylesheet" type="text/css" href="/vendor/css/jquery-ui.v1.12.1.min.css">
+	<script type="text/javascript" src="/vendor/js/jquery.v3.4.1.min.js"></script>
+	<script type="text/javascript" src="/vendor/js/jquery-ui.v1.12.1.min.js"></script>
+	<link href="/vendor/css/js-snackbar.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="/vendor/js/js-snackbar.js"></script>
+	<script type="text/javascript" src="/vendor/js/moment-2.29.1.min.js"></script>
+	<script type="text/javascript" src="/vendor/js/socket.io.min.js"></script>
+	<script type="text/javascript" src="<%- assetVersion('/vendor/js/FileSaver.js') %>"></script>
+	<script type="text/javascript" src="<%- assetVersion('/js/dbtypes.js') %>"></script>
+	<script type="text/javascript" src="<%- assetVersion('/js/utils.js') %>"></script>
+	<script type="text/javascript" src="<%- assetVersion('/js/modals.js') %>"></script>
+	<script type="text/javascript" src="<%- assetVersion('/hahamjs/helper.js') %>"></script>
+	<script type="text/javascript" src="<%- assetVersion('/hahamjs/form-elements.js') %>"></script>
+	<script type="text/javascript" src="<%- assetVersion('/hahamjs/grid-elements.js') %>"></script>
+	<script type="text/javascript" src="<%- assetVersion('/hahamjs/haham.js') %>"></script>
+	<link href="<%- assetVersion('/css/main.css') %>" rel="stylesheet" type="text/css" />
+</head>
 
-        <script type="text/javascript" src="/vendor/js/jquery.v3.4.1.min.js"></script>
-        <script type="text/javascript" src="/vendor/js/jquery-ui.v1.12.1.min.js"></script>
-        
-        <link href="/vendor/css/js-snackbar.css" rel="stylesheet" type="text/css" />
-        <script type="text/javascript" src="/vendor/js/js-snackbar.js"></script>
+<body id="page-top">
+	<%- body %>
+	<script type="text/javascript" src="/vendor/js/bootstrap.bundle.v5.1.0.min.js"></script>
+	<script type="text/javascript" src="<%- assetVersion('/js/scripts.js') %>"></script>
+</body>
 
-        <script type="text/javascript" src="/vendor/js/moment-2.29.1.min.js"></script>
-        <script type="text/javascript" src="/vendor/js/socket.io.min.js"></script>
-
-        <script type="text/javascript" src="<%- assetVersion('/vendor/js/FileSaver.js') %>"></script>
-
-        <script type="text/javascript" src="<%- assetVersion('/js/dbtypes.js') %>"></script>
-        <script type="text/javascript" src="<%- assetVersion('/js/utils.js') %>"></script>
-
-        
-        
-        <script type="text/javascript" src="<%- assetVersion('/js/modals.js') %>"></script>
-
-        
-        
-        
-
-        <link href="<%- assetVersion('/css/main.css') %>" rel="stylesheet" type="text/css" />
-       
-    </head>
-    <body id="page-top">
-        <%- body %>
-        <script type="text/javascript" src="/vendor/js/bootstrap.bundle.v5.1.0.min.js"></script>
-        <script type="text/javascript" src="<%- assetVersion('/js/scripts.js') %>"></script>
-    </body>
 </html>

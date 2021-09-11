@@ -1,5 +1,5 @@
 
-function poc_Card(parentId, item,cb){
+function frm_Card(parentId, item,cb){
 	var s=`
 	<div class="${item.col || ''} p-1 ${item.visible===false?'hidden':''}">
 	<div class="card cerceve1">
@@ -19,7 +19,7 @@ function poc_Card(parentId, item,cb){
 	cb()
 }
 
-function poc_Tab(parentId, item,cb){
+function frm_Tab(parentId, item,cb){
 	let bActive=false
 	item.tabs.forEach((tab)=>{
 		if(tab.active===true){
@@ -56,7 +56,7 @@ function poc_Tab(parentId, item,cb){
 	cb()
 }
 
-function poc_Group(input,item){
+function frm_Group(input,item){
 	if(item.noGroup===true){
 		return input
 	}else{
@@ -71,7 +71,7 @@ function poc_Group(input,item){
 	}
 }
 
-function poc_FormHtml(parentId, item,cb){
+function frm_FormHtml(parentId, item,cb){
 	var html=''
 	if(item.html){
 		html=replaceUrlCurlyBracket(item.html, item) || ''
@@ -79,15 +79,15 @@ function poc_FormHtml(parentId, item,cb){
 		html=item.value
 	}
 	
-	var s= poc_Group(html,item)
+	var s= frm_Group(html,item)
 	
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', s)
 	cb()
 }
 
-function poc_Label(parentId, item,cb){
+function frm_Label(parentId, item,cb){
 
-	let s=poc_Group(`<label  id="${item.id}" class="m-0 p-0 ${item.class || ''}">${item.value || item.title  || item.label || item.text || ''}</label>`,item)
+	let s=frm_Group(`<label  id="${item.id}" class="m-0 p-0 ${item.class || ''}">${item.value || item.title  || item.label || item.text || ''}</label>`,item)
 
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', s)
 
@@ -96,9 +96,8 @@ function poc_Label(parentId, item,cb){
 	cb()
 }
 
-
-function poc_TextBox(parentId, item,cb){
-	let s=poc_Group(`<input type="text" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off" autofill="off" spellcheck="false" value="${item.value!=undefined?item.value:''}">`,item)
+function frm_TextBox(parentId, item,cb){
+	let s=frm_Group(`<input type="text" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off" autofill="off" spellcheck="false" value="${item.value!=undefined?item.value:''}">`,item)
 
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', s)
 
@@ -107,7 +106,7 @@ function poc_TextBox(parentId, item,cb){
 }
 
 
-function poc_InputHidden(parentId, item,cb){
+function frm_InputHidden(parentId, item,cb){
 
 	let s=`<input type="hidden" id="${item.id}" name="${item.name}" onchange="${item.onchange || ''}" value="${item.value!=undefined?item.value:''}">`
 
@@ -118,26 +117,26 @@ function poc_InputHidden(parentId, item,cb){
 }
 
 
-function poc_Button(parentId, item,cb){
+function frm_Button(parentId, item,cb){
 	var label=`${item.text || ''}`
 	var titleText=`${item.title || item.text || ''}`
 	if(item.icon){
 		label=`<i class="${item.icon}"></i> ${label}`
 	}
 	
-	var s= poc_Group(`<a class="${item.class || 'btn btn-info'}" id="${item.id || ''}" href="${item.href || (item.value || '')}" target="${item.target || ''}" title="${titleText}">${label}</a>`,item)
+	var s= frm_Group(`<a class="${item.class || 'btn btn-info'}" id="${item.id || ''}" href="${item.href || (item.value || '')}" target="${item.target || ''}" title="${titleText}">${label}</a>`,item)
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', s)
 	cb()
 }
 
-function poc_TextareaBox(parentId, item,cb){
+function frm_TextareaBox(parentId, item,cb){
 
 	let s=`
 	<textarea class="form-control text-nowrap ${item.class || ''}" style="font-family: courier new"  id="${item.id}-textarea" rows="${item.rows || 4}"  placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocorrect="off" spellcheck="false"></textarea>
 	<input type="hidden" id="${item.id}" name="${item.name}" >
 	`
 
-	s=poc_Group(s,item)
+	s=frm_Group(s,item)
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', s)
 	
 	let textAreaValue=item.value!=undefined?item.value:''
@@ -159,7 +158,7 @@ function poc_TextareaBox(parentId, item,cb){
 	cb()
 }
 
-function poc_ImageBox(parentId, item,cb){
+function frm_ImageBox(parentId, item,cb){
 	let s=`
 	<div>
 	<label for="fileUpload_${item.id}" class="btn btn-primary btn-image-edit"><i class="fas fa-edit"></i></label>
@@ -172,7 +171,7 @@ function poc_ImageBox(parentId, item,cb){
 	
 	`
 
-	s=poc_Group(s,item)
+	s=frm_Group(s,item)
 
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', s)
 
@@ -199,7 +198,7 @@ function poc_ImageBox(parentId, item,cb){
 }
 
 
-function poc_FileBox(parentId, item,cb){
+function frm_FileBox(parentId, item,cb){
 	let s=`
 	<div>
 	<label for="fileUpload_${item.id}" class="btn btn-primary"><i class="fas fa-file-alt"></i> Dosya seçiniz</label><br>
@@ -211,7 +210,7 @@ function poc_FileBox(parentId, item,cb){
 	<input type="hidden" name="${item.name}[fileName]" value="${item.value.fileName || ''}" >
 	
 	`
-	s=poc_Group(s,item)
+	s=frm_Group(s,item)
 
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', s)
 
@@ -242,31 +241,31 @@ function poc_FileBox(parentId, item,cb){
 }
 
 
-function poc_NumberBox(parentId, item,cb){
-	let s=poc_Group(`<input type="number" class="form-control text-end ${item.class || ''} text-end" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off" autofill="off" spellcheck="false" value="${item.value!=undefined?item.value:0}">`,item)
+function frm_NumberBox(parentId, item,cb){
+	let s=frm_Group(`<input type="number" class="form-control text-end ${item.class || ''} text-end" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off" autofill="off" spellcheck="false" value="${item.value!=undefined?item.value:0}">`,item)
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', s)
 	cb()
 }
 
-function poc_MoneyBox(parentId, item,cb){
-	let s=poc_Group(`<input type="number" class="form-control text-end ${item.class || ''} text-end" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off" autofill="off" spellcheck="false" value="${item.value!=undefined?item.value:0}">`,item)
+function frm_MoneyBox(parentId, item,cb){
+	let s=frm_Group(`<input type="number" class="form-control text-end ${item.class || ''} text-end" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off" autofill="off" spellcheck="false" value="${item.value!=undefined?item.value:0}">`,item)
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', s)
 	cb()
 }
 
-function poc_DateBox(parentId, item,cb){
-	let s=poc_Group(`<input type="date" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off" autofill="off" spellcheck="false" value="${item.value!=undefined?item.value:''}">`,item)
+function frm_DateBox(parentId, item,cb){
+	let s=frm_Group(`<input type="date" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off" autofill="off" spellcheck="false" value="${item.value!=undefined?item.value:''}">`,item)
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', s)
 	cb()
 }
 
-function poc_TimeBox(parentId, item,cb){
-	let s=poc_Group(`<input type="time" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" step="1" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off" autofill="off" spellcheck="false" value="${(item.value!=undefined?item.value:'').substr(0,8)}">`,item)
+function frm_TimeBox(parentId, item,cb){
+	let s=frm_Group(`<input type="time" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" step="1" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off" autofill="off" spellcheck="false" value="${(item.value!=undefined?item.value:'').substr(0,8)}">`,item)
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', s)
 	cb()
 }
 
-function poc_Lookup(parentId, item,cb){
+function frm_Lookup(parentId, item,cb){
 	let s=`<select type="text" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" autocomplete="chrome-off" ${item.required?'required="required"':''} ${item.readonly==true?'disabled':''} onchange="${item.onchange || ''}">
 	<option value="" ${item.value==''?'selected':''}>${item.showAll===true?'*':'-- Seç --'}</option>`
 	if(item.lookup){
@@ -287,7 +286,7 @@ function poc_Lookup(parentId, item,cb){
 		s+=`<input type="hidden" name="${item.lookupTextFieldName || ''}" value="">`
 	}
 
-	s=poc_Group(s,item)
+	s=frm_Group(s,item)
 
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', s)
 
@@ -305,7 +304,7 @@ function poc_Lookup(parentId, item,cb){
 }
 
 
-function poc_CheckBoxLookup(parentId, item,cb){
+function frm_CheckBoxLookup(parentId, item,cb){
 
 	var s=``
 	
@@ -333,7 +332,7 @@ function poc_CheckBoxLookup(parentId, item,cb){
 	cb()
 }
 
-function poc_RemoteLookup(parentId, item,cb){
+function frm_RemoteLookup(parentId, item,cb){
 	
 	var s=``
 
@@ -370,7 +369,7 @@ function poc_RemoteLookup(parentId, item,cb){
 }
 
 
-function poc_CheckBox(parentId, item,cb){
+function frm_CheckBox(parentId, item,cb){
 	let s=``
 	let input=`<input type="checkbox" class="${item.class || 'form-checkbox'}" id="${item.id}" name="${item.name}" value="true" ${item.value?'checked':''} ${item.readonly==true?'disabled':''} onchange="${item.onchange || ''}" />`
 	if(item.noGroup===true){
@@ -390,9 +389,9 @@ function poc_CheckBox(parentId, item,cb){
 	cb()
 }
 
-function poc_DateRangeBox(parentId, item,cb){
+function frm_DateRangeBox(parentId, item,cb){
 	let s=`<div id="${item.id}" class="d-md-flex m-0 p-0">
-	<select class="form-control ${item.class || ''}" name="cbDate" id="cbDate" style="min-width:110px;">
+	<select class="form-control ${item.class || ''}" name="cbDate" id="cbDate" style="width:110px;">
 	<option value="">Tarih</option>
 	<option value="today">Bugün</option>
 	<option value="thisWeek">Bu Hafta</option>
@@ -405,14 +404,14 @@ function poc_DateRangeBox(parentId, item,cb){
 	<option value="thisYear">Bu yıl</option>
 	<option value="last1Year">Son 1 yıl</option>
 	</select>
-	<div class="d-flex" style="min-width:280px;">
+	<div class="d-flex" style="min-width:220px;">
 	<input type="date" name="date1" id="date1" class="form-control" value="${moment().format('YYYY-MM-DD')}">
 	<input type="date" name="date2" id="date2" class="form-control" value="${moment().format('YYYY-MM-DD')}">
 	</div>
 	</div>`
 
 
-	s=poc_Group(s,item)
+	s=frm_Group(s,item)
 
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', s)
 
