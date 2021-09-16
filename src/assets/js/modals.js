@@ -81,9 +81,10 @@ function modalCopyOk(){
 
 function logout(){
 	confirmX('Programdan çıkmak istiyor musunuz?',(resp)=>{
-		console.log(`resp:`,resp)
-		if(resp)
+		if(resp){
+			localStorage.removeItem('global')
 			window.location.href=`/logout`
+		}
 	})
 }
 

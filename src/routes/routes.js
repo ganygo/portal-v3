@@ -1,4 +1,4 @@
-var loginHelper = require('./login-helper')
+//var loginHelper = require('./login-helper')
 module.exports = (app) => {
 	firstRoutes(app)
 
@@ -27,17 +27,29 @@ function firstRoutes(app) {
 	})
 
 	app.all('/changedb', function(req, res) {
-		if(req.query.token) {
+		if(req.query.token)
 			req.session.token = req.query.token
-		}
+		let sid = req.query.sid || req.session.sessionId || ''
+
+
 		if(!req.session.token) {
 			res.redirect('/login')
 		} else {
-			loginHelper.changeDb(req, res, (err) => {
-				if(err) {
-					errorPage(req, res, err)
+			api({ endpoint: '/session/changedb', method: 'POST', token: req.session.token || '', body: { db: req.query.db || req.session.dbId || '', sid: sid } }, (err, resp) => {
+				if(!err) {
+					Object.keys(resp.data).forEach((key) => {
+						if(!['sessionId', '_id', 'token', 'username', 'role'].includes())
+							req.session[key] = resp.data[key]
+					})
+					// req.session.sessionId = resp.data._id
+					// req.session.token = auth.token || ''
+					// req.session.username = auth.username || ''
+					// req.session.role = auth.role || ''
+
+					res.render('_common/passport', { data: resp.data })
+
 				} else {
-					res.redirect('/')
+					errorPage(req, res, err)
 				}
 			})
 		}
@@ -50,18 +62,23 @@ function firstRoutes(app) {
 			} else {
 				var auth = JSON.parse(decodeURIComponent(req.query.auth))
 
-				req.session.username = auth.username || ''
-				req.session.role = auth.role || 'user'
-				req.session.token = auth.token || ''
+				api({ endpoint: '/session', method: 'POST', token: auth.token || '' }, (err, resp) => {
+					if(!err) {
+						Object.keys(resp.data).forEach((key) => {
+							if(!['sessionId', '_id', 'token', 'username', 'role'].includes())
+								req.session[key] = resp.data[key]
+						})
+						req.session.sessionId = resp.data._id
+						req.session.token = auth.token || ''
+						req.session.username = auth.username || ''
+						req.session.role = auth.role || ''
 
-				loginHelper.changeDb(req, res, (err) => {
-					if(err) {
-						errorPage(req, res, err)
+						res.render('_common/passport', { data: resp.data })
+
 					} else {
-						res.redirect('/')
+						errorPage(req, res, err)
 					}
 				})
-
 			}
 		} catch (tryErr) {
 			errorPage(req, res, tryErr)
@@ -76,6 +93,8 @@ function firstRoutes(app) {
 			req.session.token = null
 			req.session.dbId = ''
 			req.session.dbName = ''
+			req.session.username = ''
+			req.session.role = ''
 			res.redirect('/')
 		}
 	})
@@ -111,14 +130,14 @@ function localApi(req, res) {
 }
 
 function localDbApi(req, res) {
-		
+
 	if(!(req.session || {}).dbId)
-		return res.status(200).json({ success: false, error: {code:'SESSION_NOT_FOUND',message:'Oturum sonlandırılmış'} })
+		return res.status(200).json({ success: false, error: { code: 'SESSION_NOT_FOUND', message: 'Oturum sonlandırılmış' } })
 	let endpoint = `/${req.session.dbId}`
 	Object.keys(req.params || {}).forEach((key, index) => {
 		endpoint += '/' + req.params[key]
 	})
-	req.endpoint=endpoint
+	req.endpoint = endpoint
 	api(req, (err, data) => {
 		if(err) {
 			res.status(200).json({ success: false, error: err })
