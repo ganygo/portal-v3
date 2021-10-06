@@ -42,7 +42,7 @@
 		return resp
 	}
 	
-	function sayfayiAcalim(){
+	function sayfayiAcalim(callback){
 		if((hashObj.query.mid || '')!=''){
 			$(`#leftMenu a`).removeClass('active')
 			$(`#leftMenu #menu${hashObj.query.mid.replaceAll('.','-')}`).addClass('active')
@@ -51,7 +51,7 @@
 		var sayfa=sayfaBul()
 		if(sayfa){
 		
-			generatePage('#mainCtrl form',sayfa)
+			generatePage('#mainCtrl form',sayfa,callback)
 		
 		}else{
 			$('#mainCtrl form').html('sayfa bulunamadi')
@@ -64,18 +64,22 @@
 		
 	}
 
-	$(document).ready(()=>{
-		
+	let bNoAction=false
 
+	$(document).ready(()=>{
 		anotherViewStyle('mainCtrl')
 		sayfayiAcalim()
 		window.onhashchange=()=>{
+			if(bNoAction)
+				return
+			bNoAction=true
 			hashObj=getHashObject()
 			anotherViewStyle('mainCtrl')
 
 			$('#mainCtrl form').html('loading...')
-			sayfayiAcalim()
-
+			sayfayiAcalim(()=>{
+				bNoAction=false
+			})
 		}
 	})
 

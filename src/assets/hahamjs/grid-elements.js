@@ -45,7 +45,7 @@ function grid(parentId,item,bRoot,insideOfModal,cb){
 		`
 	}
 
-	document.querySelector(parentId).insertAdjacentHTML('beforeend', s)
+	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 
 	document.querySelector(`${parentId} #${item.id}`).item=item
 
@@ -165,12 +165,12 @@ function gridButtonPanel(parentId,item,bRoot,insideOfModal,cb){
 		}
 		
 		calistir(()=>{
-			document.querySelector(parentId).insertAdjacentHTML('beforeend', s)
+			document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 			cb()
 		})
 
 	}else{
-		document.querySelector(parentId).insertAdjacentHTML('beforeend', s)
+		document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 		cb()
 	}
 }
@@ -208,7 +208,7 @@ function gridBody(parentId,item,bRoot,insideOfModal,cb){
 			s+=`</tr>`
 		})
 
-		document.querySelector(`${parentId} table tbody`).insertAdjacentHTML('beforeend', s)
+		document.querySelector(`${parentId} table tbody`).insertAdjacentHTML('beforeend', htmlEval(s))
 
 		
 		refreshRemoteList(remoteList)
@@ -710,7 +710,7 @@ function gridHeader(parentId,item,bRoot,insideOfModal,cb){
 	</thead>
 	`
 
-	document.querySelector(`${parentId} table`).insertAdjacentHTML('afterbegin', s)
+	document.querySelector(`${parentId} table`).insertAdjacentHTML('afterbegin', htmlEval(s))
 
 	gridFilterRow(`${parentId} table thead`,item,bRoot,insideOfModal,cb)
 

@@ -1,13 +1,10 @@
 <% layout('./layouts/plain') %>
 <script type="text/javascript" src="<%- assetVersion('/hahamjs/helper.js') %>"></script>
-
-
 <style type="text/css">
-	body{
-		background-color: #333333!important;
-	}
+body {
+	background-color: #212121 !important;
+}
 </style>
-
 <div id="layoutAuthentication">
 	<div id="layoutAuthentication_content">
 		<nav class="navbar static-top">
@@ -18,15 +15,16 @@
 						<span class="text-primary">Go</span>
 					</a>
 				</div>
-
 			</div>
 		</nav>
-		<main>    
+		<main>
 			<div class="container mb-4">
 				<div class="row justify-content-center">
 					<div class="col-lg-5">
 						<div id="loginPanel" class="card shadow-lg border-0 rounded-lg mt-5">
-							<div class="card-header"><div class="text-center login-title text-primary"><i class="fas fa-hourglass-half mr-1"></i> Lütfen bekleyiniz</div></div>
+							<div class="card-header">
+								<div class="text-center login-title text-primary"><i class="fas fa-hourglass-half mr-1"></i> Lütfen bekleyiniz</div>
+							</div>
 							<div class="card-body">
 								yükleniyor...
 							</div>
@@ -37,23 +35,19 @@
 		</main>
 	</div>
 </div>
-
 <script type="text/javascript">
-	var data=<%- JSON.stringify(data) %>
+var data = <%- JSON.stringify(data) %>
 
-	if((localStorage.getItem('global') || '')==''){
-		localStorage.clear()
-	}
-	
+if((localStorage.getItem('global') || '') == '') {
+	localStorage.clear()
+}
 
-	if(data.token){
-		localStorage.setItem('global',JSON.stringify(data || {}))
+if(data.token) {
+	localStorage.setItem('global', JSON.stringify(data || {}))
 
-		var q=getAllUrlParams()
-	setTimeout(()=>{
-		window.location.href='/haham#/dashboard/main?mid=0'
-},400)
-	}
-	
-
+	var q = getAllUrlParams()
+	// setTimeout(() => {
+		window.location.href = '/haham#/dashboard/main?mid=0'
+	// }, 1000)
+}
 </script>

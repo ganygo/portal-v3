@@ -1327,15 +1327,12 @@ function runProgramAjax(data){
 						download(`data:application/file;base64,${btoa2(result.data)}`,`export_${(new Date()).yyyymmddhhmmss()}.csv`,'application/file')
 						return
 					}else if(programType=='connector-exporter'){
-						alertX(result.data,(answer)=>{
-							
+						alertX(result.data,'Bilgi',()=>{
 							window.onhashchange()
-							
 						})
 					}else{
-						alertX(result.data,(answer)=>{
+						alertX(result.data,'Bilgi',()=>{
 							window.onhashchange()
-							
 						})
 					}
 				}
@@ -1401,7 +1398,7 @@ function pencereyiKapat(){
 }
 
 function anotherViewStyle(divId){
-	switch(hashObj.query.view || ''){
+	switch((hashObj.query || {}).view || ''){
 		case 'print':
 		viewStylePrint(divId)
 		break

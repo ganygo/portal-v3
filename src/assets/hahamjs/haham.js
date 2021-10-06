@@ -1,7 +1,7 @@
 var rootGridId = 0
 var remoteList = {}
 
-function generatePage(divId, pageJson) {
+function generatePage(divId, pageJson, callback) {
 	$(divId).html('')
 	$(divId).hide()
 	try {
@@ -35,7 +35,7 @@ function generatePage(divId, pageJson) {
 				}
 				$(divId).append(`<script type="text/javascript">${scrt}<\/script>`)
 			}
-			
+
 			getRemoteData(pageSubObj, (err, data) => {
 				if(!err) {
 					switch ((pageSubObj.type || '')) {
@@ -83,18 +83,24 @@ function generatePage(divId, pageJson) {
 					confirmX('Oturum sonlandırılmış. Yeniden giriş yapmak istiyor musunuz?', (answer) => {
 						if(answer) {
 							window.location.href = `/login?ret=${window.location.href}`
+
 						}
+						if(callback)
+							return callback()
 					})
-					//window.location.href=`/changedb?sid=${global.sessionId}&r=${window.location.href}`
 				}
 			}
 			loadCardCollapses()
 			$(document).trigger('loaded')
 			$(divId).show()
+			if(callback)
+				return callback()
 		})
 	} catch (tryErr) {
 		$(divId).html(`Hata2:${tryErr.name || ''} ${tryErr.message || ''}`)
 		$(divId).show()
+		if(callback)
+			return callback()
 	}
 }
 

@@ -370,3 +370,20 @@ String.prototype.padding = function(n, c)
 }
 
 
+function htmlEval(html){
+	let s1=html.indexOf('`',0)
+	let s2=html.indexOf('`',s1+2)
+	while(s1>-1 && s2>s1){
+		let kodParcasi=html.substr(s1,s2-s1+1)
+		try{
+			let sbuf=eval(kodParcasi)
+			html=html.replace(kodParcasi,sbuf)
+		}catch{}
+
+		s1=html.indexOf('`',s2+1)
+		s2=html.indexOf('`',s1+2)
+	}
+
+
+	return html
+}

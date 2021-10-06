@@ -125,7 +125,8 @@ function confirmX(message, type='info',cb){
 
 
 function alertX(message, title='', type='info',cb){
-	var icon='fas fa-exclamation-triangle'
+	let icon='fas fa-exclamation-triangle'
+	
 	if(typeof title=='function'){
 		cb=title
 		title=''

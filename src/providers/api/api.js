@@ -35,7 +35,6 @@ module.exports = (req, cb) => {
 		data: data
 	}
 
-	console.log(`${url} options:`,options)
 	urllib.request(url, options, (error, body, response) => {
 		if(!error) {
 			if(typeof body == 'string') {

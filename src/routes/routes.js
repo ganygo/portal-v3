@@ -41,10 +41,14 @@ function firstRoutes(app) {
 						if(!['sessionId', '_id', 'token', 'username', 'role'].includes())
 							req.session[key] = resp.data[key]
 					})
-					// req.session.sessionId = resp.data._id
-					// req.session.token = auth.token || ''
-					// req.session.username = auth.username || ''
-					// req.session.role = auth.role || ''
+					if(config.ispiyonService)
+						if(config.ispiyonService.enabled)
+							resp.data.ispiyonServiceUrl = config.ispiyonService.url || ''
+
+					if(config.login)
+						resp.data.login = {
+							url: config.login.url || ''
+						}
 
 					res.render('_common/passport', { data: resp.data })
 
@@ -54,6 +58,7 @@ function firstRoutes(app) {
 			})
 		}
 	})
+	
 
 	app.all('/login', function(req, res) {
 		try {
@@ -72,6 +77,15 @@ function firstRoutes(app) {
 						req.session.token = auth.token || ''
 						req.session.username = auth.username || ''
 						req.session.role = auth.role || ''
+
+						if(config.ispiyonService)
+							if(config.ispiyonService.enabled)
+								resp.data.ispiyonServiceUrl = config.ispiyonService.url || ''
+
+						if(config.login)
+							resp.data.login = {
+								url: config.login.url || ''
+							}
 
 						res.render('_common/passport', { data: resp.data })
 
