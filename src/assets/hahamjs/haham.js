@@ -343,7 +343,7 @@ function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
 						let key = dizi[index]
 						item.fields[key].value = hashObj.query[key] || item.fields[key].value || ''
 						item.fields[key].showAll = true
-						item.fields[key].class = 'my-0'
+						item.fields[key].class = 'my-3 my-md-0'
 
 						generateControl('#filterForm', item.fields[key], data, false, insideOfModal, () => {
 							index++
@@ -434,7 +434,7 @@ function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
 
 function filterFormButton(divId) {
 	var s = `
-	<div class="ms-auto col text-end pt-2 pt-md-4">
+	<div class="col text-end p-1 pt-2 ">
 	<a href="javascript:runFilter('${divId}')" class="btn btn-primary text-nowrap" title="Filtrele" ><i class="fas fa-sync-alt"><i class="fas fa-filter ms-2"></i></i></a>
 	</div>
 	`
@@ -505,7 +505,7 @@ function itemDefaultValues(item, autocol = false, insideOfModal = false, queryVa
 			}
 		} else {
 			if(item.type.toLowerCase() == 'daterange') {
-				item.col = item.col || 'col-md-6'
+				item.col = item.col || 'col-md-auto'
 			} else {
 				item.col = item.col || 'col-md-12'
 			}

@@ -184,7 +184,7 @@ input, button, select, label, textarea {
 }
 .g-input {
 	position: relative;
-	/*margin-bottom: 10px;*/
+	margin-bottom: 0.6rem;
 	/*box-sizing: border-box;*/
 	/*display: inline-block;*/
 }
@@ -201,13 +201,16 @@ input, button, select, label, textarea {
 	left: 11px;
 	z-index: 1;
 	cursor: text;
+	border-radius: 3px;
+  // border: 1px solid var(--bs-dark);
 }
 
-.g-input input, .g-input textarea {
+
+.g-input input, .g-input textarea, .g-input select {
 	border: 1px solid var(--bs-gray);
 	display: block;
 	padding: 8px;
-	border-radius: 3px;
+	border-radius: 5px;
 	width: 100%;
 	box-sizing: border-box;
 	padding-top:12px;
@@ -218,12 +221,13 @@ input, button, select, label, textarea {
 	width: 100%;
 }
 
-.g-input input:focus, .g-input textarea:focus {
+.g-input input:focus, .g-input textarea:focus, .g-input select:focus {
 	outline: 0;
 	border-color: var(--bs-blue);
 }
 
 .g-input input:focus+label, .g-input input:not(:placeholder-shown)+label,
+.g-input select:focus+label, .g-input select:not(:placeholder-shown)+label,
 .g-input textarea:focus+label, .g-input textarea:not(:placeholder-shown)+label{
 	transform: translateX(-3px) translateY(-25px);
 	font-size: 80%;
@@ -944,7 +948,7 @@ td {
 @media (max-width: 768px){
 	#layoutSidenav_nav {
 		position: absolute;
-		z-index: 1;
+		z-index: 999;
 		right: 0px;
 		font-size: 125%;
 	}
@@ -1050,3 +1054,121 @@ textarea.form-control {
 .font-size-150 {
 	font-size: 150%;
 }
+
+.form-check-input {
+	width: 2.5rem!important;
+	height: 1.2rem;
+	margin-left: -2.5rem!important;
+}
+.form-check-label {
+	margin-left: 0.5rem;
+  margin-top: 3px;
+}
+
+.form-check-input:checked {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.switch-primary:checked {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+
+.switch-secondary:checked {
+    background-color: var(--bs-secondary);
+    border-color: var(--bs-secondary);
+}
+
+.switch-info:checked {
+    background-color: var(--bs-info);
+    border-color: var(--bs-info);
+}
+
+.switch-success:checked {
+    background-color: var(--bs-success);
+    border-color: var(--bs-success);
+}
+
+.switch-warning:checked {
+    background-color: var(--bs-warning);
+    border-color: var(--bs-warning);
+}
+
+.switch-danger:checked {
+    background-color: var(--bs-danger);
+    border-color: var(--bs-danger);
+}
+
+
+.switch-dark:checked {
+    background-color: var(--bs-dark);
+    border-color: var(--bs-dark);
+}
+
+.switch-light:checked {
+    background-color: var(--bs-light);
+    border-color: var(--bs-light);
+}
+
+.switch-gray:checked {
+    background-color: var(--bs-gray);
+    border-color: var(--bs-gray);
+}
+
+.switch-pink:checked {
+    background-color: var(--bs-pink);
+    border-color: var(--bs-pink);
+}
+
+.switch-red:checked {
+    background-color: var(--bs-red);
+    border-color: var(--bs-red);
+}
+
+.switch-indigo:checked {
+    background-color: var(--bs-indigo);
+    border-color: var(--bs-indigo);
+}
+
+.switch-purple:checked {
+    background-color: var(--bs-purple);
+    border-color: var(--bs-purple);
+}
+
+.switch-orange:checked {
+    background-color: var(--bs-orange);
+    border-color: var(--bs-orange);
+}
+
+.switch-blue:checked {
+    background-color: var(--bs-blue);
+    border-color: var(--bs-blue);
+}
+
+.switch-yellow:checked {
+    background-color: var(--bs-yellow);
+    border-color: var(--bs-yellow);
+}
+
+.switch-green:checked {
+    background-color: var(--bs-green);
+    border-color: var(--bs-green);
+}
+
+.switch-teal:checked {
+    background-color: var(--bs-teal);
+    border-color: var(--bs-teal);
+}
+
+.switch-cyan:checked {
+    background-color: var(--bs-cyan);
+    border-color: var(--bs-cyan);
+}
+
+.switch-white:checked {
+    background-color: var(--bs-white);
+    border-color: var(--bs-white);
+}
+

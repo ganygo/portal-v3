@@ -60,15 +60,19 @@ function frm_Group(input, item) {
 		return input
 	} else {
 		return `
-		<div class="${item.col || ''} p-1">
-		<div class="form-group  ${item.visible===false?'hidden':''}">
-		<label class="m-0 p-0 ellipsis w-100 ${item.required?'form-required':''}">${item.title || ''}${helpButton(item)}</label>
+		<div class="${item.col || 'col-12'} p-1">
+		<div class="g-input  ${item.visible===false?'hidden':''}">
 		${input}
+		<label for="${item.id}" class="">${item.title || ''}${helpButton(item)}</label>
+		
 		</div>
 		</div>
 		`
 	}
+
+	// ps-0 ps-md-1 pb-0 pb-md-3 
 }
+
 
 function frm_FormHtml(parentId, item, cb) {
 	var html = ''
@@ -96,7 +100,7 @@ function frm_Label(parentId, item, cb) {
 }
 
 function frm_TextBox(parentId, item, cb) {
-	let s = frm_Group(`<input type="text" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off" autofill="off" spellcheck="false" value="${item.value!=undefined?item.value:''}">`, item)
+	let s = frm_Group(`<input type="text" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder=" " ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" value="${item.value!=undefined?item.value:''}">`, item)
 
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 
@@ -134,7 +138,7 @@ function frm_Button(parentId, item, cb) {
 function frm_TextareaBox(parentId, item, cb) {
 
 	let s = `
-	<textarea class="form-control text-nowrap ${item.class || ''}" style="font-family: courier new"  id="${item.id}-textarea" rows="${item.rows || 4}"  placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocorrect="off" spellcheck="false"></textarea>
+	<textarea class="form-control text-nowrap ${item.class || ''}" style="font-family: courier new"  id="${item.id}-textarea" rows="${item.rows || 4}"  placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" spellcheck="false"></textarea>
 	<input type="hidden" id="${item.id}" name="${item.name}" >
 	`
 
@@ -244,31 +248,31 @@ function frm_FileBox(parentId, item, cb) {
 
 
 function frm_NumberBox(parentId, item, cb) {
-	let s = frm_Group(`<input type="number" class="form-control text-end ${item.class || ''} text-end" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off" autofill="off" spellcheck="false" value="${item.value!=undefined?item.value:0}">`, item)
+	let s = frm_Group(`<input type="number" class="form-control text-end ${item.class || ''} text-end" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" value="${item.value!=undefined?item.value:0}">`, item)
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 	cb()
 }
 
 function frm_MoneyBox(parentId, item, cb) {
-	let s = frm_Group(`<input type="number" class="form-control text-end ${item.class || ''} text-end" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off" autofill="off" spellcheck="false" value="${item.value!=undefined?item.value:0}">`, item)
+	let s = frm_Group(`<input type="number" class="form-control text-end ${item.class || ''} text-end" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" value="${item.value!=undefined?item.value:0}">`, item)
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 	cb()
 }
 
 function frm_DateBox(parentId, item, cb) {
-	let s = frm_Group(`<input type="date" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off" autofill="off" spellcheck="false" value="${item.value!=undefined?item.value:''}">`, item)
+	let s = frm_Group(`<input type="date" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" value="${item.value!=undefined?item.value:''}">`, item)
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 	cb()
 }
 
 function frm_TimeBox(parentId, item, cb) {
-	let s = frm_Group(`<input type="time" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" step="1" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off" autofill="off" spellcheck="false" value="${(item.value!=undefined?item.value:'').substr(0,8)}">`, item)
+	let s = frm_Group(`<input type="time" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" step="1" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" value="${(item.value!=undefined?item.value:'').substr(0,8)}">`, item)
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 	cb()
 }
 
 function frm_Lookup(parentId, item, cb) {
-	let s = `<select type="text" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" autocomplete="chrome-off" ${item.required?'required="required"':''} ${item.readonly==true?'disabled':''} onchange="${item.onchange || ''}">
+	let s = `<select type="text" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" ${item.required?'required="required"':''} ${item.readonly==true?'disabled':''} onchange="${item.onchange || ''}">
 	<option value="" ${item.value==''?'selected':''}>${item.showAll===true?'*':'-- Seç --'}</option>`
 	if(item.lookup) {
 		if(Array.isArray(item.lookup)) {
@@ -335,14 +339,9 @@ function frm_CheckBoxLookup(parentId, item, cb) {
 }
 
 function frm_RemoteLookup(parentId, item, cb) {
-
 	var s = ``
 
-	var input = `
-	<div class="input-group">
-	<input type="search" class="form-control ${item.class || ''}" id="${item.id}-autocomplete-text"  placeholder="${item.placeholder || item.title || ''}" value="${item.valueText || ''}" autocomplete="off" autofill="off" spellcheck="false" ${item.required?'required="required"':''} ${item.readonly?'readonly':''} title="${item.title || ''}: Tümünü listelemek için boşluk tuşuna basabilirsiniz." >
-	<div class="input-group-text"><i class="fas fa-ellipsis-v"></i></div>
-	</div>
+	var input=`
 	<input type="hidden" name="${item.name}" value="${item.value!=undefined?item.value:''}">
 	<input type="hidden" id="${item.id}-obj"  value="">
 	`
@@ -350,14 +349,14 @@ function frm_RemoteLookup(parentId, item, cb) {
 		input += `<input type="hidden" name="${item.lookupTextFieldName || ''}" value="${item.valueText || ''}">`
 	}
 
-
+	input+=`<input type="search" class="form-control ${item.class || ''}" id="${item.id}-autocomplete-text"  placeholder=" " value="${item.valueText || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" ${item.required?'required="required"':''} ${item.readonly?'readonly':''} title="${item.title || ''}: Tümünü listelemek için boşluk tuşuna basabilirsiniz." >`
 	if(item.noGroup === true) {
 		s = input
 	} else {
 		s = `<div class="${item.col || ''} p-1 ${item.visible===false?'hidden':''}">
-		<div class="form-group">
-		<label class="m-0 p-0 ellipsis w-100 ${item.required?'form-required':''}">${item.title || ''}${helpButton(item)} ${item.lookupTextField?'<span class="ms-1 bold small text-success" id="' + item.id + '-original-text" title=""></span>':''}</label>
+		<div class="g-input">
 		${input}
+		<label for="${item.id}-autocomplete-text" class="text-nowrap"><i class="fas fa-search"></i> ${item.title || ''}</label>
 		</div>
 		</div>
 		`
@@ -370,19 +369,23 @@ function frm_RemoteLookup(parentId, item, cb) {
 	cb()
 }
 
-
 function frm_CheckBox(parentId, item, cb) {
 	let s = ``
-	let input = `<input type="checkbox" class="${item.class || 'form-checkbox'}" id="${item.id}" name="${item.name}" value="true" ${item.value?'checked':''} ${item.readonly==true?'disabled':''} onchange="${item.onchange || ''}" />`
+	let sClass = `${item.class || 'form-check-input'}`
+
+	if((item.name || '').toLowerCase().indexOf('passive') > -1) {
+		sClass = `${item.class || 'form-check-input switch-dark'}`
+	}
+
+	let input = `<input type="checkbox" class="${sClass}" id="${item.id}" name="${item.name}" value="true" ${item.value?'checked':''} ${item.readonly==true?'disabled':''} onchange="${item.onchange || ''}" />`
 	if(item.noGroup === true) {
 		s = input
 	} else {
 		s = `<div class="${item.col || ''} p-1 ${item.visible===false?'hidden':''}">
-		<div class="form-group">
-		<label>
-		<span class="mb-1" style="display:block;">${item.title || ''}${helpButton(item)}</span>
+		<div class="form-check form-switch">
 		${input}
-		</label>
+		<label class="form-check-label" for="${item.id}">${item.title || ''}${helpButton(item)}</label>
+		
 		</div>
 		</div>`
 	}
@@ -392,28 +395,37 @@ function frm_CheckBox(parentId, item, cb) {
 }
 
 function frm_DateRangeBox(parentId, item, cb) {
-	let s = `<div id="${item.id}" class="d-md-flex m-0 p-0">
-	<select class="form-control ${item.class || ''}" name="cbDate" id="cbDate" style="width:110px;">
-	<option value="">Tarih</option>
-	<option value="today">Bugün</option>
-	<option value="thisWeek">Bu Hafta</option>
-	<option value="thisMonth">Bu Ay</option>
-	<option value="lastMonth">Geçen Ay</option>
-	<option value="last1Week">Son 1 Hafta</option>
-	<option value="last1Month">Son 1 Ay</option>
-	<option value="last3Months">Son 3 Ay</option>
-	<option value="last6Months">Son 6 Ay</option>
-	<option value="thisYear">Bu yıl</option>
-	<option value="last1Year">Son 1 yıl</option>
-	</select>
-	<div class="d-flex" style="min-width:220px;">
-	<input type="date" name="date1" id="date1" class="form-control" value="${moment().format('YYYY-MM-DD')}">
-	<input type="date" name="date2" id="date2" class="form-control" value="${moment().format('YYYY-MM-DD')}">
+	let s = `
+	<div class="${item.col || 'col-md-auto'} p-1">
+	<div id="${item.id}" class="d-md-flex m-0 p-0">
+		<div class="g-input">
+			<select class="form-control ${item.class || ''}" name="cbDate" id="cbDate">
+			<option value="">Tarih</option>
+			<option value="today">Bugün</option>
+			<option value="thisWeek">Bu Hafta</option>
+			<option value="thisMonth">Bu Ay</option>
+			<option value="lastMonth">Geçen Ay</option>
+			<option value="last1Week">Son 1 Hafta</option>
+			<option value="last1Month">Son 1 Ay</option>
+			<option value="last3Months">Son 3 Ay</option>
+			<option value="last6Months">Son 6 Ay</option>
+			<option value="thisYear">Bu yıl</option>
+			<option value="last1Year">Son 1 yıl</option>
+			</select>
+			<label for="cbDate" class="">Tarih</label>
+		</div>
+		<div class="d-md-flex">
+			<div class="g-input mb-4 my-md-0">
+				<input type="date" name="date1" id="date1" class="form-control" value="${moment().format('YYYY-MM-DD')}">
+				<label for="date1" class="">Başlangıç</label>
+			</div>
+			<div class="g-input mb-4 my-md-0">
+				<input type="date" name="date2" id="date2" class="form-control" value="${moment().format('YYYY-MM-DD')}">
+				<label for="date2" class="">Bitiş</label>
+			</div>
+		</div>
 	</div>
 	</div>`
-
-
-	s = frm_Group(s, item)
 
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 
