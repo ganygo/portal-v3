@@ -160,20 +160,20 @@ Number.prototype.formatQuantity = function(c) {
 
 function convertNumber(text) {
 	// try {
-		if(typeof text=='number')
-			return text
-		text = text || ''
-		let replace = '[^-\\d' + whatDecimalPointer() + ']'
-		let reg = new RegExp(replace, "g")
+	if(typeof text == 'number')
+		return text
+	text = text || ''
+	let replace = '[^-\\d' + whatDecimalPointer() + ']'
+	let reg = new RegExp(replace, "g")
 
-		text = text.replace(reg, '')
+	text = text.replace(reg, '')
 
-		// if(!isNaN(text)) {
-		// 	return Number(text)
-		// } else {
-		// 	return 0
-		// }
-		return Number(text)
+	// if(!isNaN(text)) {
+	// 	return Number(text)
+	// } else {
+	// 	return 0
+	// }
+	return Number(text)
 	// } catch (err) {
 	// 	console.log(`typeof text:`, typeof text)
 	// 	console.log(`text:`, text)
@@ -391,7 +391,54 @@ String.prototype.padding = function(n, c) {
 }
 
 
-function htmlEval(html) {
+function calculate(formula, values) {
+	if((formula || '') == '')
+		return 0
+	formula = formula.replaceAll('${', '{').replaceAll('{', '${')
+	let code = `(function(){
+	`
+	Object.keys(values).forEach((key) => {
+		code += `let ${key}=${JSON.stringify(values[key])}\n`
+	})
+
+	code += `return eval(\`${formula}\`)
+	})()`
+
+	return eval(code)
+}
+
+function htmlEval(html, values = {}) {
+	try {
+		html = html.replaceAll('${', '{').replaceAll('{', '${')
+		let code = ''
+		Object.keys(values).forEach((key) => {
+			code += `let ${key}=${JSON.stringify(values[key])}\n`
+		})
+		code += `return \`${html}\``
+		let f = new Function(code)
+		return f()
+	} catch {}
+	return html
+}
+
+// function htmlEval(exp, values={}) {
+// 	if((exp || '') == '')
+// 		return ''
+// 	exp=exp.replaceAll('${','{').replaceAll('{','${')
+// 	let code=`(function(){
+// 	`
+// 	Object.keys(values).forEach((key)=>{
+// 		code+=`let ${key}=${JSON.stringify(values[key])}\n`
+// 	})
+
+// 	code+=`return \`${exp}\`
+// 	})()`
+
+// 	return code
+// }
+
+
+function htmlEval11(html) {
 	let s1 = html.indexOf('`', 0)
 	let s2 = html.indexOf('`', s1 + 2)
 	while(s1 > -1 && s2 > s1) {

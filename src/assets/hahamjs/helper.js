@@ -509,24 +509,13 @@ function cboEasyDateChange(value){
 	}
 }
 
-function calculate(formula, values) {
-	if((formula || '') == '')
-		return 0
-	formula=formula.replaceAll('${','{').replaceAll('{','${')
-	let code=`(function(){
-	`
-	Object.keys(values).forEach((key)=>{
-		code+=`let ${key}=${JSON.stringify(values[key])}\n`
-	})
 
-	code+=`return eval(\`${formula}\`)
-	})()`
-	
-	return eval(code)
-}
 
 
 function replaceUrlCurlyBracket(url,item){
+
+	return htmlEval(url,item)
+	
 	if((url || '')=='')
 		return ''
 	if(!(url.indexOf('{')>-1 && url.indexOf('}')>-1))
@@ -631,6 +620,11 @@ function getRemoteData(item,cb){
 		switch(item.type){
 			case 'grid':
 			data=[]
+			let ps=pageSettings.getItem(`pageSize`)
+			if(ps){
+				hashObj.query.pageSize=ps
+				setHashObject(hashObj)
+			}
 			break
 			case 'form':
 			data={}

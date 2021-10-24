@@ -775,7 +775,7 @@ function gridFilterRow(parentId, item, bRoot, insideOfModal, cb) {
 	}
 
 	calistir(() => {
-		document.querySelector(`${parentId} #filterRow`).insertAdjacentHTML('beforeend', `<th>bos kolon</th>`)
+		document.querySelector(`${parentId} #filterRow`).insertAdjacentHTML('beforeend', `<th>&nbsp;</th>`)
 		cb()
 	})
 }
@@ -894,7 +894,7 @@ function buttonRowCell(listItem, rowIndex, item, bRoot) {
 }
 
 function gridPageSize(item, bRoot) {
-
+	
 	var s = `<div class="align-items-center" style="display: inline-flex">
 	Sayfada
 	<select class="form-control input-inline input-sm ms-1" id="pageSize${item.id}">
