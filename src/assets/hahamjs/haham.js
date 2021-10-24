@@ -108,11 +108,11 @@ function headerButtons(divId, pageSubObj) {
 	let hbtn = ``
 	if(pageSubObj.type == 'form') {
 		hbtn = `
-		<button id="headerButtonSave" class="btn btn-primary btn-form-header" title="Kaydet"><i class="fas fa-save"></i></button>
-		<a href="javascript:history.back(-1)" class="btn btn-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
+		<button id="headerButtonSave" class="btn btn-outline-primary btn-form-header" title="Kaydet"><i class="fas fa-save"></i></button>
+		<a href="javascript:history.back(-1)" class="btn btn-outline-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
 		if(pageSubObj.options) {
 			if(pageSubObj.options.mode == 'view') {
-				hbtn = `<a href="javascript:history.back(-1)" class="btn btn-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
+				hbtn = `<a href="javascript:history.back(-1)" class="btn btn-outline-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
 			}
 		}
 	}
@@ -174,7 +174,7 @@ function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
 		Object.keys(item.fields).forEach((key) => {
 
 			item.fields[key].field = key
-			item.fields[key] = itemDefaultValues(item.fields[key], autocol, insideOfModal, queryValues)
+			item.fields[key] = itemDefaultValues(item.fields[key], bRoot, autocol, insideOfModal, queryValues)
 			if(item.fields[key].type == 'grid') {
 				item.fields[key].parentField = key
 
@@ -185,7 +185,7 @@ function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
 			if(tab.fields) {
 				Object.keys(tab.fields).forEach((key) => {
 					tab.fields[key].field = key
-					tab.fields[key] = itemDefaultValues(tab.fields[key], autocol, insideOfModal, queryValues)
+					tab.fields[key] = itemDefaultValues(tab.fields[key], bRoot, autocol, insideOfModal, queryValues)
 					if(tab.fields[key].type == 'grid') {
 						tab.fields[key].parentField = key
 
@@ -193,6 +193,8 @@ function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
 				})
 			}
 		})
+	} else {
+		item = itemDefaultValues(item, bRoot, autocol, insideOfModal, queryValues)
 	}
 
 	item.insideOfModal = insideOfModal
@@ -215,13 +217,14 @@ function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
 			break
 
 		case 'money':
+		item.class += ' text-end'
 			if(item.readonly) {
 				let buf = getPropertyByKeyPath(data, item.field, item.value)
 				if(buf == undefined) {
 					buf = 0
 				}
-				item.value = Number(buf) //.formatMoney()
-				item.class += ' text-end'
+				item.value = Number(buf).formatMoney()
+				
 
 				frm_MoneyBox(divId, item, cb)
 			} else {
@@ -380,13 +383,15 @@ function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
 				})
 			}
 
+
 			if(item.fields) {
 				dizi = Object.keys(item.fields)
 				index = 0
-				if(bRoot || item.type == 'modal') {
+				if(bRoot || item.type == 'modal' || item.type == 'form') {
 					document.querySelector(divId).insertAdjacentHTML('beforeend', `<div class="row m-0"></div>`)
 					calistir2(item.fields, `${divId} .row`, cb)
 				} else {
+
 					frm_Card(divId, item, () => {
 						calistir2(item.fields, `${divId} #${item.id}`, cb)
 					})
@@ -435,14 +440,14 @@ function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
 function filterFormButton(divId) {
 	var s = `
 	<div class="col text-end p-1 pt-2 ">
-	<a href="javascript:runFilter('${divId}')" class="btn btn-primary text-nowrap" title="Filtrele" ><i class="fas fa-sync-alt"><i class="fas fa-filter ms-2"></i></i></a>
+	<a href="javascript:runFilter('${divId}')" class="btn btn-outline-primary text-nowrap filter-button" title="Filtrele" ><i class="fas fa-sync-alt"><i class="fas fa-filter ms-2"></i></i></a>
 	</div>
 	`
 
 	return s
 }
 
-function itemDefaultValues(item, autocol = false, insideOfModal = false, queryValues = false) {
+function itemDefaultValues(item, bRoot = false, autocol = false, insideOfModal = false, queryValues = false) {
 	var field = item.field || ''
 	var lookupTextField = item.lookupTextField || ''
 	if(item.parentField) {
@@ -460,13 +465,17 @@ function itemDefaultValues(item, autocol = false, insideOfModal = false, queryVa
 	item.id = generateFormId(field)
 
 	item.name = generateFormName(field)
-	item.title = item.title || ''
+	item.text = item.text || ''
 	item.icon = item.icon || ''
+	// if(item.title!='')
+	// 	item.title=item.title.replace(/&/gim, '&amp;').replace(/</gim, '&lt;').replace(/>/gim, '&gt;')
+
 
 	item.type = item.type || ''
 
 	if(item.type == '' && item.fields) {
 		item.type = 'group'
+		item.isChild = bRoot ? false : true
 	}
 	if(item.type == '' && item.tabs) {
 		item.type = 'tab'
@@ -527,11 +536,11 @@ function itemDefaultValues(item, autocol = false, insideOfModal = false, queryVa
 	item.class = item.class || ''
 	item.readonly = item.readonly || false
 
-	if(item.required) {
-		if(item.title.substr(0, 1) != '*') {
-			item.title = `*${item.title}`
-		}
+
+	if(item.noGroup === true && !item.placeholder) {
+		item.placeholder = item.text
 	}
+
 
 	item.insideOfModal = insideOfModal
 	if(!item.value) {
@@ -560,17 +569,10 @@ function formKaydet(dataSource, divId) {
 	formSave(dataSource, formData)
 }
 
-// $('#${divId} input,select').on('change',(e)=>{
-// 	var fields=${JSON.stringify(fieldList)}
-// 	var valueObj=getDivData('#${divId}')
-// 	Object.keys(fields).forEach((key)=>{
-// 		if(fields[key].id!=e.target.id && fields[key].calc){
-// 			try{
-// 				$(\`#\${fields[key].id}\`).val(eval(replaceUrlCurlyBracket(fields[key].calc,valueObj)))
-// 			}catch(tryErr){
-// 				$(\`#\${fields[key].id}\`).val(replaceUrlCurlyBracket(fields[key].calc,valueObj))
-// 			}
-
-// 		}
-// 	})
-// })
+function itemLabelCaption(item, text=''){
+	if(item.required===true){
+		return `<span class="label-required">*${text || item.text || ''}</span>`
+	}else{
+		return (text || item.text || '')
+	}
+}

@@ -1,12 +1,14 @@
 function frm_Card(parentId, item, cb) {
-	var s = `
-	<div class="${item.col || ''} p-1 ${item.visible===false?'hidden':''}">
+	//	<a class="btn btn-collapse ${item.collapsed?'collapsed':''}" data-bs-toggle="collapse" data-bs-target="#cardCollapse${item.id}" aria-expanded="${!item.collapsed?'false':'true'}" aria-fields="cardCollapse${item.id}" href="#"><i class="far fa-caret-square-up fa-2x"></i></a>
+	let s = `
+	<div class="${item.col || ''} p-1 pb-3 ${item.visible===false?'hidden':''}">
 	<div class="card cerceve1">
-	<div class="card-header">
-	<a class="btn btn-collapse ${item.collapsed?'collapsed':''}" data-bs-toggle="collapse" data-bs-target="#cardCollapse${item.id}" aria-expanded="${!item.collapsed?'false':'true'}" aria-fields="cardCollapse${item.id}" href="#"><i class="far fa-caret-square-up fa-2x"></i></a>
-	${item.title}${helpButton(item)}
+	<div class="card-header hand-pointer ${item.isChild?'child':''}" data-bs-toggle="collapse" data-bs-target="#cardCollapse${item.id}" aria-expanded="${!item.collapsed?'false':'true'}" aria-fields="cardCollapse${item.id}" >
+	<a class="btn btn-collapse ${item.collapsed?'collapsed':''}" data-bs-toggle="collapse" data-bs-target="#cardCollapse${item.id}" aria-expanded="${!item.collapsed?'false':'true'}" aria-fields="cardCollapse${item.id}" ><i class="fas fa-caret-up fa-2x"></i>
+</a>	
+	${item.text}${helpButton(item)}
 	</div>
-	<div  id="cardCollapse${item.id}" class="card-body p-2 card-collapse collapse ${item.collapsed?'collapsed':'show'}">
+	<div  id="cardCollapse${item.id}" class="card-body  card-collapse collapse p-2 pt-0 ${item.collapsed?'collapsed':'show'}">
 	<div class="row" id="${item.id}">
 	${item.html || item.controls || ''}
 	</div>
@@ -14,7 +16,9 @@ function frm_Card(parentId, item, cb) {
 	</div>
 	</div>
 	`
+
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
+
 	cb()
 }
 
@@ -36,7 +40,7 @@ function frm_Tab(parentId, item, cb) {
 	item.tabs.forEach((tab, tabIndex) => {
 		s += `<li class="nav-item">
 		<a class="nav-link ${tab.active?'active':''}" href="#formTab${item.id}${tabIndex}" role="tab" data-bs-toggle="tab" id="IDformTab${item.id}${tabIndex}" aria-controls="formTab${item.id}${tabIndex}" aria-selected="${tab.active?'true':'false'}">
-		${tab.icon?'<i class="' + tab.icon + '"></i>':''} ${tab.title || ''}
+		${tab.icon?'<i class="' + tab.icon + '"></i>':''} ${tab.text || ''}
 		</a>
 		</li>`
 	})
@@ -63,7 +67,7 @@ function frm_Group(input, item) {
 		<div class="${item.col || 'col-12'} p-1">
 		<div class="g-input  ${item.visible===false?'hidden':''}">
 		${input}
-		<label for="${item.id}" class="">${item.title || ''}${helpButton(item)}</label>
+		<label for="${item.id}" class="">${itemLabelCaption(item)}${helpButton(item)}</label>
 		
 		</div>
 		</div>
@@ -75,14 +79,14 @@ function frm_Group(input, item) {
 
 
 function frm_FormHtml(parentId, item, cb) {
-	var html = ''
+	let html = ''
 	if(item.html) {
 		html = replaceUrlCurlyBracket(item.html, item) || ''
 	} else {
 		html = item.value
 	}
 
-	var s = frm_Group(html, item)
+	let s = frm_Group(html, item)
 
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 	cb()
@@ -90,17 +94,18 @@ function frm_FormHtml(parentId, item, cb) {
 
 function frm_Label(parentId, item, cb) {
 
-	let s = frm_Group(`<label  id="${item.id}" class="m-0 p-0 ${item.class || ''}">${item.value || item.title  || item.label || item.text || ''}</label>`, item)
+	let s = frm_Group(`<label  id="${item.id}" class="m-0 p-0 ${item.class || ''}">${itemLabelCaption(item, (item.value || item.text || ''))}</label>`, item)
 
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 
-	$(`${parentId} #${item.id}`).val(item.value != undefined ? item.value : '')
+	if(item.id && item.value)
+		$(`${parentId} #${item.id}`).val(item.value)
 
 	cb()
 }
 
 function frm_TextBox(parentId, item, cb) {
-	let s = frm_Group(`<input type="text" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder=" " ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" value="${item.value!=undefined?item.value:''}">`, item)
+	let s = frm_Group(`<input type="text" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || ' '}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" value="${item.value!=undefined?item.value:''}">`, item)
 
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 
@@ -121,13 +126,21 @@ function frm_InputHidden(parentId, item, cb) {
 
 
 function frm_Button(parentId, item, cb) {
-	var label = `${item.text || ''}`
-	var titleText = `${item.title || item.text || ''}`
+	let label = `${item.text || ''}`
+	let titleText = `${item.title || item.text || ''}`
 	if(item.icon) {
 		label = `<i class="${item.icon}"></i> ${label}`
 	}
 
-	var s = frm_Group(`<a class="${item.class || 'btn btn-info'}" id="${item.id || ''}" href="${item.href || (item.value || '')}" target="${item.target || ''}" title="${titleText}">${label}</a>`, item)
+
+	let s = `<a class="${item.class || 'btn btn-info'}" id="${item.id || ''}" href="${item.href || (item.value || '')}" target="${item.target || ''}" title="${titleText.replaceAll('"','\'')}">${label}</a>`
+
+	if(item.noGroup !== true) {
+		s = `<div class="${item.col || 'col-12'} p-1 ${item.visible===false?'hidden':''}">
+		${s}
+		</div>
+		`
+	}
 
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 	cb()
@@ -138,7 +151,7 @@ function frm_Button(parentId, item, cb) {
 function frm_TextareaBox(parentId, item, cb) {
 
 	let s = `
-	<textarea class="form-control text-nowrap ${item.class || ''}" style="font-family: courier new"  id="${item.id}-textarea" rows="${item.rows || 4}"  placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" spellcheck="false"></textarea>
+	<textarea class="form-control text-nowrap ${item.class || ''}" style="font-family: courier new"  id="${item.id}-textarea" rows="${item.rows || 4}"  placeholder="${item.placeholder || ' '}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" spellcheck="false"></textarea>
 	<input type="hidden" id="${item.id}" name="${item.name}" >
 	`
 
@@ -248,31 +261,50 @@ function frm_FileBox(parentId, item, cb) {
 
 
 function frm_NumberBox(parentId, item, cb) {
-	let s = frm_Group(`<input type="number" class="form-control text-end ${item.class || ''} text-end" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" value="${item.value!=undefined?item.value:0}">`, item)
+	let s = frm_Group(`<input type="number" class="form-control text-end ${item.class || ''} text-end" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || ' '}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" value="${item.value!=undefined?item.value:0}">`, item)
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 	cb()
 }
 
 function frm_MoneyBox(parentId, item, cb) {
-	let s = frm_Group(`<input type="number" class="form-control text-end ${item.class || ''} text-end" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" value="${item.value!=undefined?item.value:0}">`, item)
+	let input = `<input type="text" class="form-control text-end ${item.class || ''} text-end" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || ' '}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" value="${Number(item.value != undefined ? item.value : 0).formatMoney()}">`
+	let s = frm_Group(input, item)
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
+
+	$(`${parentId} #${item.id}`).on({
+		focus: function() {
+			if($(this).attr('readonly'))
+				return
+			let sbuf = $(`${parentId} #${item.id}`).val()
+
+			$(this).attr('type', 'number')
+			$(this).val(convertNumber(sbuf))
+			
+		},
+		blur: function() {
+			let sbuf = $(`${parentId} #${item.id}`).val()
+			$(this).attr('type', 'text')
+			$(this).val(Number(sbuf).formatMoney())
+		}
+
+	})
 	cb()
 }
 
 function frm_DateBox(parentId, item, cb) {
-	let s = frm_Group(`<input type="date" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" value="${item.value!=undefined?item.value:''}">`, item)
+	let s = frm_Group(`<input type="date" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || ' '}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" value="${item.value!=undefined?item.value:''}">`, item)
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 	cb()
 }
 
 function frm_TimeBox(parentId, item, cb) {
-	let s = frm_Group(`<input type="time" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" step="1" placeholder="${item.placeholder || item.title || item.label}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" value="${(item.value!=undefined?item.value:'').substr(0,8)}">`, item)
+	let s = frm_Group(`<input type="time" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" step="1" placeholder="${item.placeholder || ' '}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" value="${(item.value!=undefined?item.value:'').substr(0,8)}">`, item)
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 	cb()
 }
 
 function frm_Lookup(parentId, item, cb) {
-	let s = `<select type="text" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || item.title || item.label}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" ${item.required?'required="required"':''} ${item.readonly==true?'disabled':''} onchange="${item.onchange || ''}">
+	let s = `<select type="text" class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || ' '}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" ${item.required?'required="required"':''} ${item.readonly==true?'disabled':''} onchange="${item.onchange || ''}">
 	<option value="" ${item.value==''?'selected':''}>${item.showAll===true?'*':'-- Seç --'}</option>`
 	if(item.lookup) {
 		if(Array.isArray(item.lookup)) {
@@ -312,9 +344,9 @@ function frm_Lookup(parentId, item, cb) {
 
 function frm_CheckBoxLookup(parentId, item, cb) {
 
-	var s = ``
+	let s = ``
 
-	var input = `
+	let input = `
 	<select name="${item.name}" id="${item.id}" class="form-control p-0 m-0 ${item.class || ''}">
 	<option value="">*</option>
 	<option value="true" ${(item.value!=undefined?item.value:'').toString()=='true'?'selected':''}><i class="fas fa-check-square text-primary"></i> Evet</option>
@@ -327,7 +359,7 @@ function frm_CheckBoxLookup(parentId, item, cb) {
 		s = `<div class="${item.col || ''} p-1 ${item.visible===false?'hidden':''}">
 		<div class="form-group">
 		<label>
-		<span class="mb-1" style="display:block;">${item.title || ''}${helpButton(item)}</span>
+		<span class="mb-1" style="display:block;">${item.text || ''}${helpButton(item)}</span>
 		${input}
 		</label>
 		</div>
@@ -339,9 +371,10 @@ function frm_CheckBoxLookup(parentId, item, cb) {
 }
 
 function frm_RemoteLookup(parentId, item, cb) {
-	var s = ``
 
-	var input=`
+	let s = ``
+
+	let input = `
 	<input type="hidden" name="${item.name}" value="${item.value!=undefined?item.value:''}">
 	<input type="hidden" id="${item.id}-obj"  value="">
 	`
@@ -349,14 +382,14 @@ function frm_RemoteLookup(parentId, item, cb) {
 		input += `<input type="hidden" name="${item.lookupTextFieldName || ''}" value="${item.valueText || ''}">`
 	}
 
-	input+=`<input type="search" class="form-control ${item.class || ''}" id="${item.id}-autocomplete-text"  placeholder=" " value="${item.valueText || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" ${item.required?'required="required"':''} ${item.readonly?'readonly':''} title="${item.title || ''}: Tümünü listelemek için boşluk tuşuna basabilirsiniz." >`
+	input += `<input type="search" class="form-control ${item.class || ''}" id="${item.id}-autocomplete-text"  placeholder="${item.placeholder || ' '}" value="${item.valueText || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" ${item.required?'required="required"':''} ${item.readonly?'readonly':''} title="${item.title || 'Tümünü listelemek için BOŞLUK tuşuna basabilirsiniz.'}" >`
 	if(item.noGroup === true) {
 		s = input
 	} else {
 		s = `<div class="${item.col || ''} p-1 ${item.visible===false?'hidden':''}">
 		<div class="g-input">
 		${input}
-		<label for="${item.id}-autocomplete-text" class="text-nowrap"><i class="fas fa-search"></i> ${item.title || ''}</label>
+		<label for="${item.id}-autocomplete-text" class="text-nowrap"><i class="fas fa-search"></i> ${item.text || ''}</label>
 		</div>
 		</div>
 		`
@@ -379,12 +412,14 @@ function frm_CheckBox(parentId, item, cb) {
 
 	let input = `<input type="checkbox" class="${sClass}" id="${item.id}" name="${item.name}" value="true" ${item.value?'checked':''} ${item.readonly==true?'disabled':''} onchange="${item.onchange || ''}" />`
 	if(item.noGroup === true) {
-		s = input
+		s = `<div class="form-switch  text-center  m-0  p-0 ms-3 ps-3">
+		${input}
+		</div>`
 	} else {
 		s = `<div class="${item.col || ''} p-1 ${item.visible===false?'hidden':''}">
 		<div class="form-check form-switch">
 		${input}
-		<label class="form-check-label" for="${item.id}">${item.title || ''}${helpButton(item)}</label>
+		<label class="form-check-label" for="${item.id}">${item.text || ''}${helpButton(item)}</label>
 		
 		</div>
 		</div>`
@@ -393,6 +428,8 @@ function frm_CheckBox(parentId, item, cb) {
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 	cb()
 }
+
+
 
 function frm_DateRangeBox(parentId, item, cb) {
 	let s = `
@@ -415,11 +452,11 @@ function frm_DateRangeBox(parentId, item, cb) {
 			<label for="cbDate" class="">Tarih</label>
 		</div>
 		<div class="d-md-flex">
-			<div class="g-input mb-4 my-md-0">
+			<div class="g-input">
 				<input type="date" name="date1" id="date1" class="form-control" value="${moment().format('YYYY-MM-DD')}">
 				<label for="date1" class="">Başlangıç</label>
 			</div>
-			<div class="g-input mb-4 my-md-0">
+			<div class="g-input">
 				<input type="date" name="date2" id="date2" class="form-control" value="${moment().format('YYYY-MM-DD')}">
 				<label for="date2" class="">Bitiş</label>
 			</div>
@@ -466,7 +503,7 @@ function frm_DateRangeBox(parentId, item, cb) {
 
 
 	function cbDate_onchange() {
-		var obj = cboEasyDateChange($(`${parentId} #${item.id} #cbDate`).val())
+		let obj = cboEasyDateChange($(`${parentId} #${item.id} #cbDate`).val())
 		$(`${parentId} #${item.id} #date1`).val(obj.date1)
 		$(`${parentId} #${item.id} #date2`).val(obj.date2)
 		pageSettings.setItem('cbDate', $(`${parentId} #${item.id} #cbDate`).val())

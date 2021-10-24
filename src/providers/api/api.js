@@ -81,7 +81,7 @@ function servisCalisiyorMu(err, cb) {
 					message: `${err.address || ''}:${err.port || 0} Servis calismiyor!`
 				}
 
-				mail.sendErrorMail(`${(new Date()).yyyymmddhhmmss()} Rest Service Error`, errObj)
+				//mail.sendErrorMail(`${(new Date()).yyyymmddhhmmss()} Rest Service Error`, errObj)
 				if(cb) {
 					return cb(errObj)
 				}

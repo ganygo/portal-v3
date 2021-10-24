@@ -509,6 +509,22 @@ function cboEasyDateChange(value){
 	}
 }
 
+function calculate(formula, values) {
+	if((formula || '') == '')
+		return 0
+	formula=formula.replaceAll('${','{').replaceAll('{','${')
+	let code=`(function(){
+	`
+	Object.keys(values).forEach((key)=>{
+		code+=`let ${key}=${JSON.stringify(values[key])}\n`
+	})
+
+	code+=`return eval(\`${formula}\`)
+	})()`
+	
+	return eval(code)
+}
+
 
 function replaceUrlCurlyBracket(url,item){
 	if((url || '')=='')

@@ -166,7 +166,7 @@ function alertX(message, title='', type='info',cb){
 }
 
 function showError(err){
-	alertX(`${err.code || err.name} - ${err.message || err.name}`,'Hata','danger')
+	alertX(`${err.code || err.name}<br>${err.message || err.name}`,'Hata','danger')
 }
 
 

@@ -43,7 +43,7 @@
 	}
 	
 	function sayfayiAcalim(callback){
-		if((hashObj.query.mid || '')!=''){
+		if((((hashObj || {}).query || {}).mid || '')!=''){
 			$(`#leftMenu a`).removeClass('active')
 			$(`#leftMenu #menu${hashObj.query.mid.replaceAll('.','-')}`).addClass('active')
 		}
@@ -55,6 +55,7 @@
 		
 		}else{
 			$('#mainCtrl form').html('sayfa bulunamadi')
+			callback()
 		}
 	}
 	
