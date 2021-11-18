@@ -7967,7 +7967,7 @@ textarea {
   font-family: arial;
   position: absolute;
   top: 9px;
-  left: 11px;
+  left: 7px;
   z-index: 1;
   cursor: text;
   border-radius: 3px;
@@ -8073,13 +8073,17 @@ textarea {
 .cerceve1 .card-header a {
   color: var(--bs-primary); }
 
-.cerceve1 .card-header.child {
+.cerceve1.child .card-header {
   background-color: rgba(0, 0, 0, 0.12);
   color: var(--bs-dark);
   font-weight: normal; }
 
-.cerceve1 .card-header.child a {
+.cerceve1.child .card-header a {
   color: var(--bs-dark); }
+
+.cerceve1.mother {
+  -webkit-box-shadow: 1px 1px 4px 0px rgba(58, 59, 69, 0.4) !important;
+  box-shadow: 1px 1px 4px 0px rgba(58, 59, 69, 0.4) !important; }
 
 .card-header {
   padding: 0.25rem !important;
@@ -8543,8 +8547,17 @@ img {
 .nav-pills .show > .nav-link {
   margin-right: 20px; }
 
-.font-size-150 {
+.font-size-125,
+.fs-125 {
+  font-size: 125%; }
+
+.font-size-150,
+.fs-150 {
   font-size: 150%; }
+
+.font-size-200,
+.fs-200 {
+  font-size: 200%; }
 
 .imageBox-img {
   width: 100%;
@@ -8814,3 +8827,28 @@ textarea.form-control {
   height: 2.65rem;
   margin-top: 0.45rem;
   padding-top: 0.6rem; }
+
+.totalbox-row {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+  border-bottom: 1px solid #6c757d47;
+  height: 38px;
+  margin-right: 0.25rem;
+  margin-left: 0.25rem; }
+
+.td-number-thousand,
+.td-money-thousand,
+.td-amount-thousand,
+.td-price-thousand,
+.td-quantity-thousand,
+.td-total-thousand {
+  font-weight: bolder; }
+
+.td-number-decimal,
+.td-money-decimal,
+.td-amount-decimal,
+.td-price-decimal,
+.td-quantity-decimal,
+.td-total-decimal {
+  font-size: 90%;
+  opacity: 0.9; }

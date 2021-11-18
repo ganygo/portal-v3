@@ -43,7 +43,8 @@ if((localStorage.getItem('global') || '') == '') {
 }
 
 if(data.token) {
-	localStorage.setItem('global', JSON.stringify(data || {}))
+	global=Object.assign({},global,(data || {}))
+	localStorage.setItem('global', JSON.stringify(global || {}))
 
 	var q = getAllUrlParams()
 	// setTimeout(() => {

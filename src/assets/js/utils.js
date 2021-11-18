@@ -1,53 +1,58 @@
 Date.prototype.yyyymmdd = function() {
-	var yyyy = this.getFullYear().toString()
-	var mm = (this.getMonth() + 1).toString()
-	var dd = this.getDate().toString()
-	var HH = this.getHours().toString()
-	var min = this.getMinutes().toString()
-	var sec = this.getSeconds().toString()
+	let yyyy = this.getFullYear().toString()
+	let mm = (this.getMonth() + 1).toString()
+	let dd = this.getDate().toString()
+	let HH = this.getHours().toString()
+	let min = this.getMinutes().toString()
+	let sec = this.getSeconds().toString()
 	return yyyy + '-' + (mm[1] ? mm : "0" + mm[0]) + '-' + (dd[1] ? dd : "0" + dd[0])
 }
 
 Date.prototype.hhmmss = function() {
 
-	var HH = this.getHours().toString()
-	var min = this.getMinutes().toString()
-	var sec = this.getSeconds().toString()
+	let HH = this.getHours().toString()
+	let min = this.getMinutes().toString()
+	let sec = this.getSeconds().toString()
 	return (HH[1] ? HH : "0" + HH[0]) + ':' + (min[1] ? min : "0" + min[0]) + ':' + (sec[1] ? sec : "0" + sec[0])
 }
 
 Date.prototype.yyyymmddhhmmss = function() {
-	var yyyy = this.getFullYear().toString()
-	var mm = (this.getMonth() + 1).toString()
-	var dd = this.getDate().toString()
-	var HH = this.getHours().toString()
-	var min = this.getMinutes().toString()
-	var sec = this.getSeconds().toString()
+	let yyyy = this.getFullYear().toString()
+	let mm = (this.getMonth() + 1).toString()
+	let dd = this.getDate().toString()
+	let HH = this.getHours().toString()
+	let min = this.getMinutes().toString()
+	let sec = this.getSeconds().toString()
 	return yyyy + '-' + (mm[1] ? mm : "0" + mm[0]) + '-' + (dd[1] ? dd : "0" + dd[0]) + ' ' + (HH[1] ? HH : "0" + HH[0]) + ':' + (min[1] ? min : "0" + min[0]) + ':' + (sec[1] ? sec : "0" + sec[0])
 }
 
 Date.prototype.hhmm = function() {
 
-	var HH = this.getHours().toString()
-	var min = this.getMinutes().toString()
-	var sec = this.getSeconds().toString()
+	let HH = this.getHours().toString()
+	let min = this.getMinutes().toString()
+	let sec = this.getSeconds().toString()
 	return (HH[1] ? HH : "0" + HH[0]) + ':' + (min[1] ? min : "0" + min[0])
 }
 
 Date.prototype.addDays = function(days) {
-	var dat = new Date(this.valueOf())
+	let dat = new Date(this.valueOf())
 	dat.setDate(dat.getDate() + days)
 	return dat
 }
 
 Date.prototype.lastThisMonth = function() {
-	var dat = new Date(this.valueOf())
+	let dat = new Date(this.valueOf())
 	dat = new Date(dat.getFullYear(), dat.getMonth() + 1, 0)
 	return dat
 }
 
 function clone(obj) {
+	try{
 	return JSON.parse(JSON.stringify(obj))
+}catch(tryErr){
+	console.error('obj:',obj)
+	console.error(tryErr)
+}
 }
 
 
@@ -80,9 +85,9 @@ function encodeURIComponent2(str) {
 }
 
 function htmlEncode(str) {
-	var buf = []
+	let buf = []
 	if(str) {
-		for(var i = str.length - 1; i >= 0; i--) {
+		for(let i = str.length - 1; i >= 0; i--) {
 			buf.unshift(['&#', str[i].charCodeAt(), ';'].join(''))
 		}
 	} else {
@@ -109,53 +114,79 @@ function dateTimeFromText(dateStr) {
 
 
 Number.prototype.formatDecimal = function() {
-	var c = 0;
-	var d = whatDecimalPointer()
-	var t = d == ',' ? '.' : ',';
+	let c = 0;
+	let d = whatDecimalPointer()
+	let t = d == ',' ? '.' : ',';
 
-	var s = _formatMoney(this, c, d, t)
+	let s = _formatMoney(this, c, d, t)
 
 	return s;
 }
 
 Number.prototype.formatMoney = function(c1) {
-	var c = c1 || 2;
-	var d = whatDecimalPointer()
-	var t = d == ',' ? '.' : ',';
+	let c = c1 || 2;
+	let d = whatDecimalPointer()
+	let t = d == ',' ? '.' : ','
 
-	var s = _formatMoney(this, c, d, t)
+	let s = _formatNumber(this, c, d, t)
 
 	return s;
 }
 
-function _formatMoney(value, c, d, t) {
-	var n = value,
-		c = isNaN(c = Math.abs(c)) ? 2 : c,
-		d = d == undefined ? "." : d,
-		t = t == undefined ? "," : t,
-		s = n < 0 ? "-" : "",
-		i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
-		j = (j = i.length) > 3 ? j % 3 : 0
+
+
+function _formatNumber(value, c, d, t) {
+	var n = value
+	c = isNaN(c) ? 2 : c
+	d = d == undefined ? whatDecimalPointer() : d
+	t = t == undefined ? (d == ',' ? '.' : ',') : t
+	var s = n < 0 ? '-' : ''
+	var i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + ''
+	var j = (j = i.length) > 3 ? j % 3 : 0
 	return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "")
 }
 
 Number.prototype.n2 = function() {
-	var sbuf = this.toString()
+	let sbuf = this.toString()
 	if(sbuf.length == 1) {
-		sbuf = '0' + sbuf;
+		sbuf = '0' + sbuf
 	}
 
-	return sbuf;
+	return sbuf
+}
+
+
+Number.prototype.round = function(precision) {
+	var t = this
+	var rakam = 1
+	if(precision <= 0)
+		return Math.round(t)
+	for(var i = 0; i < precision; i++) {
+		rakam = rakam * 10
+	}
+	var sonuc = Math.round(rakam * t) / rakam
+
+	return sonuc
+
+}
+
+Number.prototype.toDigit = function(digit) {
+	var t = this
+	var s = t.toString()
+	if(s.length < digit) {
+		s = '0'.repeat(digit - s.length) + s
+	}
+	return s
 }
 
 Number.prototype.formatQuantity = function(c) {
+	c = isNaN(c) ? 1 : c
+	let d = whatDecimalPointer()
+	let t = d == ',' ? '.' : ','
 
-	var d = whatDecimalPointer()
-	var t = d == ',' ? '.' : ',';
+	let s = _formatNumber(this, c, d, t)
 
-	var s = _formatQuantity(this, c, d, t)
-
-	return s;
+	return s
 }
 
 function convertNumber(text) {
@@ -173,6 +204,8 @@ function convertNumber(text) {
 	// } else {
 	// 	return 0
 	// }
+	if(text == '')
+		text = '0'
 	return Number(text)
 	// } catch (err) {
 	// 	console.log(`typeof text:`, typeof text)
@@ -182,36 +215,16 @@ function convertNumber(text) {
 
 }
 
-function _formatQuantity(value, c, d, t) {
-	var n = value,
 
-		d = d == undefined ? "." : d,
-		t = t == undefined ? "," : t,
-		s = n < 0 ? "-" : "";
-
-
-	if(c == undefined) {
-		i = parseInt(n = Math.abs(+n || 0)) + "";
-		j = (j = i.length) > 3 ? j % 3 : 0;
-		var kusurat = Math.round(Math.abs(n - i) * 1000) / 1000;
-
-		return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (Math.abs(n - i) > 0 ? d : '') + kusurat.toString().slice(2)
-	} else {
-		i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "";
-		j = (j = i.length) > 3 ? j % 3 : 0;
-		return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "")
-	}
-
-}
 
 function whatDecimalPointer() {
-	var n = 1.1;
+	let n = 1.1;
 	n = n.toLocaleString().substring(1, 2)
 	return n;
 }
 
 function pagination(c, m) {
-	var current = Number(c),
+	let current = Number(c),
 		last = Number(m),
 		delta = 2,
 		left = current - delta,
@@ -246,13 +259,13 @@ function pagination(c, m) {
 
 
 String.prototype.replaceAll = function(search, replacement) {
-	var target = this
+	let target = this
 	return target.split(search).join(replacement)
 }
 
 function uuidv4() {
 	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-		var r = Math.random() * 16 | 0,
+		let r = Math.random() * 16 | 0,
 			v = c == 'x' ? r : (r & 0x3 | 0x8)
 		return v.toString(16)
 	})
@@ -262,7 +275,7 @@ function uuidv4() {
 function listObjectToObject(listObj) {
 	if(typeof listObj != 'object' || listObj == null)
 		return listObj
-	var obj = {}
+	let obj = {}
 
 	function calistir(anaObj, keys, parentKey = '') {
 		if(anaObj[keys[0]] == undefined) {
@@ -277,7 +290,7 @@ function listObjectToObject(listObj) {
 			anaObj[keys[0]] = listObj[`${(parentKey?parentKey+'.':'')}${keys[0]}`]
 
 		} else {
-			var key = keys[0]
+			let key = keys[0]
 			parentKey += (parentKey ? '.' : '') + key
 			keys.splice(0, 1)
 			calistir(anaObj[key], keys, parentKey)
@@ -285,7 +298,7 @@ function listObjectToObject(listObj) {
 	}
 
 	Object.keys(listObj).forEach((mainKey) => {
-		var a = calistir(obj, mainKey.split('.'))
+		let a = calistir(obj, mainKey.split('.'))
 		obj = Object.assign({}, obj, a)
 	})
 
@@ -294,7 +307,7 @@ function listObjectToObject(listObj) {
 
 
 function objectToListObject(objOrj, exceptArrays = false) {
-	var listObj = {}
+	let listObj = {}
 	if(objOrj == undefined || objOrj == null)
 		return listObj
 
@@ -305,7 +318,7 @@ function objectToListObject(objOrj, exceptArrays = false) {
 			}
 		} else if(typeof obj == 'object') {
 			Object.keys(obj || {}).forEach((key) => {
-				var key2 = (parentKey ? parentKey + '.' : '') + key
+				let key2 = (parentKey ? parentKey + '.' : '') + key
 				calistir(obj[key], key2)
 			})
 		} else {
@@ -329,8 +342,8 @@ function objectArrayControl(obj) {
 			return obj
 
 		if(typeof obj == 'object') {
-			var bFound = false
-			var dizi = []
+			let bFound = false
+			let dizi = []
 			Object.keys(obj).forEach((key) => {
 				if(isNaN(key)) {
 					bFound = true
@@ -350,18 +363,22 @@ function objectArrayControl(obj) {
 }
 
 function getDivData(divId, prefix = '', eskiBirIndex = true) {
-	var obj = {}
+	let obj = {}
 	if(!document)
 		return obj
-	var elements = document.querySelector(`${divId}`).querySelectorAll(`input, select`)
-	var index = 0
+	let elements = document.querySelector(`${divId}`).querySelectorAll(`input, select`)
+	let index = 0
 	while(index < elements.length) {
 		if(elements[index].name != '' && (elements[index].name.indexOf('[-1]') < 0 || eskiBirIndex)) {
-			var key = elements[index].name.replaceAll('[', '.').replaceAll(']', '')
-			var value = elements[index].value
+			let key = elements[index].name.replaceAll('[', '.').replaceAll(']', '')
+			let value = elements[index].value
+			if(elements[index].type == 'text' && elements[index].classList.contains('formatted-number')) {
+				value = convertNumber(elements[index].value)
+			}
 			if(elements[index].type == 'checkbox') {
 				value = elements[index].checked
 			}
+
 			if(prefix != '') {
 				if(key.substr(0, prefix.length) == prefix) {
 					key = key.substr(prefix.length)
@@ -381,12 +398,12 @@ function getDivData(divId, prefix = '', eskiBirIndex = true) {
 
 
 String.prototype.padding = function(n, c) {
-	var val = this.valueOf()
+	let val = this.valueOf()
 	if(Math.abs(n) <= val.length) {
 		return val
 	}
-	var m = Math.max((Math.abs(n) - this.length) || 0, 0)
-	var pad = Array(m + 1).join(String(c || ' ').charAt(0))
+	let m = Math.max((Math.abs(n) - this.length) || 0, 0)
+	let pad = Array(m + 1).join(String(c || ' ').charAt(0))
 	return (n < 0) ? pad + val : val + pad
 }
 

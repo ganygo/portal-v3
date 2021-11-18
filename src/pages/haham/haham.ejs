@@ -1,12 +1,12 @@
 <% layout('../_common/layouts/general') %>
 
 
-<style type="text/css">
-	
-</style>
+<style type="text/css">	
+	.alitek {	
+		color: blue;}	@media(max-width: 768px) {.alitek {	font-size: 12pt;color: red;}	}	.alitek {		background-color: yellow;	}</style>
 
 <div id="mainCtrl" class="px-0 pt-2">
-	<form></form>
+	<form class="row m-0"></form>
 </div>
 <script type="text/javascript">
 
@@ -42,7 +42,14 @@
 		return resp
 	}
 	
-	function sayfayiAcalim(callback){
+	let bSayfaAciliyor=false
+
+	function sayfayiAcalim(){
+		if(bSayfaAciliyor)
+			return
+		anotherViewStyle('mainCtrl')
+		$('#mainCtrl form').html('loading...')
+		bSayfaAciliyor=true
 		if((((hashObj || {}).query || {}).mid || '')!=''){
 			$(`#leftMenu a`).removeClass('active')
 			$(`#leftMenu #menu${hashObj.query.mid.replaceAll('.','-')}`).addClass('active')
@@ -51,11 +58,13 @@
 		var sayfa=sayfaBul()
 		if(sayfa){
 		
-			generatePage('#mainCtrl form',sayfa,callback)
+			generatePage('#mainCtrl form',sayfa,()=>{
+				bSayfaAciliyor=false
+			})
 		
 		}else{
 			$('#mainCtrl form').html('sayfa bulunamadi')
-			callback()
+			bSayfaAciliyor=false
 		}
 	}
 	
@@ -65,22 +74,15 @@
 		
 	}
 
-	let bNoAction=false
+	
 
 	$(document).ready(()=>{
 		anotherViewStyle('mainCtrl')
 		sayfayiAcalim()
 		window.onhashchange=()=>{
-			if(bNoAction)
-				return
-			bNoAction=true
 			hashObj=getHashObject()
-			anotherViewStyle('mainCtrl')
-
-			$('#mainCtrl form').html('loading...')
-			sayfayiAcalim(()=>{
-				bNoAction=false
-			})
+			
+			sayfayiAcalim()
 		}
 	})
 

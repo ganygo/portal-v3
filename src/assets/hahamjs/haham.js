@@ -4,7 +4,7 @@ var remoteList = {}
 function generatePage(divId, pageJson, callback) {
 	$(divId).html('')
 	$(divId).hide()
-	try {
+//	try {
 		let dizi = []
 		if(Array.isArray(pageJson)) {
 			dizi = pageJson
@@ -23,24 +23,19 @@ function generatePage(divId, pageJson, callback) {
 			}
 
 			let pageSubObj = clone(dizi[index])
-			headerButtons(divId, pageSubObj)
-			if(pageSubObj.script) {
-				let scrt = ''
-				if(Array.isArray(pageSubObj.script)) {
-					pageSubObj.script.forEach((e) => {
-						scrt += e + '\r\n'
-					})
-				} else {
-					scrt = pageSubObj.script
-				}
-				$(divId).append(`<script type="text/javascript">${scrt}<\/script>`)
-			}
+			pageSubObj.level = 0
 
+
+			headerButtons(divId, pageSubObj)
+			// appendLinkedScript(divId, '/js/order-helper.js')
+			// appendScript(divId, `<script type="text/javascript">function formCalc(tableId) { calculateOrder('${divId}',tableId) }</script>`)
+
+			// appendScript(divId, pageSubObj.script)
 			getRemoteData(pageSubObj, (err, data) => {
 				if(!err) {
 					switch ((pageSubObj.type || '')) {
 						case 'filter':
-							generateControl(divId, pageSubObj, data, true, false, (err) => {
+							generateControl(divId, pageSubObj, data, false, (err) => {
 								if(!err) {
 									document.querySelector(`${divId} #filterForm`).insertAdjacentHTML('beforeend', `${filterFormButton('#filterForm')}`)
 								}
@@ -52,14 +47,14 @@ function generatePage(divId, pageJson, callback) {
 
 
 						case 'grid':
-							generateControl(divId, pageSubObj, data, true, false, (err) => {
+							generateControl(divId, pageSubObj, data, false, (err) => {
 								index++
 								setTimeout(calistir, 0, cb)
 							})
 							break
 
 						default:
-							generateControl(divId, pageSubObj, data, true, false, (err) => {
+							generateControl(divId, pageSubObj, data, false, (err) => {
 								index++
 								setTimeout(calistir, 0, cb)
 							})
@@ -96,20 +91,32 @@ function generatePage(divId, pageJson, callback) {
 			if(callback)
 				return callback()
 		})
-	} catch (tryErr) {
-		$(divId).html(`Hata2:${tryErr.name || ''} ${tryErr.message || ''}`)
-		$(divId).show()
-		if(callback)
-			return callback()
-	}
+	// } catch (tryErr) {
+	// 	console.error(tryErr)
+	// 	$(divId).html(`Hata2:${tryErr.name || ''} ${tryErr.message || ''}`)
+	// 	$(divId).show()
+	// 	if(callback)
+	// 		return callback()
+	// }
 }
+
 
 function headerButtons(divId, pageSubObj) {
 	let hbtn = ``
 	if(pageSubObj.type == 'form') {
+		// hbtn = `
+		// <button id="headerButtonCalc" class="btn btn-secondary btn-form-header" title="Hesapla"><i class="fas fa-sync-alt"></i></button>
+		// <button id="headerButtonSave" class="btn btn-outline-primary btn-form-header ms-2" title="Kaydet"><i class="fas fa-save"></i></button>
+		// <a href="javascript:history.back(-1)" class="btn btn-outline-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
+		// if(pageSubObj.options) {
+		// 	if(pageSubObj.options.mode == 'view') {
+		// 		hbtn = `<a href="javascript:history.back(-1)" class="btn btn-outline-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
+		// 	}
+		// }
 		hbtn = `
-		<button id="headerButtonSave" class="btn btn-outline-primary btn-form-header" title="Kaydet"><i class="fas fa-save"></i></button>
+		<button id="headerButtonSave" class="btn btn-outline-primary btn-form-header ms-2" title="Kaydet"><i class="fas fa-save"></i></button>
 		<a href="javascript:history.back(-1)" class="btn btn-outline-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
+
 		if(pageSubObj.options) {
 			if(pageSubObj.options.mode == 'view') {
 				hbtn = `<a href="javascript:history.back(-1)" class="btn btn-outline-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
@@ -120,73 +127,53 @@ function headerButtons(divId, pageSubObj) {
 	$('#headerButtons').html(hbtn)
 
 	$('#headerButtonSave').on('click', () => {
-		var formData = getFormData(`${divId}`)
-
-		formSave(pageSubObj.dataSource, formData)
+		formKaydet(pageSubObj.dataSource, divId)
 	})
 }
 
-function pageFilter(divId, pageSubObj, cb) {
-	getRemoteData(pageSubObj, (err, data) => {
-		if(!err) {
-			generateControl(divId, pageSubObj, data, true, false, (err) => {
-				if(!err) {
-					document.querySelector(`${divId} #filterForm`).insertAdjacentHTML('beforeend', `${filterFormButton('#filterForm')}`)
-				}
-				cb(err)
-			})
-		} else {
-			cb(err)
-		}
-	})
-}
+function generateControl(divId, item, data, insideOfModal, callback) {
+	let autocol = item.options ? (item.options.autocol === true ? true : false) : false
+	let queryValues = item.options ? (item.options.queryValues === true ? true : false) : false
 
-function pageGrid(divId, pageSubObj, cb) {
-	getRemoteData(pageSubObj, (err, data) => {
-		if(!err) {
-			generateControl(divId, pageSubObj, data, true, false, (err) => {
-				cb(err)
-			})
+	if(item.type == 'widget') {
+		item = generateWidget(item)
+	}
 
-		} else {
-			cb(err)
-		}
-	})
-}
 
-function pageForm(divId, pageSubObj, cb) {
+	item = itemLevels(item, item.level)
+	item = itemHtmlCode(item)
 
-	getRemoteData(pageSubObj, (err, data) => {
-		if(!err) {
-			generateControl(divId, pageSubObj, data, true, false, (err) => {
-				cb(err)
-			})
-		} else {
-			cb(err)
-		}
-	})
-}
+	if(item.level == 0) item.pageFormId = divId
 
-function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
-	var autocol = item.options ? (item.options.autocol === true ? true : false) : false
-	var queryValues = item.options ? (item.options.queryValues === true ? true : false) : false
+	if(item.script) {
+		$(divId).append(`<script type="text/javascript">${item.script}</script>`)
+		//document.querySelector(divId).insertAdjacentHTML('afterbegin', `<script type="text/javascript">${item.script}</script>`)
+	}
+
 	if(item.fields) {
 		Object.keys(item.fields).forEach((key) => {
 
 			item.fields[key].field = key
-			item.fields[key] = itemDefaultValues(item.fields[key], bRoot, autocol, insideOfModal, queryValues)
+			item.fields[key].pageFormId = item.pageFormId || ''
+			item.fields[key] = itemDefaultValues(item.fields[key], autocol, insideOfModal, queryValues)
+
 			if(item.fields[key].type == 'grid') {
 				item.fields[key].parentField = key
+			} else if(item.fields[key].type == 'widget') {
 
 			}
 		})
 	} else if(item.tabs) {
 		item.tabs.forEach((tab) => {
+			tab.pageFormId = item.pageFormId || ''
+
 			if(tab.fields) {
 				Object.keys(tab.fields).forEach((key) => {
 					tab.fields[key].field = key
-					tab.fields[key] = itemDefaultValues(tab.fields[key], bRoot, autocol, insideOfModal, queryValues)
+					tab.fields[key] = itemDefaultValues(tab.fields[key], autocol, insideOfModal, queryValues)
+					tab.fields[key].pageFormId = tab.pageFormId || ''
 					if(tab.fields[key].type == 'grid') {
+
 						tab.fields[key].parentField = key
 
 					}
@@ -194,12 +181,14 @@ function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
 			}
 		})
 	} else {
-		item = itemDefaultValues(item, bRoot, autocol, insideOfModal, queryValues)
+		item = itemDefaultValues(item, autocol, insideOfModal, queryValues)
 	}
 
 	item.insideOfModal = insideOfModal
 
+
 	switch ((item.type || '').toLowerCase()) {
+
 		case 'hidden':
 			item.value = getPropertyByKeyPath(data, item.field, item.value)
 			frm_InputHidden(divId, item, cb)
@@ -217,23 +206,34 @@ function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
 			break
 
 		case 'money':
-		item.class += ' text-end'
+		case 'quantity':
+		case 'amount':
+		case 'price':
+			if(item.class.indexOf('text-end') < 0)
+				item.class += ' text-end'
 			if(item.readonly) {
-				let buf = getPropertyByKeyPath(data, item.field, item.value)
-				if(buf == undefined) {
-					buf = 0
-				}
-				item.value = Number(buf).formatMoney()
-				
-
-				frm_MoneyBox(divId, item, cb)
+				let buf = getPropertyByKeyPath(data, item.field, item.value) || 0
+				item.value = Number(buf).formatMoney(item.round || 2)
+				frm_FormattedNumberBox(divId, item, cb)
 			} else {
-				item.value = getPropertyByKeyPath(data, item.field, item.value)
-				if(item.value == undefined) {
-					item.value = 0
-				}
+				item.value = getPropertyByKeyPath(data, item.field, item.value) || 0
+				frm_FormattedNumberBox(divId, item, cb)
+			}
+			break
 
-				frm_MoneyBox(divId, item, cb)
+		case 'total':
+			if(item.class.indexOf('text-end') < 0)
+				item.class += ' text-end'
+			if(item.readonly) {
+				let buf = getPropertyByKeyPath(data, item.field, item.value) || 0
+				item.value = Number(buf).formatMoney(item.round || 2)
+
+
+				frm_TotalBox(divId, item, cb)
+			} else {
+				item.value = getPropertyByKeyPath(data, item.field, item.value) || 0
+
+				frm_TotalBox(divId, item, cb)
 			}
 			break
 
@@ -315,17 +315,22 @@ function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
 			break
 		case 'grid':
 
-			if(bRoot) {
+			if(item.level == 0) {
+
 				item.value = data
-				grid(divId, item, bRoot, insideOfModal, cb)
+				grid(divId, item, insideOfModal, cb)
 			} else {
-				let orjinalId = item.id
-				item.id = `card-${item.id}`
-				frm_Card(divId, item, () => {
-					item.value = getPropertyByKeyPath(data, item.field, [])
-					item.id = orjinalId
-					grid(`${divId} #card-${item.id}`, item, bRoot, insideOfModal, cb)
-				})
+				item.value = getPropertyByKeyPath(data, item.field, [])
+				grid(divId, item, insideOfModal, cb)
+
+				// let orjinalId = item.id
+				// item.id = `card-${item.id}`
+
+				// frm_Card(divId, item, () => {
+				// 	item.value = getPropertyByKeyPath(data, item.field, [])
+				// 	item.id = orjinalId
+				// 	grid(`${divId} #card-${item.id}`, item, insideOfModal, cb)
+				// })
 			}
 
 
@@ -348,7 +353,7 @@ function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
 						item.fields[key].showAll = true
 						item.fields[key].class = 'my-3 my-md-0'
 
-						generateControl('#filterForm', item.fields[key], data, false, insideOfModal, () => {
+						generateControl('#filterForm', item.fields[key], data, insideOfModal, () => {
 							index++
 							setTimeout(calistir1, 0, cb1)
 						})
@@ -360,8 +365,8 @@ function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
 			} else {
 				cb()
 			}
-
 			break
+		case 'widgetcontrol':
 		case 'tab':
 		case 'form':
 		case 'group':
@@ -375,7 +380,7 @@ function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
 				}
 				let key = dizi[index]
 
-				generateControl(connDivId, fields[key], data, false, insideOfModal, () => {
+				generateControl(connDivId, fields[key], data, insideOfModal, () => {
 					index++
 					setTimeout(() => {
 						calistir2(fields, connDivId, cb1)
@@ -387,13 +392,30 @@ function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
 			if(item.fields) {
 				dizi = Object.keys(item.fields)
 				index = 0
-				if(bRoot || item.type == 'modal' || item.type == 'form') {
-					document.querySelector(divId).insertAdjacentHTML('beforeend', `<div class="row m-0"></div>`)
-					calistir2(item.fields, `${divId} .row`, cb)
-				} else {
+				if(item.level == 0 || item.type == 'modal' || item.type == 'form') {
+					if(document.querySelector(divId).classList.contains('row') == false) {
+						document.querySelector(divId).insertAdjacentHTML('beforeend', `<div class="row m-0"></div>`)
+						calistir2(item.fields, `${divId} .row`, callback)
+					} else {
+						calistir2(item.fields, `${divId}`, callback)
+					}
 
+				} else if(item.type == 'widgetControl') {
+					if(item.grouped === true) {
+						let orjinalId = item.id
+						item.id = 'card-' + item.id
+						frm_Card(divId, item, () => {
+							calistir2(item.fields, `${divId} #${item.id}`, callback)
+						})
+					} else {
+						calistir2(item.fields, divId, callback)
+					}
+
+				} else {
+					let orjinalId = item.id
+					item.id = 'card-' + item.id
 					frm_Card(divId, item, () => {
-						calistir2(item.fields, `${divId} #${item.id}`, cb)
+						calistir2(item.fields, `${divId} #${item.id}`, callback)
 					})
 				}
 			} else if(item.tabs) {
@@ -423,7 +445,7 @@ function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
 						}
 					}
 
-					calistirTab(cb)
+					calistirTab(callback)
 				})
 			}
 
@@ -435,7 +457,96 @@ function generateControl(divId, item, data, bRoot, insideOfModal, cb) {
 			frm_TextBox(divId, item, cb)
 			break
 	}
+
+
+	function cb() {
+		if(item.html) {
+			console.log(`item.html:`, item.html)
+			document.querySelector(divId).insertAdjacentHTML('beforeend', item.html)
+		}
+		callback()
+	}
 }
+
+
+
+function itemLevels(item, level = 0) {
+	if(Array.isArray(item)) {
+		item.forEach((e) => {
+			e = itemLevels(e, level + 1)
+		})
+		return item
+	} else if(typeof item == 'object' && item != null) {
+		item.level = level
+		if(item.fields != undefined) {
+			Object.keys(item.fields).forEach((key) => {
+				item.fields[key] = itemLevels(item.fields[key], level + 1)
+			})
+		}
+		if(item.modal != undefined) {
+			item.modal = itemLevels(item.modal, level + 1)
+		}
+		if(item.tabs != undefined) {
+			item.tabs.forEach((tab) => {
+				tab.level = level
+				tab = itemLevels(tab, level)
+			})
+		}
+		return item
+	} else {
+		return item
+	}
+}
+
+function generateWidget(item) {
+	if(!item.widget)
+		return item
+	if(!global.widgets[item.widget])
+		return item
+
+	let prefix = item.prefix || ''
+	cloneWidget = clone(global.widgets[item.widget])
+	cloneWidget.level = item.level
+	let widget = widgetPrefixDuzelt(cloneWidget, { prefix: prefix })
+	widget = Object.assign({}, widget, item)
+	widget.type = 'widgetControl'
+	return widget
+}
+
+function widgetPrefixDuzelt(itemWidget, valueObj) {
+	if(!itemWidget.fields)
+		return itemWidget
+	let obj = { level: itemWidget.level }
+
+	Object.keys(itemWidget).forEach((key) => {
+		if(key != 'fields') {
+			obj[key] = clone(itemWidget[key])
+		}
+	})
+
+
+	obj.fields = {}
+	Object.keys(itemWidget.fields).forEach((key) => {
+		let yeniKey = htmlEval(key, valueObj)
+		if(itemWidget.fields[key].fields != undefined) {
+			obj.fields[yeniKey] = widgetPrefixDuzelt(itemWidget.fields[key], valueObj)
+			obj.fields[yeniKey].level = obj.level + 1
+		} else {
+			obj.fields[yeniKey] = itemWidget.fields[key]
+			if(typeof obj.fields[yeniKey] == 'object') {
+				obj.fields[yeniKey].level = obj.level + 1
+			}
+			Object.keys(itemWidget.fields[key]).forEach((key2) => {
+				if(key2 != 'fields') {
+					itemWidget.fields[key][key2] = htmlEval(itemWidget.fields[key][key2], valueObj)
+				}
+			})
+		}
+
+	})
+	return obj
+}
+
 
 function filterFormButton(divId) {
 	var s = `
@@ -447,8 +558,9 @@ function filterFormButton(divId) {
 	return s
 }
 
-function itemDefaultValues(item, bRoot = false, autocol = false, insideOfModal = false, queryValues = false) {
+function itemDefaultValues(item, autocol = false, insideOfModal = false, queryValues = false) {
 	var field = item.field || ''
+
 	var lookupTextField = item.lookupTextField || ''
 	if(item.parentField) {
 		field = `${item.parentField}.${field}`
@@ -474,8 +586,8 @@ function itemDefaultValues(item, bRoot = false, autocol = false, insideOfModal =
 	item.type = item.type || ''
 
 	if(item.type == '' && item.fields) {
+
 		item.type = 'group'
-		item.isChild = bRoot ? false : true
 	}
 	if(item.type == '' && item.tabs) {
 		item.type = 'tab'
@@ -485,12 +597,15 @@ function itemDefaultValues(item, bRoot = false, autocol = false, insideOfModal =
 		item.col = 'col-md-' + item.col
 	} else {
 		if(autocol) {
-			switch (item.type.toLowerCase()) {
+			switch ((item.type || '').toLowerCase()) {
 				case 'identity':
 					item.col = 'col-md-1'
 					break
 				case 'number':
 				case 'money':
+				case 'amount':
+				case 'quantity':
+				case 'price':
 					item.col = 'col-md-2'
 					break
 				case 'remotelookup':
@@ -543,13 +658,14 @@ function itemDefaultValues(item, bRoot = false, autocol = false, insideOfModal =
 
 
 	item.insideOfModal = insideOfModal
+	item.dataType = item.dataType || item.type || 'unknown'
 	if(!item.value) {
 
 		if(queryValues) {
 			item.value = hashObj.query[item.field] || ''
-		} else if(item.type == 'date') {
+		} else if(item.dataType == 'date') {
 			item.value = (new Date()).yyyymmdd()
-		} else if(item.type == 'time') {
+		} else if(item.dataType == 'time') {
 			item.value = (new Date()).hhmmss()
 		} else if(item.lastRecord === true) {
 			var lastRecord = pageSettings.getItem('lastRecord')
@@ -560,19 +676,86 @@ function itemDefaultValues(item, bRoot = false, autocol = false, insideOfModal =
 		}
 	}
 
+	try {
+		switch (item.dataType) {
+			case 'total':
+				item.round = item.round || global.numberFormats.amount.round || 2
+				break
+			case 'amount':
+				item.round = item.round || global.numberFormats.amount.round || 2
+				break
+			case 'price':
+				item.round = item.round || global.numberFormats.price.round || 5
+				break
+			case 'quantity':
+				item.round = item.round || global.numberFormats.quantity.round || 3
+				break
+			case 'money':
+				item.round = item.round || global.numberFormats.money.round || 2
+				break
+			default:
+				item.round = item.round || 2
+				break
+		}
+	} catch {}
 
 	return item
 }
 
-function formKaydet(dataSource, divId) {
-	var formData = getFormData(`${divId}`)
-	formSave(dataSource, formData)
+function itemHtmlCode(item) {
+	if(item.html) {
+		let htmlString = ''
+		if(Array.isArray(item.html)) {
+			item.html.forEach((e) => {
+				htmlString += e + '\n'
+			})
+		} else {
+			htmlString = item.html
+		}
+
+		item.html = replaceUrlCurlyBracket(htmlString, item) || ''
+	}
+	if(item.script) {
+		let scriptString = ''
+		if(Array.isArray(item.script)) {
+			item.script.forEach((e) => {
+				scriptString += e + '\n'
+			})
+		} else {
+			scriptString = item.script
+		}
+		item.script = scriptString
+	}
+	if(item.stylesheet){
+		if(!Array.isArray(item.stylesheet)){
+			item.stylesheet=[item.stylesheet]
+		}
+	}
+	return item
 }
 
-function itemLabelCaption(item, text=''){
-	if(item.required===true){
+function formKaydet(dataSource, divId) {
+
+
+	let numberInputs = document.querySelectorAll(`${divId} .formatted-number`)
+	let i = 0
+	while(i < numberInputs.length) {
+		let e = numberInputs[i]
+		let sbuf = e.value
+		e.attributes.type = 'number'
+		e.value = convertNumber(sbuf)
+		i++
+	}
+
+	let formData = getFormData(`${divId}`)
+	formSave(dataSource, formData)
+
+}
+
+function itemLabelCaption(item, text = '') {
+	if(item.required === true) {
 		return `<span class="label-required">*${text || item.text || ''}</span>`
-	}else{
+	} else {
 		return (text || item.text || '')
 	}
 }
