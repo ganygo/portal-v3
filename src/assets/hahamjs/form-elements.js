@@ -4,9 +4,11 @@ function frm_Card(parentId, item, cb) {
 	let s = `
 	<div class="${item.col || ''} p-1 pb-1 ${item.visible===false?'hidden':''}">
 	<div class="card cerceve1 ${item.level>1?'child':'mother'} ${item.class || ''}" level="${item.level || ''}" data-type="${item.dataType}" data-field="${item.field || ''}" >
-		<div class="card-header hand-pointer ${item.showHeader===false?'d-none':''}" data-bs-toggle="collapse" data-bs-target="#cardCollapse${item.id}" aria-expanded="${!item.collapsed?'false':'true'}" aria-fields="cardCollapse${item.id}" >
-		<a class="btn btn-collapse ${item.collapsed?'collapsed':''}" data-bs-toggle="collapse" data-bs-target="#cardCollapse${item.id}" aria-expanded="${!item.collapsed?'false':'true'}" aria-fields="cardCollapse${item.id}" ><i class="fas fa-caret-up fa-2x"></i></a>	
-		${item.text}${helpButton(item)}
+		<div class="card-header${item.showHeader===false?'d-none':''}"  >
+			<span class="hand-pointer" data-bs-toggle="collapse" data-bs-target="#cardCollapse${item.id}" aria-expanded="${!item.collapsed?'false':'true'}" aria-fields="cardCollapse${item.id}">
+			<a class="btn btn-collapse ${item.collapsed?'collapsed':''}" data-bs-toggle="collapse" data-bs-target="#cardCollapse${item.id}" aria-expanded="${!item.collapsed?'false':'true'}" aria-fields="cardCollapse${item.id}" ><i class="fas fa-caret-up fa-2x"></i></a>	
+			${item.text}${helpButton(item)}
+			</span>
 		</div>
 		<div  id="cardCollapse${item.id}" class="card-body  card-collapse collapse p-2 pt-0 ${item.collapsed?'collapsed':'show'}">
 			<div class="row" id="${item.id}">

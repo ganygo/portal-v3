@@ -1,96 +1,153 @@
 var rootGridId = 0
 var remoteList = {}
+let bSayfaAciliyor = false
+
+
+
+function findPageObject() {
+	document.title = hashObj.title + ' - GanyGO'
+	$('#pageTitle').html(`<i class="${hashObj.icon}"></i> ${hashObj.breadCrumbsHtml}`)
+	var sayfa = getPropertyByKeyPath(global.pages, hashObj.pathKey)
+	if(!sayfa)
+		return null
+	var resp
+	switch (hashObj.func) {
+		case 'edit':
+			resp = sayfa.edit || sayfa.form
+			break
+		case 'view':
+			resp = sayfa.view || sayfa.edit || sayfa.form || null
+			break
+		case 'print':
+			resp = sayfa.print || sayfa.edit || sayfa.form || null
+			break
+		case 'addnew':
+			resp = sayfa.addnew || sayfa.form || null
+			break
+
+		case '':
+		case 'index':
+			resp = sayfa.index || null
+			break
+		default:
+			resp = sayfa[hashObj.func] || null
+			break
+	}
+	return resp
+}
+
+
+
+function publishPage(divId,before,after) {
+	if(bSayfaAciliyor)
+		return
+	if(before) before()
+	let sayfa = findPageObject()
+	if(sayfa) {
+
+		generatePage(divId, sayfa, () => {
+			bSayfaAciliyor = false
+			if(after) after()
+		})
+
+	} else {
+		$(divId).html('sayfa bulunamadi')
+		bSayfaAciliyor = false
+		if(after) after()
+	}
+}
+
 
 function generatePage(divId, pageJson, callback) {
 	$(divId).html('')
 	$(divId).hide()
-//	try {
-		let dizi = []
-		if(Array.isArray(pageJson)) {
-			dizi = pageJson
-		} else {
-			dizi.push(pageJson)
+	//	try {
+	let dizi = []
+	if(Array.isArray(pageJson)) {
+		dizi = pageJson
+	} else {
+		dizi.push(pageJson)
+	}
+
+
+	let index = 0
+	rootGridId = 0
+	remoteList = {}
+
+	function calistir(cb) {
+		if(index >= dizi.length) {
+			return cb()
 		}
 
-
-		let index = 0
-		rootGridId = 0
-		remoteList = {}
-
-		function calistir(cb) {
-			if(index >= dizi.length) {
-				return cb()
-			}
-
-			let pageSubObj = clone(dizi[index])
-			pageSubObj.level = 0
+		let pageSubObj = clone(dizi[index])
+		pageSubObj.level = 0
 
 
-			headerButtons(divId, pageSubObj)
-			// appendLinkedScript(divId, '/js/order-helper.js')
-			// appendScript(divId, `<script type="text/javascript">function formCalc(tableId) { calculateOrder('${divId}',tableId) }</script>`)
+		headerButtons(divId, pageSubObj)
+		// appendLinkedScript(divId, '/js/order-helper.js')
+		// appendScript(divId, `<script type="text/javascript">function formCalc(tableId) { calculateOrder('${divId}',tableId) }</script>`)
 
-			// appendScript(divId, pageSubObj.script)
-			getRemoteData(pageSubObj, (err, data) => {
-				if(!err) {
-					switch ((pageSubObj.type || '')) {
-						case 'filter':
-							generateControl(divId, pageSubObj, data, false, (err) => {
-								if(!err) {
-									document.querySelector(`${divId} #filterForm`).insertAdjacentHTML('beforeend', `${filterFormButton('#filterForm')}`)
-								}
-								index++
-								setTimeout(calistir, 0, cb)
-							})
-							break
+		// appendScript(divId, pageSubObj.script)
+		getRemoteData(pageSubObj, (err, data) => {
+			if(!err) {
+				switch ((pageSubObj.type || '')) {
+					case 'filter':
+						generateControl(divId, pageSubObj, data, false, (err) => {
+							if(!err) {
+								document.querySelector(`${divId} #filterForm`).insertAdjacentHTML('beforeend', `${filterFormButton('#filterForm')}`)
+							}
+							index++
+							setTimeout(calistir, 0, cb)
+						})
+						break
 
 
 
-						case 'grid':
-							generateControl(divId, pageSubObj, data, false, (err) => {
-								index++
-								setTimeout(calistir, 0, cb)
-							})
-							break
+					case 'grid':
+						generateControl(divId, pageSubObj, data, false, (err) => {
+							index++
+							setTimeout(calistir, 0, cb)
+						})
+						break
 
-						default:
-							generateControl(divId, pageSubObj, data, false, (err) => {
-								index++
-								setTimeout(calistir, 0, cb)
-							})
-							break
-							// default:
+					default:
+						generateControl(divId, pageSubObj, data, false, (err) => {
+							index++
+							setTimeout(calistir, 0, cb)
+						})
+						break
+						// default:
 
-							// index++
-							// setTimeout(calistir,0,cb)
-							// break
-					}
-				} else {
-					cb(err)
+						// index++
+						// setTimeout(calistir,0,cb)
+						// break
 				}
-			})
-		}
-
-		calistir((err) => {
-			if(err) {
-				$(divId).html(`Hata1:${err.code || err.name || ''} ${err.message || ''}`)
-				if(err.code == 'SESSION_NOT_FOUND') {
-					confirmX('Oturum sonlandırılmış. Yeniden giriş yapmak istiyor musunuz?', (answer) => {
-						if(answer) {
-							window.location.href = `/login?ret=${window.location.href}`
-
-						}
-						if(callback)
-							return callback()
-					})
-				}
+			} else {
+				cb(err)
 			}
-			loadCardCollapses()
-			$(document).trigger('loaded')
-			$(divId).show()
-			if(callback)
-				return callback()
 		})
+	}
+
+	calistir((err) => {
+		if(err) {
+			$(divId).html(`Hata1:${err.code || err.name || ''} ${err.message || ''}`)
+			if(err.code == 'SESSION_NOT_FOUND') {
+				confirmX('Oturum sonlandırılmış. Yeniden giriş yapmak istiyor musunuz?', (answer) => {
+					if(answer) {
+						window.location.href = `/login?ret=${window.location.href}`
+
+					}
+					if(callback)
+						return callback()
+				})
+			}
+		}
+		loadCardCollapses()
+		$(document).trigger('loaded')
+		$(divId).show()
+		if(callback)
+			return callback()
+	})
 	// } catch (tryErr) {
 	// 	console.error(tryErr)
 	// 	$(divId).html(`Hata2:${tryErr.name || ''} ${tryErr.message || ''}`)
@@ -104,15 +161,7 @@ function generatePage(divId, pageJson, callback) {
 function headerButtons(divId, pageSubObj) {
 	let hbtn = ``
 	if(pageSubObj.type == 'form') {
-		// hbtn = `
-		// <button id="headerButtonCalc" class="btn btn-secondary btn-form-header" title="Hesapla"><i class="fas fa-sync-alt"></i></button>
-		// <button id="headerButtonSave" class="btn btn-outline-primary btn-form-header ms-2" title="Kaydet"><i class="fas fa-save"></i></button>
-		// <a href="javascript:history.back(-1)" class="btn btn-outline-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
-		// if(pageSubObj.options) {
-		// 	if(pageSubObj.options.mode == 'view') {
-		// 		hbtn = `<a href="javascript:history.back(-1)" class="btn btn-outline-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
-		// 	}
-		// }
+	
 		hbtn = `
 		<button id="headerButtonSave" class="btn btn-outline-primary btn-form-header ms-2" title="Kaydet"><i class="fas fa-save"></i></button>
 		<a href="javascript:history.back(-1)" class="btn btn-outline-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
@@ -726,9 +775,9 @@ function itemHtmlCode(item) {
 		}
 		item.script = scriptString
 	}
-	if(item.stylesheet){
-		if(!Array.isArray(item.stylesheet)){
-			item.stylesheet=[item.stylesheet]
+	if(item.stylesheet) {
+		if(!Array.isArray(item.stylesheet)) {
+			item.stylesheet = [item.stylesheet]
 		}
 	}
 	return item

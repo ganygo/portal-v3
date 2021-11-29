@@ -21,7 +21,7 @@ var global = {
 	}
 }
 
-function initGlobals() {
+function initHahamGlobals() {
 	try {
 		if(localStorage.getItem('global')) {
 			global = Object.assign({}, global, JSON.parse(localStorage.getItem('global')))
@@ -31,7 +31,7 @@ function initGlobals() {
 	}
 }
 
-initGlobals()
+initHahamGlobals()
 initIspiyonService()
 
 var hashObj = getHashObject()
@@ -1427,63 +1427,6 @@ function pencereyiKapat() {
 	window.close()
 }
 
-function anotherViewStyle(divId) {
-	switch ((hashObj.query || {}).view || '') {
-		case 'print':
-			viewStylePrint(divId)
-			break
-		case 'plain':
-			viewStylePlain(divId)
-			break
-	}
-}
-
-function viewStylePlain(divId) {
-
-	$('body').hide()
-	$('#title-panel').hide()
-	$('.navtop').hide()
-	$('#layoutSidenav_nav').hide()
-	$('.footer').hide()
-	$('#layoutSidenav_content').css('margin-top', '0px')
-	$('#main-container').removeClass('cerceve1')
-	$('#main-container').removeClass('p1')
-
-	$('body').show()
-}
-
-function viewStylePrint(divId) {
-
-	$('body').hide()
-	$('#title-panel').hide()
-	$('.navtop').hide()
-	$('#layoutSidenav_nav').hide()
-	$('.footer').hide()
-	$('#layoutSidenav_content').css('margin-top', '0px')
-	$('#main-container').removeClass('cerceve1')
-	$('#main-container').removeClass('p1')
-	$(`body #${divId}`).remove()
-
-	var ifrm = document.createElement('iframe')
-	ifrm.setAttribute('id', divId)
-	ifrm.style.display = 'block'
-	ifrm.style.border = 'none'
-	ifrm.style.height = '90vh'
-	ifrm.style.width = '100vw'
-
-	$('body').css('margin', 0)
-
-	document.getElementById('main-container').appendChild(ifrm)
-	document.getElementById('main-container').innerHTML += `
-	<div class="row m-0 border">
-	<div class="col-12 p-2">
-	<a class="btn btn-primary ms-3 mt-2" href="javascript:frameYazdir('${divId}')"><i class="fas fa-print"></i> Yazdır</a>
-	<a class="btn btn-dark ms-3 mt-2" href="javascript:pencereyiKapat()"><i class="fas fa-times"></i> Kapat</a>
-	</div>
-	</div>
-	`
-	$('body').show()
-}
 
 function getPageSettings(module) {
 	if(!global.settings)

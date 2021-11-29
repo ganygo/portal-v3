@@ -48,7 +48,7 @@ app.use(flash())
 
 global.api = require('./providers/api/api.js')
 global.docFormHelper = require('./lib/doc_form_helper.js')
-global.dbType = require('./assets/js/dbtypes.js').types
+// global.dbType = require('./assets/js/dbtypes.js').types
 
 
 if(config.status != 'development') {
