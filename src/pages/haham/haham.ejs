@@ -1,9 +1,10 @@
 <% layout('../_common/layouts/general') %>
-<div id="mainCtrl" class="px-0 pt-2">
-	<form class="row m-0"></form>
-</div>
+<form class="row m-0">
+	<div id="mainCtrl" class="px-0 pt-2"></div>
+</form>
 <script type="text/javascript">
-	
+
+var mainDivId='#mainCtrl'
 if(window.location.hash == '') {
 	window.location.hash = '/dashboard/main'
 }
@@ -19,11 +20,11 @@ $(document).ready(() => {
 })
 
 function sayfayiGoster(){
-	publishPage('#mainCtrl form',
+	publishPage(mainDivId,
 	()=>{ //before
-		anotherViewStyle('mainCtrl')
-		$('#mainCtrl form').html('loading...')
-		bSayfaAciliyor = true
+		anotherViewStyle(mainDivId)
+		$(mainDivId).html('loading...')
+		
 		if((((hashObj || {}).query || {}).mid || '') != '') {
 			$(`#leftMenu a`).removeClass('active')
 			$(`#leftMenu #menu${hashObj.query.mid.replaceAll('.','-')}`).addClass('active')
@@ -61,7 +62,10 @@ function viewStylePlain(divId) {
 	$('body').hide()
 	$('#title-panel').hide()
 	$('.navtop').hide()
+	
+
 	$('#layoutSidenav_nav').hide()
+
 	$('.footer').hide()
 	$('#layoutSidenav_content').css('margin-top', '0px')
 	$('#main-container').removeClass('cerceve1')
@@ -75,15 +79,16 @@ function viewStylePrint(divId) {
 	$('body').hide()
 	$('#title-panel').hide()
 	$('.navtop').hide()
+	$('.navtop').removeClass('d-flex')
 	$('#layoutSidenav_nav').hide()
 	$('.footer').hide()
 	$('#layoutSidenav_content').css('margin-top', '0px')
 	$('#main-container').removeClass('cerceve1')
 	$('#main-container').removeClass('p1')
-	$(`body #${divId}`).remove()
+	$(`body ${divId}`).remove()
 
 	var ifrm = document.createElement('iframe')
-	ifrm.setAttribute('id', divId)
+	ifrm.setAttribute('id', divId.replace('#',''))
 	ifrm.style.display = 'block'
 	ifrm.style.border = 'none'
 	ifrm.style.height = '90vh'

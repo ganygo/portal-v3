@@ -182,6 +182,9 @@ function gridButtonPanel(parentId, item, insideOfModal, cb) {
 
 function gridBody(parentId, item, insideOfModal, cb) {
 	document.querySelector(`${parentId} table tbody`).innerHTML = ''
+	if(!item)
+		if(cb) cb()
+
 	if(item.value) {
 		let list = []
 		if(Array.isArray(item.value)) {
@@ -194,8 +197,11 @@ function gridBody(parentId, item, insideOfModal, cb) {
 		let fieldList = clone(item.fields)
 		let s = ``
 
-		list.forEach((listItem, rowIndex) => {
-			listItem.rowIndex = rowIndex
+		list.forEach((listItem, index) => {
+			if(!listItem)
+				listItem={}
+			
+			listItem.rowIndex = index
 			s += `<tr>`
 			if(item.options.selection) {
 				s += `<td><input class="grid-checkbox checkSingle" type="checkbox" value="${listItem._id || ''}" /></td>`
@@ -208,7 +214,7 @@ function gridBody(parentId, item, insideOfModal, cb) {
 				s += gridBody_Cell(field, listItem, insideOfModal)
 			})
 			if(item.options.buttonCount > 0) {
-				s += `<td class="text-center text-nowrap">${buttonRowCell(listItem,rowIndex,item )}</td>`
+				s += `<td class="text-center text-nowrap">${buttonRowCell(listItem,index,item )}</td>`
 			}
 			s += `</tr>`
 		})
@@ -519,7 +525,7 @@ function gridBody_Cell(field, listItem, insideOfModal) {
 				itemValue = ''
 			}
 			if(typeof itemValue == 'object' && itemValue._id != undefined) {
-				td = `<div class="">${replaceUrlCurlyBracket((field.dataSource.label || '{name}'), itemValue)}</div>`
+				td = `<div class="">${replaceUrlCurlyBracket((field.dataSource.label || '${name}'), itemValue)}</div>`
 				bRemoteOlarakBulalim = false
 			} else if(field.lookupTextField) {
 				let valueText = getPropertyByKeyPath(listItem, field.lookupTextField)
@@ -671,7 +677,7 @@ function gridButtonOptions(item, insideOfModal) {
 	}
 
 	if(options.buttons.copy[0] == true && options.buttons.copy[1] == '') {
-		options.buttons.copy[1] = `<a href="javascript:gridCopyItem({rowIndex},'#${item.id}')" class="btn btn-grid-row btn-success " title="Kopyala"><i class="fas fa-copy"></i></a>`
+		options.buttons.copy[1] = `<a href="javascript:gridCopyItem(\$\{rowIndex\},'#${item.id}')" class="btn btn-grid-row btn-success " title="Kopyala"><i class="fas fa-copy"></i></a>`
 	}
 
 	if(options.buttons.print[0] == true && options.buttons.print[1] == '') {
@@ -684,36 +690,36 @@ function gridButtonOptions(item, insideOfModal) {
 			}
 		}
 
-		options.buttons.print[1] = `<a href="javascript:popupCenter('${menuLink(hashObj.path + '/print/{_id}',q2)}','Yazdır','900','600')" class="btn btn-grid-row btn-info " title="Yazdır"><i class="fas fa-print"></i></a>`
+		options.buttons.print[1] = `<a href="javascript:popupCenter('${menuLink(hashObj.path + '/print/\$\{_id\}',q2)}','Yazdır','900','600')" class="btn btn-grid-row btn-info " title="Yazdır"><i class="fas fa-print"></i></a>`
 	}
 
 	if(options.buttons.view[0] == true && options.buttons.view[1] == '') {
-		options.buttons.view[1] = `<a href="${menuLink(hashObj.path + '/view/{_id}',q)}" class="btn btn-info btn-grid-row fas fa-eye" title="İncele"></a>`
+		options.buttons.view[1] = `<a href="${menuLink(hashObj.path + '/view/\$\{_id\}',q)}" class="btn btn-info btn-grid-row fas fa-eye" title="İncele"></a>`
 	}
 
 	if(options.buttons.edit[0] == true && options.buttons.edit[1] == '') {
 		if(item.level == 0) {
-			options.buttons.edit[1] = `<a href="${menuLink(hashObj.path + '/edit/{_id}',q)}" class="btn btn-primary btn-grid-row fas fa-edit" target="_self"  title="Düzenle"></a>`
+			options.buttons.edit[1] = `<a href="${menuLink(hashObj.path + '/edit/\$\{_id\}',q)}" class="btn btn-primary btn-grid-row fas fa-edit" target="_self"  title="Düzenle"></a>`
 		} else {
 			if(!insideOfModal) {
-				options.buttons.edit[1] = `<a href="javascript:gridSatirDuzenle('#${item.id}',{rowIndex},${insideOfModal})" class="btn btn-info btn-grid-row fas fa-edit grid-modal-mode-off" title="Satır Düzenle"></a>`
+				options.buttons.edit[1] = `<a href="javascript:gridSatirDuzenle('#${item.id}',\$\{rowIndex\},${insideOfModal})" class="btn btn-info btn-grid-row fas fa-edit grid-modal-mode-off" title="Satır Düzenle"></a>`
 				if(item.modal) {
-					options.buttons.edit[1] += `<a href="javascript:gridModalEditRow('#${item.id}',{rowIndex},${insideOfModal})" class="btn btn-success btn-grid-row fas fa-window-restore grid-modal-mode-on" title="Modal Düzenle"></a>`
+					options.buttons.edit[1] += `<a href="javascript:gridModalEditRow('#${item.id}',\$\{rowIndex\},${insideOfModal})" class="btn btn-success btn-grid-row fas fa-window-restore grid-modal-mode-on" title="Modal Düzenle"></a>`
 				}
 			} else {
-				options.buttons.edit[1] = `<a href="javascript:gridSatirDuzenle('#modalRow #${item.id}',{rowIndex},${insideOfModal})" class="btn btn-info btn-grid-row fas fa-edit" title="Satır Düzenle"></a>`
+				options.buttons.edit[1] = `<a href="javascript:gridSatirDuzenle('#modalRow #${item.id}',\$\{rowIndex\},${insideOfModal})" class="btn btn-info btn-grid-row fas fa-edit" title="Satır Düzenle"></a>`
 			}
 		}
 	}
 
 	if(options.buttons.delete[0] == true && options.buttons.delete[1] == '') {
 		if(item.level == 0) {
-			options.buttons.delete[1] = `<a href="javascript:gridDeleteItem({rowIndex},'#${item.id}')" class="btn btn-danger btn-grid-row fas fa-trash-alt" title="Sil"></a>`
+			options.buttons.delete[1] = `<a href="javascript:gridDeleteItem(\$\{rowIndex\},'#${item.id}')" class="btn btn-danger btn-grid-row fas fa-trash-alt" title="Sil"></a>`
 		} else {
 			if(!insideOfModal) {
-				options.buttons.delete[1] = `<a href="javascript:gridSatirSil('#${item.id}',{rowIndex},${insideOfModal})" class="btn btn-danger btn-grid-row fas fa-trash-alt" title="Sil"></a>`
+				options.buttons.delete[1] = `<a href="javascript:gridSatirSil('#${item.id}',\$\{rowIndex\},${insideOfModal})" class="btn btn-danger btn-grid-row fas fa-trash-alt" title="Sil"></a>`
 			} else {
-				options.buttons.delete[1] = `<a href="javascript:gridSatirSil('#modalRow #${item.id}',{rowIndex},${insideOfModal})" class="btn btn-danger btn-grid-row fas fa-trash-alt" title="Sil"></a>`
+				options.buttons.delete[1] = `<a href="javascript:gridSatirSil('#modalRow #${item.id}',\$\{rowIndex\},${insideOfModal})" class="btn btn-danger btn-grid-row fas fa-trash-alt" title="Sil"></a>`
 			}
 		}
 	}
@@ -974,7 +980,7 @@ function buttonRowCell(listItem, rowIndex, item) {
 	listItem['rowIndex'] = rowIndex
 	Object.keys(item.options.buttons).forEach((key) => {
 		if(key != 'add') {
-			s += `${item.options.buttons[key][0]?replaceUrlCurlyBracket(item.options.buttons[key][1],listItem):''}`
+			s += `${item.options.buttons[key][0]?htmlEval(item.options.buttons[key][1],listItem):''}`
 		}
 	})
 

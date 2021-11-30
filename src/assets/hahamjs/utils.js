@@ -424,9 +424,10 @@ function calculate(formula, values) {
 	return eval(code)
 }
 
-function htmlEval(html, values = {}) {
+function htmlEval(html, values = {}, bracketDollar=true) {
 	try {
-		html = html.replaceAll('${', '{').replaceAll('{', '${')
+		// if(bracketDollar)
+		// 	html = html.replaceAll('${', '{').replaceAll('{', '${')
 		let code = ''
 		Object.keys(values).forEach((key) => {
 			code += `let ${key}=${JSON.stringify(values[key])}\n`

@@ -1415,12 +1415,16 @@ function runPanelButtons(url, method) {
 
 
 function frameYazdir(frameId) {
-	var mainCtrl = document.getElementById(frameId)
+	var mainCtrl = document.querySelector(frameId)
+	if(!mainCtrl){
+		console.log(`HATA: ${frameId} Bulunamadi`)
+	}
 	var iframe = mainCtrl.contentWindow || (mainCtrl.contentDocument.document || mainCtrl.contentDocument)
 
 	iframe.focus()
 	iframe.print()
 }
+
 
 function pencereyiKapat() {
 	window.open('', '_parent', '');
@@ -1651,32 +1655,21 @@ function getUrlInfo(href = window.location.href) {
 	}
 }
 
-
-
-
-// function appendScript(divId, html) {
-// 	if(script) {
-// 		let innerScript = ''
-// 		if(Array.isArray(script)) {
-// 			script.forEach((e) => {
-// 				innerScript += e + '\n'
-// 			})
-// 		} else {
-// 			innerScript = script
-// 		}
-
-// 		let i = 0,
-// 			bFound = false
-// 		while(i < document.scripts.length) {
-// 			if(document.scripts[i].innerHTML == innerScript) {
-// 				bFound = true
-// 				break
-// 			}
-// 			i++
-// 		}
-// 		if(!bFound) {
-// 			document.querySelector(divId).insertAdjacentHTML('afterbegin', `<script type="text/javascript">${innerScript}</script>`)
-// 		}
-// 	}
-// }
-
+function insertHTML(divId,position,html){
+	if(!document.querySelector(divId)){
+		console.error(`insertHTML ${divId} Bulunamadi`)
+	}else{
+		if(document.querySelector(divId).tagName=='IFRAME'){
+			let conDoc=document.querySelector(divId).contentDocument
+			if(conDoc){
+				conDoc.write(html)
+				// if(conDoc.querySelector('body'))
+				// 	conDoc.querySelector('body').insertAdjacentHTML(position, html)
+			}
+			
+		}else{
+			document.querySelector(divId).insertAdjacentHTML(position, html)
+		}
+	}
+	
+}

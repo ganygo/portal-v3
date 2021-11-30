@@ -1,6 +1,4 @@
 module.exports = function(req,res,callback){
-	var data={
-		
-	}
+	var data={}
 	callback(null,data)
 }

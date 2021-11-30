@@ -2,7 +2,10 @@
 module.exports = (app) => {
 	firstRoutes(app)
 
+	setRoutes(app, '/api/downloadFile/:func/:param1/:param2/:param3', localApiDownload)
 	setRoutes(app, '/api/:func/:param1/:param2/:param3', localApi)
+	
+	setRoutes(app, '/dbapi/downloadFile/:func/:param1/:param2/:param3', localDbApiDownload)
 	setRoutes(app, '/dbapi/:func/:param1/:param2/:param3', localDbApi)
 
 	pageRoutes(app)
@@ -35,7 +38,7 @@ function firstRoutes(app) {
 		if(!req.session.token) {
 			res.redirect('/login')
 		} else {
-			api({ endpoint: '/session/changedb', method: 'POST', token: req.session.token || '', body: { db: req.query.db || req.session.dbId || '', sid: sid } }, (err, resp) => {
+			api.request({ endpoint: '/session/changedb', method: 'POST', token: req.session.token || '', body: { db: req.query.db || req.session.dbId || '', sid: sid } }, (err, resp) => {
 				if(!err) {
 					Object.keys(resp.data).forEach((key) => {
 						if(!['sessionId', '_id', 'token', 'username', 'role'].includes())
@@ -67,7 +70,7 @@ function firstRoutes(app) {
 			} else {
 				var auth = JSON.parse(decodeURIComponent(req.query.auth))
 
-				api({ endpoint: '/session', method: 'POST', token: auth.token || '' }, (err, resp) => {
+				api.request({ endpoint: '/session', method: 'POST', token: auth.token || '' }, (err, resp) => {
 					if(!err) {
 						Object.keys(resp.data).forEach((key) => {
 							if(!['sessionId', '_id', 'token', 'username', 'role'].includes())
@@ -134,11 +137,19 @@ function setRoutes(app, route, cb1, cb2) {
 }
 
 function localApi(req, res) {
-	api(req, (err, data) => {
+	api.request(req, (err, data) => {
 		if(err) {
 			res.status(200).json({ success: false, error: err })
 		} else {
 			res.status(200).json(data)
+		}
+	})
+}
+
+function localApiDownload(req, res) {
+	api.downloadFile(req,res, (err, data) => {
+		if(err) {
+			res.status(403).send(err.message)
 		}
 	})
 }
@@ -152,11 +163,28 @@ function localDbApi(req, res) {
 		endpoint += '/' + req.params[key]
 	})
 	req.endpoint = endpoint
-	api(req, (err, data) => {
+	api.request(req, (err, data) => {
 		if(err) {
 			res.status(200).json({ success: false, error: err })
 		} else {
 			res.status(200).json(data)
+		}
+	})
+}
+
+function localDbApiDownload(req, res) {
+
+	if(!(req.session || {}).dbId)
+		return res.status(403).send(JSON.stringify({ success: false, error: { code: 'SESSION_NOT_FOUND', message: 'Oturum sonlandırılmış' } }))
+	let endpoint = `/${req.session.dbId}`
+	Object.keys(req.params || {}).forEach((key, index) => {
+		endpoint += '/' + req.params[key]
+	})
+	req.endpoint = endpoint
+	console.log(`localDbApiDownload req.endpoint:`,req.endpoint)
+	api.downloadFile(req,res, (err, data) => {
+		if(err) {
+			res.status(403).send(err.message)
 		}
 	})
 }

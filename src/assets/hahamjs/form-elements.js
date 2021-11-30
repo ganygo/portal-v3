@@ -90,7 +90,8 @@ function frm_FormHtml(parentId, item, cb) {
 
 	let s = frm_Group(html, item)
 
-	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
+	// document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s,item))
+	insertHTML(parentId, 'beforeend', htmlEval(s, item,false))
 	cb()
 }
 
@@ -347,7 +348,7 @@ function frm_TotalBox(parentId, item, cb) {
 
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 
-	
+
 
 	cb()
 }

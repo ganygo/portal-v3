@@ -41,6 +41,7 @@ function findPageObject() {
 function publishPage(divId,before,after) {
 	if(bSayfaAciliyor)
 		return
+	bSayfaAciliyor = true
 	if(before) before()
 	let sayfa = findPageObject()
 	if(sayfa) {
