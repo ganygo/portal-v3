@@ -18,7 +18,8 @@ var global = {
 		amount: { round: 2 },
 		quantity: { round: 3 },
 		price: { round: 4 }
-	}
+	},
+	status: ''
 }
 
 function initHahamGlobals() {
@@ -40,12 +41,12 @@ function getHashObject() {
 	if(window.location.hash == '')
 		return {}
 
-	var hash = window.location.hash.substr(1)
-	var queryString = hash.split('?')[1] ? hash.split('?')[1] : ''
-	var dizi = hash.split('?')[0].split('/')
+	let hash = window.location.hash.substr(1)
+	let queryString = hash.split('?')[1] ? hash.split('?')[1] : ''
+	let dizi = hash.split('?')[0].split('/')
 	dizi.splice(0, 1)
 
-	var h = {
+	let h = {
 		path: dizi.length > 1 ? `/${dizi[0]}/${dizi[1]}` : '',
 		pathKey: dizi.length > 1 ? `${dizi[0]}.${dizi[1]}` : '',
 		func: dizi.length > 2 ? dizi[2] : '',
@@ -71,7 +72,7 @@ function getHashObject() {
 
 		h.query = getAllUrlParams(queryString)
 	}
-	var p = getPageInfos(h)
+	let p = getPageInfos(h)
 	h = Object.assign({}, h, p)
 	h['settings'] = getPageSettings(h.module)
 
@@ -79,7 +80,7 @@ function getHashObject() {
 }
 
 function setHashObject(h) {
-	var hashString = h.path || ''
+	let hashString = h.path || ''
 
 	if(h.func != '' && h.func != 'index') {
 		hashString += '/' + h.func
@@ -98,7 +99,7 @@ function setHashObject(h) {
 	}
 
 	if(h.query) {
-		var filterString = ''
+		let filterString = ''
 		Object.keys(h.query).forEach((key) => {
 			if(filterString != '')
 				filterString += '&'
@@ -113,7 +114,7 @@ function setHashObject(h) {
 }
 
 function getPageInfos(h = null) {
-	var p = {
+	let p = {
 		module: '',
 		icon: '',
 		title: '',
@@ -125,7 +126,7 @@ function getPageInfos(h = null) {
 	if(h == null) {
 		h = hashObj
 	}
-	var breadCrumbs = []
+	let breadCrumbs = []
 	if((h.query.mid || '') == '') {
 		breadCrumbs = getBreadCrumbsFromPath(global.menu, (h.path)) || []
 	} else {
@@ -158,7 +159,7 @@ function getPageInfos(h = null) {
 			}
 			breadCrumbs.push({ icon: '', text: p.funcTitle })
 		}
-		var sbuf = ''
+		let sbuf = ''
 		sbuf = breadCrumbs.length > 0 ? breadCrumbs[0].text : ''
 		p.breadCrumbs += sbuf
 		p.breadCrumbsHtml += breadCrumbs.length == 1 ? `<span class="font-weight-bold text-orange">${breadCrumbs[0].text}</span>` : sbuf
@@ -184,9 +185,9 @@ function getPageInfos(h = null) {
 }
 
 function getModulePageName() {
-	var pageName = 'page'
-	var dizi = hashObj.path.split('/')
-	var k = 0
+	let pageName = 'page'
+	let dizi = hashObj.path.split('/')
+	let k = 0
 	dizi.forEach((e) => {
 		if(e != '') {
 			if(k == 2) {
@@ -205,7 +206,7 @@ function getModulePageName() {
 var pageSettings = {
 	setItem: function(param, value) {
 		try {
-			var obj = JSON.parse(localStorage.getItem(`${getModulePageName()}`) || '{}')
+			let obj = JSON.parse(localStorage.getItem(`${getModulePageName()}`) || '{}')
 			obj[param] = value
 			localStorage.setItem(`${getModulePageName()}`, JSON.stringify(obj))
 		} catch (err) {
@@ -214,7 +215,7 @@ var pageSettings = {
 	},
 	getItem: function(param) {
 		try {
-			var obj = JSON.parse(localStorage.getItem(`${getModulePageName()}`) || '{}')
+			let obj = JSON.parse(localStorage.getItem(`${getModulePageName()}`) || '{}')
 			if(obj[param] == undefined)
 				obj[param] = null
 
@@ -229,7 +230,7 @@ var pageSettings = {
 
 function helpButton(item) {
 	if((item.help || '') != '') {
-		var helpUrl = item.help
+		let helpUrl = item.help
 		//manipulateUrl(item.help)
 
 		return `<a href="javascript:openInNewTab('${helpUrl}')" class="skip-enter-next text-primary bold ms-2" title="Yardım ve açıklama için tıklayınız"><i class="far fa-question-circle"></i></a>`
@@ -239,7 +240,7 @@ function helpButton(item) {
 }
 
 function maxLookupLength(lookup) {
-	var max = 0
+	let max = 0
 	Object.keys(lookup).forEach((key) => {
 		if(lookup[key].length > max)
 			max = lookup[key].length
@@ -248,11 +249,11 @@ function maxLookupLength(lookup) {
 }
 
 function generateFormName(name) {
-	var keys = name.toString().split('.')
+	let keys = name.toString().split('.')
 	if(keys.length <= 1) {
 		return name
 	} else {
-		var s = ''
+		let s = ''
 		keys.forEach((k, index) => {
 			if(index == 0)
 				s = k
@@ -271,8 +272,8 @@ function generateFormId(name) {
 }
 
 function loadCardCollapses() {
-	var kartlar = document.getElementsByClassName('card-collapse')
-	var i = 0
+	let kartlar = document.getElementsByClassName('card-collapse')
+	let i = 0
 	while(i < kartlar.length) {
 		if(pageSettings.getItem(`collapse_${kartlar[i].id}`)) {
 			$(`#${kartlar[i].id}`).collapse(pageSettings.getItem(`collapse_${kartlar[i].id}`))
@@ -306,25 +307,27 @@ function getAjax(url, labelStr = '{name}', exceptId = '', cb) {
 		dataType: 'json',
 		success: function(result) {
 			if(result.success) {
-				var dizi = []
+				let dizi = []
 
-				if(result.data.docs != undefined) {
-					result.data.docs.forEach((e) => {
-
-						var text = replaceUrlCurlyBracket(labelStr, e)
-						dizi.push({ label: text, value: text, obj: e })
-					})
-				} else {
-					if(Array.isArray(result.data)) {
-						result.data.forEach((e) => {
-							var text = replaceUrlCurlyBracket(labelStr, e)
+				if(result.data) {
+					if(result.data.docs != undefined) {
+						result.data.docs.forEach((e) => {
+							let text = replaceUrlCurlyBracket(labelStr, e)
 							dizi.push({ label: text, value: text, obj: e })
 						})
 					} else {
-						var text = replaceUrlCurlyBracket(labelStr, result.data)
-						dizi.push({ label: text, value: text, obj: result.data })
+						if(Array.isArray(result.data)) {
+							result.data.forEach((e) => {
+								let text = replaceUrlCurlyBracket(labelStr, e)
+								dizi.push({ label: text, value: text, obj: e })
+							})
+						} else {
+							let text = replaceUrlCurlyBracket(labelStr, result.data)
+							dizi.push({ label: text, value: text, obj: result.data })
+						}
 					}
 				}
+
 
 				if(cb)
 					cb(null, dizi)
@@ -346,19 +349,19 @@ function remoteLookupAutocomplete(locals) {
 	if(locals.dataSource == undefined)
 		return
 
-	var searchUrl = ''
+	let searchUrl = ''
 	if((locals.dataSource.search || '') != '') {
 		searchUrl = replaceUrlCurlyBracket(locals.dataSource.search, { _id: locals.value })
 
 	} else if((locals.dataSource.url || '') != '') {
 		searchUrl = replaceUrlCurlyBracket(locals.dataSource.url, { _id: locals.value })
 		if(searchUrl.indexOf('?') < 0) {
-			searchUrl += '?search={search}'
+			searchUrl += '?search=${search}'
 		} else {
-			searchUrl += '&search={search}'
+			searchUrl += '&search=${search}'
 		}
 	}
-	var idUrl = ''
+	let idUrl = ''
 	if(locals.dataSource.id || locals.dataSource.idUrl) {
 		idUrl = replaceUrlCurlyBracket(locals.dataSource.id || locals.dataSource.idUrl, { _id: locals.value })
 
@@ -376,14 +379,15 @@ function remoteLookupAutocomplete(locals) {
 		return
 	}
 
-	var labelStr = (locals.dataSource.label || '{name}')
-	var valueText = locals.valueText || ''
+	let labelStr = (locals.dataSource.label || '{name}')
+	let valueText = locals.valueText || ''
 
 
 	$(`#${locals.id}-autocomplete-text`).autocomplete({
 		source: function(request, response) {
-			var typedText = encodeURIComponent2(request.term)
-			var url = searchUrl.replace('{search}', typedText).replace('{search}', typedText).replace('{mid}', q.mid)
+			let typedText = encodeURIComponent2(request.term)
+			// let url = searchUrl.replace('${search}', typedText).replace('{search}', typedText).replace('${mid}', q.mid).replace('{mid}', q.mid)
+			let url = htmlEval(searchUrl, { search: typedText, mid: q.mid || '' })
 
 			getAjax(url, `${labelStr}`, ``, (err, result) => {
 				if(!err) {
@@ -400,8 +404,8 @@ function remoteLookupAutocomplete(locals) {
 			$(`#${locals.id}-obj`).val(encodeURIComponent2(JSON.stringify(ui.item.obj)))
 			if(locals.lookupTextField) {
 				$(`input[name="${locals.lookupTextFieldName}"]`).val((ui.item.label || ''))
-				$(`#${locals.id}-original-text`).html((ui.item.label || ''))
-				$(`#${locals.id}-original-text`).attr('title', (ui.item.label || ''))
+				// $(`#${locals.id}-original-text`).html((ui.item.label || ''))
+				// $(`#${locals.id}-original-text`).attr('title', (ui.item.label || ''))
 			}
 			if(locals.onchange) {
 				eval(`${locals.onchange}`)
@@ -415,11 +419,11 @@ function remoteLookupAutocomplete(locals) {
 
 		if($(`#${locals.id}-autocomplete-text`).val() == '') {
 			$(`input[name="${locals.name}"]`).val('')
-			$(`#${locals.id}-obj`).val('')
-			if(locals.lookupTextField) {
-				$(`#${locals.id}-original-text`).html('')
-				$(`#${locals.id}-original-text`).attr('title', '')
-			}
+			// $(`#${locals.id}-obj`).val('')
+			// if(locals.lookupTextField) {
+			// 	$(`#${locals.id}-original-text`).html('')
+			// 	$(`#${locals.id}-original-text`).attr('title', '')
+			// }
 		}
 		if(locals.lookupTextField) {
 			$(`input[name="${locals.lookupTextFieldName}"]`).val($(`#${locals.id}-autocomplete-text`).val())
@@ -428,7 +432,7 @@ function remoteLookupAutocomplete(locals) {
 
 
 	if((locals.value || '') != '') {
-		var url = idUrl.replace('{mid}', q.mid)
+		let url = idUrl.replace('{mid}', q.mid)
 		getAjax(url, `${labelStr}`, ``, (err, result) => {
 			if(!err) {
 				if(result.length > 0) {
@@ -437,7 +441,7 @@ function remoteLookupAutocomplete(locals) {
 					}
 
 					$(`input[name="${locals.name}"]`).val(result[0].obj._id.toString())
-					$(`#${locals.id}-obj`).val(encodeURIComponent2(JSON.stringify(result[0].obj)))
+					// $(`#${locals.id}-obj`).val(encodeURIComponent2(JSON.stringify(result[0].obj)))
 
 					if(locals.lookupTextField) {
 						$(`#${locals.id}-original-text`).html((result[0].label || ''))
@@ -448,9 +452,9 @@ function remoteLookupAutocomplete(locals) {
 					if(valueText == '')
 						$(`#${locals.id}-autocomplete-text`).val('')
 					$(`input[name="${locals.name}"]`).val('')
-					$(`#${locals.id}-obj`).val('')
-					$(`#${locals.id}-original-text`).html('')
-					$(`#${locals.id}-original-text`).attr('title', '')
+					// $(`#${locals.id}-obj`).val('')
+					// $(`#${locals.id}-original-text`).html('')
+					// $(`#${locals.id}-original-text`).attr('title', '')
 				}
 
 			} else {
@@ -466,8 +470,8 @@ function remoteLookupAutocomplete(locals) {
 
 function cboEasyDateChange(value) {
 
-	var date1 = new Date()
-	var date2 = new Date()
+	let date1 = new Date()
+	let date2 = new Date()
 	date1.setHours(0, 0, 0, 0)
 	date1.setMinutes(-1 * (new Date()).getTimezoneOffset())
 	date2.setHours(0, 0, 0, 0)
@@ -528,8 +532,8 @@ function replaceUrlCurlyBracket(url, item) {
 		return ''
 	if(!(url.indexOf('{') > -1 && url.indexOf('}') > -1))
 		return url
-	var fieldList = []
-	var dizi = url.split('}')
+	let fieldList = []
+	let dizi = url.split('}')
 	dizi.forEach((e) => {
 		if(e.indexOf('{') > -1) {
 			fieldList.push(e.split('{')[1])
@@ -538,8 +542,8 @@ function replaceUrlCurlyBracket(url, item) {
 
 
 	fieldList.forEach((e) => {
-		var e2 = e.replace('.toLowerCase()', '').replace('.toUpperCase()', '')
-		var value = getPropertyByKeyPath(item, e2)
+		let e2 = e.replace('.toLowerCase()', '').replace('.toUpperCase()', '')
+		let value = getPropertyByKeyPath(item, e2)
 
 		if(value) {
 			if(e.indexOf('.toLowerCase()') > -1) {
@@ -567,13 +571,13 @@ function getPropertyByKeyPath(targetObj, keyPath, defaultValue) {
 		keyPath = keyPath.substr(2)
 	keyPath = keyPath.replaceAll('/', '.')
 
-	var keys = keyPath.split('.')
+	let keys = keyPath.split('.')
 	if(keys.length == 0)
 		return defaultPropertyValue(undefined, defaultValue)
 	keys = keys.reverse()
-	var subObject = targetObj
+	let subObject = targetObj
 	while(keys.length) {
-		var k = keys.pop()
+		let k = keys.pop()
 		if(typeof subObject[k] == 'undefined' || subObject[k] == null) {
 			return defaultPropertyValue(undefined, defaultValue)
 		} else {
@@ -606,34 +610,48 @@ function defaultPropertyValue(subObject, defaultValue) {
 }
 
 function getFormData(divId) {
-	var obj = listObjectToObject($(`${divId}`).serializeArray().reduce((obj, item) => ({ ...obj, ...{[item.name.replaceAll('[', '.').replaceAll(']', '')]: item.value}}), {}))
-	$(`${divId} input[type=checkbox]`).each(function() {
-		if(this.name) {
-			var key = this.name
-			key = key.replaceAll('[', '').replaceAll(']', '.')
-			if(key.substr(-1) == '.') {
-				key = key.substr(0, key.length - 1)
+	let liste = document.querySelectorAll(`${divId} input, select`)
+	let obj = {}
+	let i = 0
+	while(i < liste.length) {
+		let e = liste[i]
+		let key = e.getAttribute('data-field')
+		let dataType = e.getAttribute('data-type') || ''
+		if(key) {
+			if(key.indexOf('.-1.') < 0) {
+				if(['number', 'money', 'total', 'quantity', 'amount', 'price'].includes(dataType)) {
+					obj[key] = Number(e.value)
+				} else if(dataType == 'boolean') {
+					if(e.type == 'checkbox') {
+						obj[key] = e.checked
+					} else {
+						obj[key] = Boolean(e.value)
+					}
+				} else {
+					obj[key] = e.value
+				}
 			}
-			obj[key] = this.checked
 		}
-	})
-	return obj
+		i++
+	}
+	return listObjectToObject(obj)
 }
 
-function getFormData1111(divId) {
-	var obj = listObjectToObject($(`${divId}`).serializeArray().reduce((obj, item) => ({ ...obj, ...{[item.name.replaceAll('[', '.').replaceAll(']', '')]: item.value}}), {}))
-	$(`${divId} input[type=checkbox]`).each(function() {
-		if(this.name) {
-			var key = this.name
-			key = key.replaceAll('[', '').replaceAll(']', '.')
-			if(key.substr(-1) == '.') {
-				key = key.substr(0, key.length - 1)
-			}
-			obj[key] = this.checked
-		}
-	})
-	return obj
-}
+// function getFormData1111(divId) {
+// 	let obj = listObjectToObject($(`${divId}`).serializeArray().reduce((obj, item) => ({ ...obj, ...{
+// 			[item.name.replaceAll('[', '.').replaceAll(']', '')]: item.value } }), {}))
+// 	$(`${divId} input[type=checkbox]`).each(function() {
+// 		if(this.name) {
+// 			let key = this.name
+// 			key = key.replaceAll('[', '').replaceAll(']', '.')
+// 			if(key.substr(-1) == '.') {
+// 				key = key.substr(0, key.length - 1)
+// 			}
+// 			obj[key] = this.checked
+// 		}
+// 	})
+// 	return obj
+// }
 
 function getRemoteData(item, cb) {
 
@@ -737,7 +755,7 @@ function getRemoteData(item, cb) {
 function cariKart_changed(prefix) {
 	if(prefix.indexOf('.party.') < 0)
 		prefix += '.party.'
-	var fieldList = [
+	let fieldList = [
 		"person.firstName.value",
 		"person.familyName.value",
 		"partyIdentification.0.ID.value",
@@ -761,16 +779,16 @@ function cariKart_changed(prefix) {
 		"websiteURI.value"
 	]
 
-	var cari = $(`#${generateFormId(prefix+'_id')}-obj`).val()
+	let cari = $(`#${generateFormId(prefix+'_id')}-obj`).val()
 	if(cari == undefined)
 		return
-	var obj = JSON.parse(decodeURIComponent(cari))
+	let obj = JSON.parse(decodeURIComponent(cari))
 
 
 	fieldList.forEach((e) => {
-		var componentFieldName = `${prefix}${e}`
+		let componentFieldName = `${prefix}${e}`
 
-		var value = getPropertyByKeyPath(obj, e)
+		let value = getPropertyByKeyPath(obj, e)
 		if(value != undefined) {
 			if($(`#${generateFormId(componentFieldName)}`).val() != undefined) {
 				$(`#${generateFormId(componentFieldName)}`).val(value)
@@ -785,10 +803,10 @@ function cariKart_changed(prefix) {
 }
 
 function countryCode_changed(prefix) {
-	var fieldName = `${prefix}postalAddress.country.identificationCode.value`
-	var fieldNameCountryName = `${prefix}postalAddress.country.name.value`
-	var countryCode = $(`#${generateFormId(fieldName)}`).val() || ''
-	var countryText = $(`#${generateFormId(fieldName)} option:selected`).text() || ''
+	let fieldName = `${prefix}postalAddress.country.identificationCode.value`
+	let fieldNameCountryName = `${prefix}postalAddress.country.name.value`
+	let countryCode = $(`#${generateFormId(fieldName)}`).val() || ''
+	let countryText = $(`#${generateFormId(fieldName)} option:selected`).text() || ''
 
 	if(countryCode != '') {
 		$(`#${generateFormId(fieldNameCountryName)}`).val(countryText)
@@ -798,8 +816,8 @@ function countryCode_changed(prefix) {
 
 
 function formSave(dataSource, formData) {
-	var url = dataSource.url
-	var method = 'GET'
+	let url = dataSource.url
+	let method = 'GET'
 	if(hashObj.func == 'addnew') {
 		method = 'POST'
 	} else if(hashObj.func == 'edit' && hashObj.id) {
@@ -826,7 +844,7 @@ function formSave(dataSource, formData) {
 				if(hashObj.func == 'index') {
 					alertX('Kayıt başarılı :-)')
 				} else {
-					var h = Object.assign({}, hashObj, { func: 'index', query: { page: 1 } })
+					let h = Object.assign({}, hashObj, { func: 'index', query: { page: 1 } })
 					setHashObject(h)
 				}
 
@@ -841,11 +859,11 @@ function formSave(dataSource, formData) {
 }
 
 function collectFieldList(item) {
-	var fieldList = {}
+	let fieldList = {}
 	if(item.tabs) {
 		item.tabs.forEach((tab) => {
 			if(tab.fields) {
-				var f = collectFieldList(tab.fields)
+				let f = collectFieldList(tab.fields)
 				fieldList = Object.assign({}, fieldList, f)
 			}
 		})
@@ -854,7 +872,7 @@ function collectFieldList(item) {
 
 		Object.keys(item.fields).forEach((key) => {
 			if(item.fields[key].fields) {
-				var f = collectFieldList(item.fields[key])
+				let f = collectFieldList(item.fields[key])
 
 				if(item.fields[key].type == 'grid') {
 
@@ -862,7 +880,7 @@ function collectFieldList(item) {
 						f[k].id = f[k].id || generateFormId(key + '.' + k)
 						f[k].name = f[k].name || generateFormName(key + '.' + k)
 					})
-					var f2 = {}
+					let f2 = {}
 					f2[key] = f
 					fieldList = Object.assign({}, fieldList, f2)
 				} else {
@@ -887,12 +905,12 @@ function collectFieldList(item) {
 function refreshRemoteList(remoteList) {
 
 	Object.keys(remoteList).forEach((e) => {
-		var idList = []
+		let idList = []
 		Object.keys(remoteList[e].list).forEach((key) => {
 			idList.push(key)
 		})
 
-		var url = `${remoteList[e].dataSource.url.split('?')[0]}/${idList.join(',')}`
+		let url = `${remoteList[e].dataSource.url.split('?')[0]}/${idList.join(',')}`
 		getAjax(url, remoteList[e].dataSource.label || '{name}', '', (err, dizi) => {
 			if(!err) {
 
@@ -977,13 +995,13 @@ function runFilter(selector, prefix = '') {
 
 
 function menuLink(path, filter) {
-	var s = `#${path}`
+	let s = `#${path}`
 
 	if(!filter) {
 		filter = {}
 	}
 	if(filter) {
-		var filterString = ''
+		let filterString = ''
 		Object.keys(filter).forEach((key) => {
 			if(filterString != '')
 				filterString += '&'
@@ -1001,18 +1019,18 @@ function openPage(url, title) {
 var q = getAllUrlParams()
 
 function getAllUrlParams(query = null) {
-	var q = {}
-	var queryString = query || window.location.search
+	let q = {}
+	let queryString = query || window.location.search
 	if(queryString.substr(0, 1) != '?') {
 		queryString = '?' + queryString
 	}
-	var dizi = queryString.split('&')
+	let dizi = queryString.split('&')
 	dizi.forEach((d) => {
-		var key = d.split('=')[0]
+		let key = d.split('=')[0]
 		if(key[0] == '?')
 			key = key.substr(1)
 
-		var value = getUrlParameter(key, queryString)
+		let value = getUrlParameter(key, queryString)
 
 		if(value != '') {
 
@@ -1024,16 +1042,16 @@ function getAllUrlParams(query = null) {
 
 function getUrlParameter(name, query = null) {
 	name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]')
-	var regex = new RegExp('[\\?&]' + name + '=([^&#]*)')
-	var results = regex.exec(query || location.search)
+	let regex = new RegExp('[\\?&]' + name + '=([^&#]*)')
+	let results = regex.exec(query || location.search)
 
 	return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '))
 }
 
 function generateLeftMenu(leftMenu) {
-	var mid = hashObj.query.mid || '0'
+	let mid = hashObj.query.mid || '0'
 
-	var s = ``
+	let s = ``
 	leftMenu.forEach((item, index) => {
 		s += generateMenu(item, mid)
 	})
@@ -1041,8 +1059,8 @@ function generateLeftMenu(leftMenu) {
 }
 
 function generateMenu(menu, mid, parent) {
-	var s = ``
-	var bActive = false
+	let s = ``
+	let bActive = false
 	if(menu.visible === false)
 		return ''
 
@@ -1103,7 +1121,7 @@ function generateMenu(menu, mid, parent) {
 		}
 		s = `\n`
 
-		var link = menuLink(menu.path, { mid: menu.mId })
+		let link = menuLink(menu.path, { mid: menu.mId })
 		if(menu.path == '/settings/form-options') {
 			global.formOptionsLink = link
 
@@ -1119,7 +1137,7 @@ function generateMenu(menu, mid, parent) {
 }
 
 function getBreadCrumbs(leftMenu, mid) {
-	var menuItem = []
+	let menuItem = []
 
 	leftMenu.forEach((m1) => {
 		if(menuItem.length > 0)
@@ -1166,7 +1184,7 @@ function getBreadCrumbs(leftMenu, mid) {
 }
 
 function getBreadCrumbsFromPath(leftMenu, path) {
-	var menuItem = []
+	let menuItem = []
 
 	leftMenu.forEach((m1) => {
 		if(menuItem.length > 0)
@@ -1230,7 +1248,7 @@ function windowPathToFieldName(path = '') {
 
 
 function programButtons1111(panelButtons = '') {
-	var prgButtons = []
+	let prgButtons = []
 	if(hashObj.settings) {
 		prgButtons = hashObj.settings.programButtons || []
 	}
@@ -1239,15 +1257,15 @@ function programButtons1111(panelButtons = '') {
 	if(prgButtons.length == 0 && panelButtons == '')
 		return ''
 
-	var sbuf = `<div class="button-bar mt-0 p-1 rounded justify-content-start" role="toolbar" aria-label="Toolbar with button groups">\n`
+	let sbuf = `<div class="button-bar mt-0 p-1 rounded justify-content-start" role="toolbar" aria-label="Toolbar with button groups">\n`
 	if(panelButtons != '')
 		sbuf += panelButtons
 
 	if(prgButtons.length > 0) {
 		prgButtons.forEach((e) => {
 			if(e.passive == false) {
-				var icon = ''
-				var text = e.text || ''
+				let icon = ''
+				let text = e.text || ''
 				if((e.icon || '') != '') {
 					icon = e.icon
 				} else {
@@ -1288,10 +1306,10 @@ function programButtons1111(panelButtons = '') {
 
 function programFileUploaderChangeEvent() {
 	$("#fileUpload").change(function() {
-		var reader = new FileReader()
-		var fileIndex = 0
-		var files = this.files
-		var uploadFiles = []
+		let reader = new FileReader()
+		let fileIndex = 0
+		let files = this.files
+		let uploadFiles = []
 		reader.addEventListener("load", function() {
 
 			if(reader.result) {
@@ -1306,7 +1324,7 @@ function programFileUploaderChangeEvent() {
 				document.dispatchEvent(new CustomEvent("file-upload-finished", { detail: uploadFiles }))
 				return
 			}
-			var file = files[fileIndex]
+			let file = files[fileIndex]
 			uploadFiles.push({ name: file.name, modifiedDate: file.lastModifiedDate, size: file.size, data: '' })
 
 			reader.readAsDataURL(file)
@@ -1320,7 +1338,7 @@ var programId = ''
 var programType = ''
 
 document.addEventListener('file-upload-finished', function(event) {
-	var data = { files: event.detail }
+	let data = { files: event.detail }
 	runProgramAjax(data)
 })
 
@@ -1331,7 +1349,7 @@ function runProgram(_id, type) {
 		$('#fileUpload').trigger('click')
 		return
 	}
-	var list = []
+	let list = []
 
 	$(".checkSingle").each(function() {
 		if(this.checked) {
@@ -1340,7 +1358,7 @@ function runProgram(_id, type) {
 	})
 	if(list.length == 0)
 		return alertX('Hiç kayıt seçilmemiş')
-	var data = { list: list }
+	let data = { list: list }
 	runProgramAjax(data)
 }
 
@@ -1380,7 +1398,7 @@ function runProgramAjax(data) {
 
 function runPanelButtons(url, method) {
 
-	var list = []
+	let list = []
 
 	$(".checkSingle").each(function() {
 		if(this.checked) {
@@ -1389,7 +1407,7 @@ function runPanelButtons(url, method) {
 	})
 	if(list.length == 0)
 		return alertX('Hiç kayıt seçilmemiş')
-	var data = { list: list }
+	let data = { list: list }
 	$.ajax({
 		url: url,
 		data: data,
@@ -1415,11 +1433,11 @@ function runPanelButtons(url, method) {
 
 
 function frameYazdir(frameId) {
-	var mainCtrl = document.querySelector(frameId)
-	if(!mainCtrl){
+	let mainCtrl = document.querySelector(frameId)
+	if(!mainCtrl) {
 		console.log(`HATA: ${frameId} Bulunamadi`)
 	}
-	var iframe = mainCtrl.contentWindow || (mainCtrl.contentDocument.document || mainCtrl.contentDocument)
+	let iframe = mainCtrl.contentWindow || (mainCtrl.contentDocument.document || mainCtrl.contentDocument)
 
 	iframe.focus()
 	iframe.print()
@@ -1435,7 +1453,7 @@ function pencereyiKapat() {
 function getPageSettings(module) {
 	if(!global.settings)
 		return []
-	var obj = global.settings.find((e) => {
+	let obj = global.settings.find((e) => {
 		if(e.module == module) {
 			return true
 		} else {
@@ -1471,7 +1489,7 @@ moment.updateLocale('en', {
 function initIspiyonService() {
 	if(!global.ispiyonServiceUrl)
 		return
-	var socket = io(global.ispiyonServiceUrl, {
+	let socket = io(global.ispiyonServiceUrl, {
 		reconnectionDelayMax: 10000
 	})
 	socket.on('connect', () => {
@@ -1491,7 +1509,7 @@ function initIspiyonService() {
 	})
 
 	socket.on('NOTIFY', (text, status, icon) => {
-		var message = SnackBar({
+		let message = SnackBar({
 			message: (text || '').substr(0, 500),
 			status: status || 'orange',
 			dismissible: true,
@@ -1506,7 +1524,7 @@ function initIspiyonService() {
 
 		$('#alertsDropdown').on('shown.bs.dropdown', () => {
 
-			var s = ``
+			let s = ``
 			if(global.lastNotifications) {
 				global.lastNotifications.forEach((e, index) => {
 					s += notificationItem(e._id, e.createdDate, e.text, e.status, e.icon)
@@ -1527,7 +1545,7 @@ function initIspiyonService() {
 }
 
 function notificationItem(id, notifyDate, text, status, icon) {
-	var bgClass = 'bg-primary'
+	let bgClass = 'bg-primary'
 	switch (status || '') {
 		case 'success':
 			bgClass = 'bg-primary'
@@ -1542,7 +1560,7 @@ function notificationItem(id, notifyDate, text, status, icon) {
 			icon = icon || 'fas fa-exclamation-triangle'
 			break
 	}
-	var s = `
+	let s = `
 	<a id='${id}' class="notification-dropdown-item dropdown-item d-flex align-items-center" href="#">
 	<div class="me-3">
 	<div class="icon-circle ${bgClass}">
@@ -1559,7 +1577,7 @@ function notificationItem(id, notifyDate, text, status, icon) {
 }
 
 function notifyMe(text, status) {
-	var message = SnackBar({
+	let message = SnackBar({
 		message: text,
 		status: status || 'orange',
 		dismissible: true,
@@ -1642,7 +1660,7 @@ function generateFieldName(name) {
 }
 
 function getUrlInfo(href = window.location.href) {
-	var match = href.match(/^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/);
+	let match = href.match(/^(https?\:)\/\/(([^:\/?#]*)(?:\:([0-9]+))?)([\/]{0,1}[^?#]*)(\?[^#]*|)(#.*|)$/);
 	return match && {
 		href: href,
 		protocol: match[1],
@@ -1655,21 +1673,37 @@ function getUrlInfo(href = window.location.href) {
 	}
 }
 
-function insertHTML(divId,position,html){
-	if(!document.querySelector(divId)){
-		console.error(`insertHTML ${divId} Bulunamadi`)
-	}else{
-		if(document.querySelector(divId).tagName=='IFRAME'){
-			let conDoc=document.querySelector(divId).contentDocument
-			if(conDoc){
-				conDoc.write(html)
-				// if(conDoc.querySelector('body'))
-				// 	conDoc.querySelector('body').insertAdjacentHTML(position, html)
-			}
-			
-		}else{
-			document.querySelector(divId).insertAdjacentHTML(position, html)
-		}
+function calculate(formula, values) {
+	if((formula || '') == '')
+		return 0
+	formula = formula.replaceAll('${', '{').replaceAll('{', '${')
+	let code = `(function(){
+	`
+	Object.keys(values).forEach((key) => {
+		code += `let ${key}=${JSON.stringify(values[key])}\n`
+	})
+
+	code += `return eval(\`${formula}\`)
+	})()`
+
+	return eval(code)
+}
+
+function htmlEval(html, values = {}, bracketDollar = true) {
+	try {
+		let code = ''
+		Object.keys(values).forEach((key) => {
+			code += `let ${key}=${JSON.stringify(values[key])}\n`
+		})
+		code += `return \`${html}\``
+		let f = new Function(code)
+		return f()
+	} catch (tryErr) {
+		// if(global.status==='development'){
+		// 	console.log('htmlEval error:',tryErr)
+		// 	console.log('htmlEval html:',html)
+		// 	console.log('htmlEval values:',values)
+		// }
 	}
-	
+	return html
 }

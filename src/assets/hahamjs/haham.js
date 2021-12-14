@@ -38,7 +38,7 @@ function findPageObject() {
 
 
 
-function publishPage(divId,before,after) {
+function publishPage(divId, before, after) {
 	if(bSayfaAciliyor)
 		return
 	bSayfaAciliyor = true
@@ -161,15 +161,18 @@ function generatePage(divId, pageJson, callback) {
 
 function headerButtons(divId, pageSubObj) {
 	let hbtn = ``
-	if(pageSubObj.type == 'form') {
-	
-		hbtn = `
-		<button id="headerButtonSave" class="btn btn-outline-primary btn-form-header ms-2" title="Kaydet"><i class="fas fa-save"></i></button>
-		<a href="javascript:history.back(-1)" class="btn btn-outline-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
+	if(hashObj.query.view === 'plain') {
+		hbtn = `<a class="btn btn-dark btn-form-header ms-2" href="javascript:pencereyiKapat()"><i class="fas fa-times"></i> Kapat</a>`
+	} else {
+		if(pageSubObj.type == 'form') {
 
-		if(pageSubObj.options) {
-			if(pageSubObj.options.mode == 'view') {
-				hbtn = `<a href="javascript:history.back(-1)" class="btn btn-outline-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
+			hbtn = `<button id="headerButtonSave" class="btn btn-outline-primary btn-form-header ms-2" title="Kaydet"><i class="fas fa-save"></i></button>
+			<a href="javascript:history.back(-1)" class="btn btn-outline-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
+
+			if(pageSubObj.options) {
+				if(pageSubObj.options.mode == 'view') {
+					hbtn = `<a href="javascript:history.back(-1)" class="btn btn-outline-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
+				}
 			}
 		}
 	}
@@ -187,6 +190,7 @@ function generateControl(divId, item, data, insideOfModal, callback) {
 
 	if(item.type == 'widget') {
 		item = generateWidget(item)
+
 	}
 
 
@@ -332,6 +336,7 @@ function generateControl(divId, item, data, insideOfModal, callback) {
 			frm_Button(divId, item, cb)
 			break
 		case 'lookup':
+
 			item.value = getPropertyByKeyPath(data, item.field, item.value) || ''
 			frm_Lookup(divId, item, cb)
 			break
@@ -511,7 +516,6 @@ function generateControl(divId, item, data, insideOfModal, callback) {
 
 	function cb() {
 		if(item.html) {
-			console.log(`item.html:`, item.html)
 			document.querySelector(divId).insertAdjacentHTML('beforeend', item.html)
 		}
 		callback()
@@ -551,19 +555,115 @@ function itemLevels(item, level = 0) {
 function generateWidget(item) {
 	if(!item.widget)
 		return item
+
+	if(!global.widgets[item.widget])
+		return item
+
+	let widget = clone(global.widgets[item.widget])
+
+	Object.assign(item, widget)
+
+	item.type = 'widgetControl'
+	item.dataType = 'widgetControl'
+
+	if((item.prefix || '') != '') {
+		let copyItem = {}
+		Object.keys(item).forEach((key) => {
+			if(key != 'fields') {
+				let yeniKey = htmlEval(key, { prefix: item.prefix })
+				copyItem[yeniKey] = item[key]
+			}
+		})
+		if(item.fields != undefined) {
+			copyItem.fields = {}
+			Object.keys(item.fields).forEach((key) => {
+				let yeniKey = htmlEval(key, { prefix: item.prefix })
+				copyItem.fields[yeniKey] = item.fields[key]
+				Object.keys(copyItem.fields[yeniKey] || {}).forEach((key2) => {
+					if(typeof copyItem.fields[yeniKey][key2] == 'string') {
+						let yeniDeger = htmlEval(copyItem.fields[yeniKey][key2], { prefix: item.prefix })
+						copyItem.fields[yeniKey][key2] = yeniDeger
+					}
+				})
+			})
+
+		}
+		return copyItem
+	} else {
+		return item
+	}
+}
+
+
+function generateWidget222(item) {
+	if(!item.widget)
+		return item
 	if(!global.widgets[item.widget])
 		return item
 
 	let prefix = item.prefix || ''
-	cloneWidget = clone(global.widgets[item.widget])
+	let widget
+	let cloneWidget = clone(global.widgets[item.widget])
 	cloneWidget.level = item.level
-	let widget = widgetPrefixDuzelt(cloneWidget, { prefix: prefix })
-	widget = Object.assign({}, widget, item)
+
+	if(prefix == '') {
+		widget = cloneWidget
+	} else {
+		widget = widgetPrefixDuzelt(cloneWidget, { prefix: prefix })
+	}
+
+
+	Object.assign(widget, item)
 	widget.type = 'widgetControl'
+	console.log(`widget:`, widget)
 	return widget
 }
 
-function widgetPrefixDuzelt(itemWidget, valueObj) {
+function widgetPrefixDuzelt2222(itemWidget, valueObj) {
+	if(!itemWidget.fields)
+		return itemWidget
+	let obj = {}
+
+	Object.keys(itemWidget).forEach((key) => {
+		if(key != 'fields') {
+			// obj[key]={}
+			// obj[key]=Object.assign({},obj[key],itemWidget[key])
+			obj[key] = clone(itemWidget[key])
+		}
+	})
+
+	obj.level = itemWidget.level || 0
+	obj.fields = {}
+	Object.keys(itemWidget.fields).forEach((key) => {
+		let yeniKey = htmlEval(key, valueObj)
+		if(itemWidget.fields[key].type != 'widget') {
+			if(itemWidget.fields[key].fields != undefined) {
+				obj.fields[yeniKey] = widgetPrefixDuzelt(itemWidget.fields[key], valueObj)
+				obj.fields[yeniKey].level = obj.level + 1
+			} else {
+				// obj.fields[yeniKey]={}
+				// obj.fields[yeniKey]=Object.assign({},obj.fields[yeniKey],itemWidget.fields[key])
+				obj.fields[yeniKey] = itemWidget.fields[key]
+				if(typeof obj.fields[yeniKey] == 'object' && yeniKey != 'lookup') {
+					obj.fields[yeniKey].level = obj.level + 1
+				}
+				Object.keys(obj.fields[yeniKey]).forEach((key2) => {
+					if(obj.fields[yeniKey][key2]) {
+						if(key2 != 'fields') {
+							// if(typeof obj.fields[yeniKey][key2]==='string' && ['text','value','html'].includes(key2)) {
+							obj.fields[yeniKey][key2] = htmlEval(obj.fields[yeniKey][key2], valueObj)
+						}
+					}
+				})
+			}
+		}
+
+	})
+	return obj
+}
+
+
+function widgetPrefixDuzelt11112(itemWidget, valueObj) {
 	if(!itemWidget.fields)
 		return itemWidget
 	let obj = { level: itemWidget.level }
@@ -692,8 +792,9 @@ function itemDefaultValues(item, autocol = false, insideOfModal = false, queryVa
 	item.visible = item.visible == undefined ? true : item.visible
 	item.collapsed = item.collapsed == undefined ? false : item.collapsed
 
-
-	item.lookup = item.lookup || {}
+	if(item.lookup == undefined) {
+		item.lookup = {}
+	}
 
 	if(item.staticValues) {
 		item.lookup = global.staticValues[item.staticValues] || {}
@@ -749,6 +850,7 @@ function itemDefaultValues(item, autocol = false, insideOfModal = false, queryVa
 		}
 	} catch {}
 
+
 	return item
 }
 
@@ -785,8 +887,6 @@ function itemHtmlCode(item) {
 }
 
 function formKaydet(dataSource, divId) {
-
-
 	let numberInputs = document.querySelectorAll(`${divId} .formatted-number`)
 	let i = 0
 	while(i < numberInputs.length) {

@@ -37,6 +37,7 @@ body {
 </div>
 <script type="text/javascript">
 var data = <%- JSON.stringify(data) %>
+data.status='<%- config.status || '' %>'
 
 if((localStorage.getItem('global') || '') == '') {
 	localStorage.clear()

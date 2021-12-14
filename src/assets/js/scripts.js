@@ -1,7 +1,7 @@
 $(document).ready(function(){
 
-	$(document).on('scroll', function() {
-		var scrollDistance = $(this).scrollTop()
+	$('#right-side').on('scroll', function() {
+		let scrollDistance = $(this).scrollTop()
 		if (scrollDistance > 100) {
 			$('.scroll-to-top').fadeIn()
 		} else {
@@ -37,12 +37,13 @@ $(document).ready(function(){
 })
 
 function scrollToTop() {
-	var body = document.body
-	var html = document.documentElement
-	body.scrollLeft = 0
-	body.scrollTop = 0
-	html.scrollLeft = 0
-	html.scrollTop = 0
+	document.querySelector('#right-side').scrollTop=0;
+	// var body = document.body
+	// var html = document.documentElement
+	// body.scrollLeft = 0
+	// body.scrollTop = 0
+	// html.scrollLeft = 0
+	// html.scrollTop = 0
 }
 
 function enterNext(bu){

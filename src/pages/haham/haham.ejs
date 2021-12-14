@@ -3,8 +3,7 @@
 	<div id="mainCtrl" class="px-0 pt-2"></div>
 </form>
 <script type="text/javascript">
-
-var mainDivId='#mainCtrl'
+var mainDivId = '#mainCtrl'
 if(window.location.hash == '') {
 	window.location.hash = '/dashboard/main'
 }
@@ -19,28 +18,28 @@ $(document).ready(() => {
 	}
 })
 
-function sayfayiGoster(){
+function sayfayiGoster() {
 	publishPage(mainDivId,
-	()=>{ //before
-		anotherViewStyle(mainDivId)
-		$(mainDivId).html('loading...')
-		
-		if((((hashObj || {}).query || {}).mid || '') != '') {
-			$(`#leftMenu a`).removeClass('active')
-			$(`#leftMenu #menu${hashObj.query.mid.replaceAll('.','-')}`).addClass('active')
-		}
-		toggleMenu()
-	},
-	()=>{ //after
+		() => { //before
+			anotherViewStyle(mainDivId)
+			$(mainDivId).html('loading...')
 
-	})
+			if((((hashObj || {}).query || {}).mid || '') != '') {
+				$(`#leftMenu a`).removeClass('active')
+				$(`#leftMenu #menu${hashObj.query.mid.replaceAll('.','-')}`).addClass('active')
+			}
+			toggleMenu()
+		},
+		() => { //after
+
+		})
 }
 
 function toggleMenu(status) {
 	if(status == 'show') {
-		$('#layoutSidenav_nav').toggle(0)
+		$('#menu-side').toggle(0)
 	} else if(window.innerWidth < 1000) {
-		$('#layoutSidenav_nav').hide()
+		$('#menu-side').hide()
 
 	}
 }
@@ -62,7 +61,7 @@ function viewStylePlain(divId) {
 	$('body').hide()
 	$('#title-panel').hide()
 	$('.navtop').hide()
-	
+	$('.navtop').removeClass('d-flex')
 
 	$('#layoutSidenav_nav').hide()
 
@@ -70,6 +69,8 @@ function viewStylePlain(divId) {
 	$('#layoutSidenav_content').css('margin-top', '0px')
 	$('#main-container').removeClass('cerceve1')
 	$('#main-container').removeClass('p1')
+
+	
 
 	$('body').show()
 }
@@ -78,6 +79,7 @@ function viewStylePrint(divId) {
 
 	$('body').hide()
 	$('#title-panel').hide()
+	$('#title-panel').removeClass('d-flex')
 	$('.navtop').hide()
 	$('.navtop').removeClass('d-flex')
 	$('#layoutSidenav_nav').hide()
@@ -85,26 +87,23 @@ function viewStylePrint(divId) {
 	$('#layoutSidenav_content').css('margin-top', '0px')
 	$('#main-container').removeClass('cerceve1')
 	$('#main-container').removeClass('p1')
-	$(`body ${divId}`).remove()
+	$(divId).addClass('print')
 
-	var ifrm = document.createElement('iframe')
-	ifrm.setAttribute('id', divId.replace('#',''))
-	ifrm.style.display = 'block'
-	ifrm.style.border = 'none'
-	ifrm.style.height = '90vh'
-	ifrm.style.width = '100vw'
 
 	$('body').css('margin', 0)
 
-	document.getElementById('main-container').appendChild(ifrm)
-	document.getElementById('main-container').innerHTML += `
-	<div class="row m-0 border">
-	<div class="col-12 p-2">
-	<a class="btn btn-primary ms-3 mt-2" href="javascript:frameYazdir('${divId}')"><i class="fas fa-print"></i> Yazdır</a>
-	<a class="btn btn-dark ms-3 mt-2" href="javascript:pencereyiKapat()"><i class="fas fa-times"></i> Kapat</a>
-	</div>
-	</div>
-	`
+	if(!document.querySelector('#printButtonPanel')) {
+
+		let s = `<div id="printButtonPanel" class="row m-0 border">
+		<div class="col-12 p-2">
+		<a class="btn btn-primary ms-3 mt-2" href="javascript:frameYazdir('${divId} iframe')"><i class="fas fa-print"></i> Yazdır</a>
+		<a class="btn btn-dark ms-3 mt-2" href="javascript:pencereyiKapat()"><i class="fas fa-times"></i> Kapat</a>
+		</div>
+		</div>
+		`
+		document.querySelector('#main-container').insertAdjacentHTML('afterend', s)
+	}
+
 	$('body').show()
 }
 </script>

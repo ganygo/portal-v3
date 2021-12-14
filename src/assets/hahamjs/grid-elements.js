@@ -11,7 +11,7 @@ function grid(parentId, item, insideOfModal, cb) {
 		<div class="border p-1">
 		<div class="d-md-flex pt-1 px-1">
 		<div class="d-md-flex flex-fill m-0 p-0 mt-1 mb-1">
-		${item.options.show.filter?'<a class="btn btn-secondary btn-sm me-md-3" style="max-height:28px;" data-bs-toggle="collapse" href="#filterRow" role="button" aria-expanded="false" aria-controls="filterRow" title="Filtre satırını göster/gizle"><i class="fas fa-filter"></i></a>':''}
+		${item.options.show.filter?'<a class="btn btn-secondary btn-sm me-md-3" style="max-height: 28px;color: white;text-shadow: 1px 1px 2px var(--bs-dark);" data-bs-toggle="collapse" href="#filterRow" role="button" aria-expanded="false" aria-controls="filterRow" title="Filtre satırını göster/gizle"><i class="fas fa-filter"></i></a>':''}
 		${item.options.show.pageSize?gridPageSize(item ):''}
 		${item.options.show.pageCount?gridPageCount(item ):''}
 		</div>
@@ -23,8 +23,7 @@ function grid(parentId, item, insideOfModal, cb) {
 	s += `
 	<div id="${item.id}" level="${item.level}" data-type="${item.dataType}" data-field="${item.field || ''}" class="table-responsive p-0 ${item.options.show.infoRow?'mt-1':''}">
 	<table id="table${item.id}" class="table table-striped border m-0 haham-table ${item.level>0 ?'table-bordered':''}"  cellspacing="0">
-	<tbody>
-	</tbody>
+	<tbody></tbody>
 	</table>
 	</div>
 	`
@@ -53,6 +52,8 @@ function grid(parentId, item, insideOfModal, cb) {
 	if(item.level == 0) {
 		programFileUploaderChangeEvent()
 	}
+
+
 
 	gridButtonPanel(`${parentId} #buttonPanel${item.id}`, item, insideOfModal, () => {
 		gridHeader(`${parentId} #${item.id}`, item, insideOfModal, () => {
@@ -180,6 +181,7 @@ function gridButtonPanel(parentId, item, insideOfModal, cb) {
 	}
 }
 
+
 function gridBody(parentId, item, insideOfModal, cb) {
 	document.querySelector(`${parentId} table tbody`).innerHTML = ''
 	if(!item)
@@ -199,28 +201,27 @@ function gridBody(parentId, item, insideOfModal, cb) {
 
 		list.forEach((listItem, index) => {
 			if(!listItem)
-				listItem={}
-			
+				listItem = {}
+
 			listItem.rowIndex = index
 			s += `<tr>`
 			if(item.options.selection) {
 				s += `<td><input class="grid-checkbox checkSingle" type="checkbox" value="${listItem._id || ''}" /></td>`
 			}
 			Object.keys(fieldList).forEach((key) => {
-				var field = fieldList[key]
+				let field = fieldList[key]
 				field.field = key
 				field.parentField = item.parentField || ''
 				field.class = replaceUrlCurlyBracket(field.class, listItem)
 				s += gridBody_Cell(field, listItem, insideOfModal)
 			})
 			if(item.options.buttonCount > 0) {
-				s += `<td class="text-center text-nowrap">${buttonRowCell(listItem,index,item )}</td>`
+				s += `<td class="border-start text-center text-nowrap p-0">${buttonRowCell(listItem,index,item )}</td>`
 			}
 			s += `</tr>`
 		})
 
 		document.querySelector(`${parentId} table tbody`).insertAdjacentHTML('beforeend', htmlEval(s))
-
 
 		refreshRemoteList(remoteList)
 	}
@@ -254,19 +255,22 @@ function gridYeniSatir(parentId, insideOfModal) {
 	let rowIndex = -1
 	let newRow = tbody.insertRow()
 	let fieldList = clone(item.fields)
-	newRow.id = `${table.id}-gridSatir-edit-${rowIndex}`
+	newRow.id = `${table.id}-grid-newrow`
 	newRow.classList.add('grid-modal-mode-off')
+
+
 	Object.keys(fieldList).forEach((key, cellIndex) => {
-		var field = clone(fieldList[key])
+		let field = clone(fieldList[key])
 		field.field = `${item.field}.${rowIndex}.${key}`
 		field.id = generateFormId(field.field)
 		field.name = generateFormName(field.field)
 		field.noGroup = true
+		field.insideOfGrid = true
 		field.value = field.value || ''
 		field.valueText = field.valueText || ''
-		var td = newRow.insertCell()
+		let td = newRow.insertCell()
 		td.id = 'td_' + field.id
-
+		td.classList.add('p-0')
 
 		if(field.lastRecord) {
 			if(table.item.value.length > 0) {
@@ -289,12 +293,25 @@ function gridYeniSatir(parentId, insideOfModal) {
 
 	let td = newRow.insertCell()
 	td.classList.add('text-center')
+	td.classList.add('text-nowrap')
+	td.classList.add('border-start')
+	td.classList.add('p-0')
 	td.innerHTML = `<a href="javascript:gridSatirOK('${parentId}','${newRow.id}',${rowIndex},${insideOfModal})" class="btn btn-primary btn-grid-row" title="Tamam"><i class="fas fa-check"></i></a>
 	<a href="javascript:gridSatirVazgec('${parentId}','${newRow.id}',${rowIndex},${insideOfModal}) "class="btn btn-dark btn-grid-row" title="Vazgeç"><i class="fas fa-reply"></i></a>
 	`
+
+	// let s = `<div id="${table.id}-grid-show-newrow" class="grid-modal-mode-off text-end d-flex"><a href="javascript:gridShowNewRow('${parentId} table tbody #${table.id}-grid-newrow','#${table.id}-grid-show-newrow') " class="btn btn-primary btn-grid-row" title="Yeni Satır"><i class="far fa-plus-square"></i> Satır Ekle</a></div>`
+	// document.querySelector(parentId).insertAdjacentHTML('beforeend', s)
+
 	editRowCalculation(`${parentId} tbody #${newRow.id}`, `${table.item.parentField}.${rowIndex}`, fieldList)
 	ilkElemanaFocuslan(`${parentId} #${newRow.id}`)
 }
+
+function gridShowNewRow(showRowId, hideRowId) {
+	$(showRowId).show()
+	$(hideRowId).hide()
+}
+
 
 function editRowCalculation(selector, prefix, fields) {
 
@@ -341,8 +358,8 @@ function editRowCalculation(selector, prefix, fields) {
 }
 
 function gridSatirOK(tableId, rowId, rowIndex, insideOfModal) {
-	var table = document.querySelector(tableId)
-	var satirObj = getDivData(`${tableId} #${rowId}`, `${table.item.field}.${rowIndex}`)
+	let table = document.querySelector(tableId)
+	let satirObj = getDivData(`${tableId} #${rowId}`, `${table.item.field}.${rowIndex}`)
 
 	if(rowIndex > -1) {
 		table.item.value[rowIndex] = Object.assign({}, table.item.value[rowIndex], satirObj)
@@ -386,13 +403,13 @@ function gridSatirDuzenle(tableId, rowIndex, insideOfModal) {
 
 	function editRowSekillendir(item, editRow, tableId, rowIndex) {
 		Object.keys(item.fields).forEach((key, cellIndex) => {
-			var field = clone(item.fields[key])
+			let field = clone(item.fields[key])
 			field.field = `${item.field}.${rowIndex}.${key}`
 			field.id = generateFormId(field.field)
 			field.name = generateFormName(field.field)
 			field.noGroup = true
 			field.value = ''
-			var td = editRow.insertCell()
+			let td = editRow.insertCell()
 			td.id = 'td_' + field.id
 			if(field.visible === false) {
 				//td.innerHTML = editRow.detail.cells[cellIndex].innerHTML
@@ -407,7 +424,7 @@ function gridSatirDuzenle(tableId, rowIndex, insideOfModal) {
 			}
 
 			field.valueText = editRow.detail.cells[cellIndex].innerText
-			var data = { value: {} }
+			let data = { value: {} }
 			data.value[field.field] = field.value
 			if(field.lookupTextField) {
 				data.value[field.lookupTextField] = field.valueText
@@ -419,6 +436,9 @@ function gridSatirDuzenle(tableId, rowIndex, insideOfModal) {
 
 		let td = editRow.insertCell()
 		td.classList.add('text-center')
+		td.classList.add('text-nowrap')
+		td.classList.add('border-start')
+		td.classList.add('p-0')
 		td.innerHTML = `<a href="javascript:gridSatirOK('${tableId}','${editRow.id}',${rowIndex},${insideOfModal})" class="btn btn-primary btn-grid-row" title="Tamam"><i class="fas fa-check"></i></a>
 		<a href="javascript:gridSatirVazgec('${tableId}','${editRow.id}',${rowIndex},${insideOfModal}) "class="btn btn-dark btn-grid-row" title="Vazgeç"><i class="fas fa-reply"></i></a>
 		`
@@ -531,7 +551,14 @@ function gridBody_Cell(field, listItem, insideOfModal) {
 				let valueText = getPropertyByKeyPath(listItem, field.lookupTextField)
 				td = `<div class="">${valueText}</div>`
 				if(field.level > 0) {
-					td += `<input type="hidden" name="${generateFormName((field.parentField?field.parentField + '.':'') + listItem.rowIndex + '.' + field.lookupTextField)}" value="${valueText}" />`
+					let sbuf = `${(field.parentField?field.parentField + '.':'')}${listItem.rowIndex}.${field.lookupTextField}`
+					let p = {
+						name: generateFormName(sbuf),
+						value: valueText,
+						dataType: 'string',
+						field: sbuf
+					}
+					td += `<input type="hidden" name="${p.name}" value="${p.value}" data-type="${p.dataType}" data-field="${p.field}" />`
 				}
 
 				if(valueText == '' && itemValue != '') {
@@ -575,27 +602,51 @@ function gridBody_Cell(field, listItem, insideOfModal) {
 			break
 	}
 	if(!field.html && field.level > 0) {
-		var prefix = (field.parentField ? field.parentField + '.' : '') + listItem.rowIndex
+		let prefix = (field.parentField ? field.parentField + '.' : '') + listItem.rowIndex
 		if(Array.isArray(itemValue)) {
 
 			itemValue.forEach((e, index) => {
 				if(typeof e == 'object') {
 					Object.keys(e).forEach((k) => {
-						td += `<input type="hidden" name="${generateFormName(prefix + '.' + field.field + '.' + index + '.' + k)}" value="${e[k]}" />`
+						let p = {
+							name: generateFormName(`${prefix}.${field.field}.${index}.${k}`),
+							value: e[k],
+							dataType: field.dataType || '',
+							field: `${prefix}.${field.field}.${index}.${k}`
+						}
+						td += `<input type="hidden" name="${p.name}" value="${p.value}" data-type="${p.dataType}" data-field="${p.field}" />`
 					})
 				} else {
-					td += `<input type="hidden" name="${generateFormName(prefix + '.' + field.field + '.' + index)}" value="${e}" />`
+					let p = {
+						name: generateFormName(`${prefix}.${field.field}.${index}`),
+						value: e,
+						dataType: field.dataType || '',
+						field: `${prefix}.${field.field}.${index}`
+					}
+					td += `<input type="hidden" name="${p.name}" value="${p.value}" data-type="${p.dataType}" data-field="${p.field}" />`
 				}
 			})
 		} else if(typeof itemValue == 'object') {
 
 			itemValue = objectToListObject(itemValue)
 			Object.keys(itemValue).forEach((e) => {
-				td += `<input type="hidden" name="${generateFormName(prefix + '.' + field.field + '.' + e)}" value="${itemValue[e]}" />`
+				let p = {
+					name: generateFormName(`${prefix}.${field.field}.${e}`),
+					value: e,
+					dataType: field.dataType || '',
+					field: `${prefix}.${field.field}.${e}`
+				}
+				td += `<input type="hidden" name="${p.name}" value="${p.value}" data-type="${p.dataType}" data-field="${p.field}" />`
 			})
 
 		} else {
-			td += `<input type="hidden" name="${generateFormName(prefix + '.' + field.field)}" value="${itemValue}" />`
+			let p = {
+				name: generateFormName(`${prefix}.${field.field}`),
+				value: itemValue,
+				dataType: field.dataType || '',
+				field: `${prefix}.${field.field}`
+			}
+			td += `<input type="hidden" name="${p.name}" value="${p.value}" data-type="${p.dataType}" data-field="${p.field}" />`
 		}
 	}
 
@@ -681,7 +732,7 @@ function gridButtonOptions(item, insideOfModal) {
 	}
 
 	if(options.buttons.print[0] == true && options.buttons.print[1] == '') {
-		var q2 = clone(q)
+		let q2 = clone(q)
 		q2['view'] = 'print'
 
 		if(hashObj.settings.print) {
@@ -774,7 +825,7 @@ function gridShowHideModalButtons(parentId, checked) {
 }
 
 function gridHeader(parentId, item, insideOfModal, cb) {
-	var s = `
+	let s = `
 	<thead>
 	<tr class="text-nowrap">`
 	if(item.options.selection === true) {
@@ -782,29 +833,33 @@ function gridHeader(parentId, item, insideOfModal, cb) {
 	}
 
 	Object.keys(item.fields).forEach((key) => {
-		var field = item.fields[key]
-		var cls = ''
-		switch (item.fields[key].type) {
-			case 'number':
-			case 'money':
-			case 'amount':
-			case 'price':
-			case 'quantity':
-			case 'total':
-				cls = 'text-end me-1'
-				break
-			case 'boolean':
-				cls = 'text-center'
-				break
+		let field = item.fields[key]
+		let cls = ''
+		if((field.headerClass || '') == '') {
+			switch (item.fields[key].type) {
+				case 'number':
+				case 'money':
+				case 'amount':
+				case 'price':
+				case 'quantity':
+				case 'total':
+					cls = 'text-end me-1'
+					break
+				case 'boolean':
+					cls = 'text-center'
+					break
+			}
+		} else {
+			cls = field.headerClass
 		}
 		if(field.visible === false) {
 			cls += ' hidden'
 		}
-		s += `<th class="${cls}" style="${field.width?'width:' + field.width + ';min-width:' + field.width + ';':''}">${field.icon?'<i class="' + field.icon + '"></i>':''} ${itemLabelCaption(field)}</th>`
+		s += `<th class="${cls}" style="${field.width?'width:' + field.width + ';min-width:' + field.width + ';':''}">${field.icon?'<i class="' + field.icon + '"></i> ':''}${itemLabelCaption(field)}</th>`
 	})
 
 	if(item.options.buttonCount > 0) {
-		s += `<th class="text-center" style="width:${item.options.buttonWidth}">
+		s += `<th class="text-center border-start" style="width:${item.options.buttonWidth}">
 		${item.options.buttons.add[0]==true?item.options.buttons.add[1]:''}
 		</th>`
 	}
@@ -861,7 +916,7 @@ function gridFilterRow(parentId, item, insideOfModal, cb) {
 	}
 
 	calistir(() => {
-		document.querySelector(`${parentId} #filterRow`).insertAdjacentHTML('beforeend', `<th>&nbsp;</th>`)
+		document.querySelector(`${parentId} #filterRow`).insertAdjacentHTML('beforeend', `<th class="border-start">&nbsp;</th>`)
 		cb()
 	})
 }
@@ -965,7 +1020,7 @@ function gridFooter(item) {
 }
 
 function filterFormButton(divId) {
-	var s = `
+	let s = `
 	<div class="ms-auto col text-end pt-2 pt-md-4">
 	<a href="javascript:runFilter('#${divId}')" class="btn btn-primary text-nowrap" title="Filtrele" ><i class="fas fa-sync-alt"><i class="fas fa-filter ms-2"></i></i></a>
 	</div>
@@ -975,8 +1030,7 @@ function filterFormButton(divId) {
 }
 
 function buttonRowCell(listItem, rowIndex, item) {
-	var s = ``
-
+	let s = ``
 	listItem['rowIndex'] = rowIndex
 	Object.keys(item.options.buttons).forEach((key) => {
 		if(key != 'add') {
@@ -989,7 +1043,7 @@ function buttonRowCell(listItem, rowIndex, item) {
 
 function gridPageSize(item) {
 
-	var s = `<div class="align-items-center" style="display: inline-flex">
+	let s = `<div class="align-items-center" style="display: inline-flex">
 	Sayfada
 	<select class="form-control input-inline input-sm ms-1" id="pageSize${item.id}">
 	<option value="10" ${item.value.pageSize==10?'selected':''}>10</option>
@@ -1005,7 +1059,7 @@ function gridPageSize(item) {
 }
 
 function gridPageCount(item) {
-	var s = `<div class="mt-1 ms-2" style="display: inline-block">`
+	let s = `<div class="mt-1 ms-2" style="display: inline-block">`
 	if(item.value.pageSize > 0 && item.value.recordCount > 0) {
 		s += `${((item.value.page-1)*item.value.pageSize)+1} - ${(item.value.page*item.value.pageSize<item.value.recordCount)?item.value.page*item.value.pageSize:item.value.recordCount} arası, Toplam: ${item.value.recordCount} kayit, ${item.value.pageCount} sayfa`
 	} else {
@@ -1022,14 +1076,14 @@ function gridPagerButtons(item) {
 	if((item.value.pageCount || 0) <= 1)
 		return ''
 
-	var s = `
+	let s = `
 	<ul class="pagination mb-1">`
 	if(item.value.page > 1) {
 		s += `<li class="page-item"><a class="page-link" href="${menuLink(hashObj.path,pageNo(1))}">|&lt;</a></li>
 		<li class="page-item"><a class="page-link" href="${menuLink(hashObj.path,pageNo(item.value.page-1))}">&lt;</a></li>`
 	}
 
-	var sayfalar = pagination(item.value.page, item.value.pageCount)
+	let sayfalar = pagination(item.value.page, item.value.pageCount)
 	sayfalar.forEach((e) => {
 		if(e == item.value.page.toString()) {
 			s += `<li class="page-item active"><span class="page-link">${item.value.page}</span></li>`
@@ -1049,7 +1103,7 @@ function gridPagerButtons(item) {
 	return s
 
 	function pageNo(page) {
-		var query = clone(hashObj.query)
+		let query = clone(hashObj.query)
 		query['page'] = page
 		return query
 	}
@@ -1099,7 +1153,7 @@ function gridDefaults(item, insideOfModal) {
 		item.options.show.filterRow = false
 
 	if(item.options.show.filterRow) {
-		var bFound = false
+		let bFound = false
 		Object.keys(item.fields).forEach((key) => {
 			if(item.fields[key].filter == undefined) {
 				item.fields[key].filter = true
@@ -1132,7 +1186,7 @@ function gridModalEditRow(tableId, rowIndex, insideOfModal) {
 	$(`#modalRow .modal-body`).html('')
 
 
-	var gridLine = {}
+	let gridLine = {}
 
 	if(item.modal) {
 		gridLine = clone(item.modal)
@@ -1153,7 +1207,8 @@ function gridModalEditRow(tableId, rowIndex, insideOfModal) {
 		gridLine.value = {}
 		$(`#modalRow .modal-title`).html('<i class="far fa-plus-square"></i> Yeni satir')
 		Object.keys(item.fields).forEach((key, cellIndex) => {
-			var field = item.fields[key]
+			item.fields[key].field = ''
+			let field = item.fields[key]
 
 			if(field.lastRecord) {
 				if(table.item.value.length > 0) {
@@ -1181,9 +1236,9 @@ function gridModalEditRow(tableId, rowIndex, insideOfModal) {
 }
 
 function gridModalOK(tableId, rowIndex, insideOfModal) {
-	var table = document.querySelector(tableId)
+	let table = document.querySelector(tableId)
 
-	var satirObj = getDivData(`#modalRow .modal-body`, '', false)
+	let satirObj = getDivData(`#modalRow .modal-body`, '', false)
 
 	if(rowIndex > -1) {
 		table.item.value[rowIndex] = satirObj
@@ -1203,7 +1258,7 @@ function grid_onchange(item) {
 		if(document.querySelector(`${item.pageFormId} #${item.id}`)) {
 			if(document.querySelector(`${item.pageFormId} #${item.id}`).item) {
 				if(item.onchange) {
-					var onchange = item.onchange
+					let onchange = item.onchange
 					if(onchange.indexOf('this.value') > -1) {
 						onchange = onchange.replace('this.value', `document.querySelector('${item.pageFormId} #${item.id}').item.value`)
 						eval(onchange)
@@ -1223,7 +1278,7 @@ function grid_onchange(item) {
 
 
 function gridSatirSil(tableId, rowIndex, insideOfModal) {
-	var table = document.querySelector(`${tableId}`)
+	let table = document.querySelector(`${tableId}`)
 	if(rowIndex > -1) {
 		if(table.item.options.confirmBeforeRemove) {
 			confirmX(`#${rowIndex+1} nolu Satiri silmek istiyor musunuz?`, (answer) => {
@@ -1244,7 +1299,7 @@ function gridSatirSil(tableId, rowIndex, insideOfModal) {
 
 function ilkElemanaFocuslan(selector) {
 
-	var ilkEleman = document.querySelector(`${selector}`).querySelector('input,select')
+	let ilkEleman = document.querySelector(`${selector}`).querySelector('input,select')
 	if(ilkEleman) {
 		ilkEleman.focus()
 		if(typeof ilkEleman.select === 'function') {
@@ -1258,15 +1313,15 @@ function ilkElemanaFocuslan(selector) {
 }
 
 function gridDeleteItem(rowIndex, tableId) {
-	var table = document.querySelector(tableId)
-	var item = table.item
+	let table = document.querySelector(tableId)
+	let item = table.item
 	if(!item.dataSource)
 		return
 	if(!item.value)
 		return
 
-	var row = table.querySelectorAll('tbody tr')[rowIndex]
-	var listItem
+	let row = table.querySelectorAll('tbody tr')[rowIndex]
+	let listItem
 	if(Array.isArray(item.value)) {
 		listItem = item.value[rowIndex]
 	} else if(item.value.docs) {
@@ -1277,8 +1332,8 @@ function gridDeleteItem(rowIndex, tableId) {
 		return
 
 
-	var soru = `Belge/Kayıt silinecektir! Onaylıyor musunuz?`
-	var i = 0
+	let soru = `Belge/Kayıt silinecektir! Onaylıyor musunuz?`
+	let i = 0
 	soru += `<br><hr class="hr-primary">`
 	while(i < row.cells.length && i < 4) {
 		if(row.cells[i].innerText.trim() != '') {
@@ -1287,15 +1342,15 @@ function gridDeleteItem(rowIndex, tableId) {
 		i++
 	}
 
-	var url = ''
+	let url = ''
 	if(item.dataSource.deleteUrl) {
 		url = item.dataSource.deleteUrl.split('?')[0]
-		if(url.indexOf('{_id}') < 0) {
-			url += `/{_id}`
+		if(url.indexOf('${_id}') < 0) {
+			url += '/${_id}'
 		}
 	} else {
 		url = item.dataSource.url.split('?')[0]
-		url += `/{_id}`
+		url += '/${_id}'
 	}
 	url = replaceUrlCurlyBracket(url, listItem)
 
@@ -1338,12 +1393,12 @@ function gridCopyItem(rowIndex, tableId) {
 
 	if(item.dataSource.copyUrl) {
 		url = item.dataSource.copyUrl.split('?')[0]
-		if(url.indexOf('{_id}') < 0) {
-			url += `/{_id}`
+		if(url.indexOf('${_id}') < 0) {
+			url += '/${_id}'
 		}
 	} else {
 		url = item.dataSource.url.split('?')[0]
-		url += `/copy/{_id}`
+		url += '/copy/${_id}'
 	}
 	url = replaceUrlCurlyBracket(url, listItem)
 
@@ -1417,12 +1472,12 @@ function gridCopyItem(rowIndex, tableId) {
 
 function gridCSVExport(gridId) {
 
-	var grid = document.querySelector(`#${gridId}`)
-	var thead = document.querySelector(`#${gridId} table thead`)
-	var tbody = document.querySelector(`#${gridId} table tbody`)
-	var item = grid.item
-	var s = ``
-	var i = 0,
+	let grid = document.querySelector(`#${gridId}`)
+	let thead = document.querySelector(`#${gridId} table thead`)
+	let tbody = document.querySelector(`#${gridId} table tbody`)
+	let item = grid.item
+	let s = ``
+	let i = 0,
 		j = 0
 	while(j < thead.rows[0].cells.length) {
 		if(item.options.selection && j == 0) {
@@ -1455,8 +1510,8 @@ function gridCSVExport(gridId) {
 
 		i++
 	}
-	var fileName = (document.text || '').split('-')[0].trim() + '.csv'
+	let fileName = (document.text || '').split('-')[0].trim() + '.csv'
 
-	var blob = new Blob([String.fromCharCode(0xFEFF), s], { type: "text/plain;charset=utf-8", autoBom: true })
+	let blob = new Blob([String.fromCharCode(0xFEFF), s], { type: "text/plain;charset=utf-8", autoBom: true })
 	saveAs(blob, fileName)
 }

@@ -408,37 +408,6 @@ String.prototype.padding = function(n, c) {
 }
 
 
-function calculate(formula, values) {
-	if((formula || '') == '')
-		return 0
-	formula = formula.replaceAll('${', '{').replaceAll('{', '${')
-	let code = `(function(){
-	`
-	Object.keys(values).forEach((key) => {
-		code += `let ${key}=${JSON.stringify(values[key])}\n`
-	})
-
-	code += `return eval(\`${formula}\`)
-	})()`
-
-	return eval(code)
-}
-
-function htmlEval(html, values = {}, bracketDollar=true) {
-	try {
-		// if(bracketDollar)
-		// 	html = html.replaceAll('${', '{').replaceAll('{', '${')
-		let code = ''
-		Object.keys(values).forEach((key) => {
-			code += `let ${key}=${JSON.stringify(values[key])}\n`
-		})
-		code += `return \`${html}\``
-		let f = new Function(code)
-		return f()
-	} catch {}
-	return html
-}
-
 // function htmlEval(exp, values={}) {
 // 	if((exp || '') == '')
 // 		return ''
@@ -456,20 +425,20 @@ function htmlEval(html, values = {}, bracketDollar=true) {
 // }
 
 
-function htmlEval11(html) {
-	let s1 = html.indexOf('`', 0)
-	let s2 = html.indexOf('`', s1 + 2)
-	while(s1 > -1 && s2 > s1) {
-		let kodParcasi = html.substr(s1, s2 - s1 + 1)
-		try {
-			let sbuf = eval(kodParcasi)
-			html = html.replace(kodParcasi, sbuf)
-		} catch {}
+// function htmlEval11(html) {
+// 	let s1 = html.indexOf('`', 0)
+// 	let s2 = html.indexOf('`', s1 + 2)
+// 	while(s1 > -1 && s2 > s1) {
+// 		let kodParcasi = html.substr(s1, s2 - s1 + 1)
+// 		try {
+// 			let sbuf = eval(kodParcasi)
+// 			html = html.replace(kodParcasi, sbuf)
+// 		} catch {}
 
-		s1 = html.indexOf('`', s2 + 1)
-		s2 = html.indexOf('`', s1 + 2)
-	}
+// 		s1 = html.indexOf('`', s2 + 1)
+// 		s2 = html.indexOf('`', s1 + 2)
+// 	}
 
 
-	return html
-}
+// 	return html
+// }
