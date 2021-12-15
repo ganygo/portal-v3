@@ -8277,14 +8277,17 @@ textarea {
   color: #fff;
   background-color: var(--bs-primary); }
 
-.navtop .nav-item .nav-link .badge-counter {
+#top-panel .badge-counter {
   position: absolute;
   transform-origin: top right;
   right: 1.4rem;
-  margin-top: -.45rem;
+  margin-top: -.35rem;
   background-color: var(--bs-red);
   padding-left: 0.2rem;
-  padding-right: 0.3rem; }
+  padding-right: 0.3rem;
+  border-radius: 0.35rem;
+  font-size: 80%;
+  text-shadow: 0 0 3px black; }
 
 .icon-circle {
   height: 2.5rem;
@@ -8751,11 +8754,14 @@ textarea.form-control {
 .table > :not(:first-child) {
   border-top: none; }
 
-.flip, .flip-x, .reflect-x {
+.flip,
+.flip-x,
+.reflect-x {
   -webkit-transform: scaleX(-1);
   transform: scaleX(-1); }
 
-.flip-y, .reflect-y {
+.flip-y,
+.reflect-y {
   -webkit-transform: scaleY(-1);
   transform: scaleY(-1); }
 
