@@ -51,6 +51,7 @@ global.docFormHelper = require('./lib/doc_form_helper.js')
 // global.dbType = require('./assets/js/dbtypes.js').types
 
 
+
 if(config.status != 'development') {
 	process.on('uncaughtException', function(err) {
 		errorLog('Caught exception: ', err)
