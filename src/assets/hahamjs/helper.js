@@ -1049,7 +1049,7 @@ function getUrlParameter(name, query = null) {
 }
 
 function generateLeftMenu(leftMenu) {
-	let mid = hashObj.query.mid || '0'
+	let mid = (hashObj.query || {}).mid || '0'
 
 	let s = ``
 	leftMenu.forEach((item, index) => {

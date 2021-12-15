@@ -21,6 +21,10 @@ module.exports = (app) => {
 }
 
 function firstRoutes(app) {
+	app.all('/*', (req, res, next) => {
+		req.session.base_uri=getBaseURI(req)
+		next()
+	})
 	app.all('/', (req, res, next) => {
 		if(req.session.token) {
 			res.redirect('/haham#/dashboard/main?mid=0')
@@ -66,14 +70,16 @@ function firstRoutes(app) {
 	app.all('/login', function(req, res) {
 		try {
 			if(!req.query.auth) {
-				res.redirect(`${config.login.url}?ret=${config.base_uri}/login`)
+				console.log(`req.session.base_uri:`,req.session.base_uri)
+				
+				res.redirect(`${config.login.url}?ret=//${getBaseURI(req)}`)
 			} else {
-				var auth = JSON.parse(decodeURIComponent(req.query.auth))
+				let auth = JSON.parse(decodeURIComponent(req.query.auth))
 
 				api.request({ endpoint: '/session', method: 'POST', token: auth.token || '' }, (err, resp) => {
 					if(!err) {
 						Object.keys(resp.data).forEach((key) => {
-							if(!['sessionId', '_id', 'token', 'username', 'role'].includes())
+							if(!['sessionId', '_id', 'token', 'username', 'role'].includes(key))
 								req.session[key] = resp.data[key]
 						})
 						req.session.sessionId = resp.data._id
@@ -117,6 +123,40 @@ function firstRoutes(app) {
 	})
 
 }
+
+
+function showReqObject(key, req, level = 0) {
+	if(level > 3) return
+	if(key.substr(0, 1) == '_' || key=='stack') return
+
+	if(req == null) {
+		console.log(`${'. '.repeat(level)}${key}: ${req}`)
+	} else if(['number', 'string', 'boolean', 'undefined'].includes(typeof req) || typeof req.getMonth === 'function') {
+		console.log(`${'. '.repeat(level)}${key}: ${req}`)
+	} else {
+		if(typeof req == 'function') {
+			console.log(`${'. '.repeat(level)}${key}: FONKSIYON`)
+		} else if(Array.isArray(req)) {
+			console.log(`${'. '.repeat(level)}${key}: [`)
+			req.forEach((e) => {
+				showReqObject(key, e, level + 1)
+			})
+			console.log(`${'. '.repeat(level)}],`)
+		} else if(typeof req == 'object') {
+			if(level == 0)
+				console.log(`{`)
+			else
+				console.log(`${'. '.repeat(level)}${key}: {`)
+			Object.keys(req).sort().forEach((key2) => {
+				showReqObject(key2, req[key2], level + 1)
+			})
+			console.log(`${'. '.repeat(level)}},`)
+		} else {
+			console.log(`${'. '.repeat(level)}${key}: `, typeof req)
+		}
+	}
+}
+
 
 function setRoutes(app, route, cb1, cb2) {
 	let dizi = route.split('/:')
@@ -206,7 +246,7 @@ function pageRoutes(app) {
 					if(view) {
 						res.render(view, data)
 					} else {
-						var fileName = `${req.params.page}/${req.params.func || req.params.page}.ejs`
+						let fileName = `${req.params.page}/${req.params.func || req.params.page}.ejs`
 						if(fs.existsSync(path.join(__dirname, '../pages', fileName))) {
 							res.render(fileName, data, (err, html) => {
 								if(!err) {
@@ -228,7 +268,7 @@ function pageRoutes(app) {
 }
 
 function setGeneralParams(req, res, data, cb) {
-	data.base_uri = config.base_uri
+	data.base_uri = getBaseURI(req)
 	data.session = req.session || {}
 	data.dbId = (req.session || {}).dbId || ''
 	data.dbName = (req.session || {}).dbName || ''
@@ -241,7 +281,7 @@ function setGeneralParams(req, res, data, cb) {
 }
 
 function errorPage(req, res, err) {
-	var data = {}
+	let data = {}
 	data['title'] = 'Hata'
 	data['err'] = err || { code: 404, message: 'Sayfa bulunamadi' }
 

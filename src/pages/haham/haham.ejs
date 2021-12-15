@@ -5,7 +5,8 @@
 <script type="text/javascript">
 var mainDivId = '#mainCtrl'
 if(window.location.hash == '') {
-	window.location.hash = '/dashboard/main'
+	window.location.hash = '/dashboard/main?mid=0'
+	window.location.reload()
 }
 
 $(document).ready(() => {
