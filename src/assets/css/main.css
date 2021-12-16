@@ -7829,7 +7829,7 @@ textarea {
   font-family: var(--bs-font-sans-serif); }
 
 .logo {
-  max-width: 100px; }
+  max-width: 120px; }
 
 @media (max-width: 768px) {
   .logo {
