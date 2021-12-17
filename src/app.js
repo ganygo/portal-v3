@@ -5,7 +5,7 @@ var path = require('path')
 var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 var engine = require('ejs-locals')
-var errorHandler = require('errorhandler')
+// var errorHandler = require('errorhandler')
 var logger = require('morgan')
 var favicon = require('serve-favicon')
 var methodOverride = require('method-override')
@@ -13,7 +13,7 @@ var methodOverride = require('method-override')
 global.app = express()
 var cors = require('cors')
 app.use(cors())
-var flash = require('connect-flash')
+// var flash = require('connect-flash')
 
 app.use(favicon(path.join(__dirname, 'assets', 'img', 'web-icon.png')))
 
@@ -31,8 +31,8 @@ app.use(express.static(path.join(__dirname, 'assets'), { maxAge: (60 * 1000 * 60
 app.use(cookieParser())
 //app.use(methodOverride())
 
-app.set('name', require('./package').name)
-app.set('version', require('./package').version)
+// app.set('name', require('./package').name)
+// app.set('version', require('./package').version)
 app.set('port', config.httpserver.port)
 
 app.set('trust proxy', 1)
@@ -43,11 +43,11 @@ app.use(session({
 	name: app.get('name'),
 	cookie: { path: '/', httpOnly: false, secure: false, maxAge: null }
 }))
-app.use(flash())
+// app.use(flash())
 
 
 global.api = require('./providers/api/api.js')()
-global.docFormHelper = require('./lib/doc_form_helper.js')
+// global.docFormHelper = require('./lib/doc_form_helper.js')
 // global.dbType = require('./assets/js/dbtypes.js').types
 
 
