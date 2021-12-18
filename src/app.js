@@ -15,7 +15,7 @@ var cors = require('cors')
 app.use(cors())
 // var flash = require('connect-flash')
 
-app.use(favicon(path.join(__dirname, 'assets', 'img', 'web-icon.png')))
+app.use(favicon(path.join(__dirname, 'assets/img/brand/favicon/favicon.ico')))
 
 app.engine('ejs', engine)
 app.set('views', path.join(__dirname, 'pages'))
