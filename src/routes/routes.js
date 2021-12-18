@@ -52,9 +52,8 @@ function firstRoutes(app) {
 						if(config.ispiyonService.enabled)
 							resp.data.ispiyonServiceUrl = config.ispiyonService.url || ''
 
-					if(config.login)
 						resp.data.login = {
-							url: config.login.url || ''
+							url: config.passport_login || ''
 						}
 
 					res.render('_common/passport', { data: resp.data })
@@ -70,9 +69,8 @@ function firstRoutes(app) {
 	app.all('/login', function(req, res) {
 		try {
 			if(!req.query.auth) {
-				console.log(`req.session.base_uri:`,req.session.base_uri)
-				
-				res.redirect(`${config.login.url}?ret=//${getBaseURI(req)}`)
+			
+				res.redirect(`${config.passport_login}?ret=//${getBaseURI(req)}`)
 			} else {
 				let auth = JSON.parse(decodeURIComponent(req.query.auth))
 
@@ -91,9 +89,8 @@ function firstRoutes(app) {
 							if(config.ispiyonService.enabled)
 								resp.data.ispiyonServiceUrl = config.ispiyonService.url || ''
 
-						if(config.login)
 							resp.data.login = {
-								url: config.login.url || ''
+								url: config.passport_login || ''
 							}
 
 						res.render('_common/passport', { data: resp.data })
