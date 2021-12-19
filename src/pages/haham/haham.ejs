@@ -60,17 +60,19 @@ function anotherViewStyle(divId) {
 function viewStylePlain(divId) {
 
 	$('body').hide()
-	$('#title-panel').hide()
-	$('.navtop').hide()
-	$('.navtop').removeClass('d-flex')
+	// $('#title-panel').hide()
+	// $('#title-panel').removeClass('d-flex')
+	$('#top-panel').hide()
+	$('#top-panel').removeClass('d-flex')
 
-	$('#layoutSidenav_nav').hide()
+	$('#side-menu').hide()
 
-	$('.footer').hide()
-	$('#layoutSidenav_content').css('margin-top', '0px')
-	$('#main-container').removeClass('cerceve1')
-	$('#main-container').removeClass('p1')
+	
+	$('#side-menu').hide()
+	$('#side-menu').css('margin-top', '0px')
 
+	$('#right-side footer').hide()
+	$('#right-side footer').removeClass('d-flex')
 	
 
 	$('body').show()
@@ -81,13 +83,13 @@ function viewStylePrint(divId) {
 	$('body').hide()
 	$('#title-panel').hide()
 	$('#title-panel').removeClass('d-flex')
-	$('.navtop').hide()
-	$('.navtop').removeClass('d-flex')
-	$('#layoutSidenav_nav').hide()
-	$('.footer').hide()
-	$('#layoutSidenav_content').css('margin-top', '0px')
-	$('#main-container').removeClass('cerceve1')
-	$('#main-container').removeClass('p1')
+	$('#top-panel').hide()
+	$('#top-panel').removeClass('d-flex')
+	$('#side-menu').hide()
+	$('#side-menu').css('margin-top', '0px')
+	$('#right-side footer').hide()
+	$('#right-side footer').removeClass('d-flex')
+	
 	$(divId).addClass('print')
 
 
@@ -102,7 +104,7 @@ function viewStylePrint(divId) {
 		</div>
 		</div>
 		`
-		document.querySelector('#main-container').insertAdjacentHTML('afterend', s)
+		document.querySelector('#right-side main').insertAdjacentHTML('afterend', s)
 	}
 
 	$('body').show()

@@ -1303,7 +1303,7 @@ html {
 	background-color: #2a2f32;
 }
 
-#menu-side {
+#side-menu {
 	font-family: 'Roboto', 'Noto', sans-serif;
 	flex: 20%;
 	color: var(--bs-white);
@@ -1319,7 +1319,7 @@ html {
 }
 
 @media (max-width: 768px) {
-	#menu-side {
+	#side-menu {
 		position: absolute;
 		z-index: 999;
 		right: 0px;
@@ -1329,23 +1329,23 @@ html {
 	}
 }
 
-#menu-side i {
+#side-menu i {
 	color: var(--bs-orange);
 	margin-right: 0.75rem;
 
 }
 
-#menu-side i.fas.fa-angle-down {
+#side-menu i.fas.fa-angle-down {
 	margin-right: 0rem;
 	text-shadow: none;
 }
 
-#menu-side .nav-link {
+#side-menu .nav-link {
 	color: var(--bs-light);
 	width: 100%;
 }
 
-#menu-side .nav-link .nav.accordion .nav-link {
+#side-menu .nav-link .nav.accordion .nav-link {
 	color: var(--bs-light);
 	opacity: 50% !important;
 }
