@@ -21,6 +21,7 @@ app.engine('ejs', engine)
 app.set('views', path.join(__dirname, 'pages'))
 app.set('view engine', 'ejs')
 
+
 app.use(logger('dev'))
 
 app.use(bodyParser.json({ limit: "500mb" }))
