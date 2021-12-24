@@ -19,7 +19,8 @@ var global = {
 		quantity: { round: 3 },
 		price: { round: 4 }
 	},
-	status: ''
+	status: '',
+	basePath: ''
 }
 
 function initHahamGlobals() {
@@ -1232,7 +1233,7 @@ function getBreadCrumbsFromPath(leftMenu, path) {
 
 
 function changedb(dbId) {
-	window.location.href = `/changedb?db=${dbId}&r=${window.location.href}`
+	window.location.href = `${global.basePath}/changedb?db=${dbId}&r=${window.location.href}`
 }
 
 function windowPathToFieldName(path = '') {

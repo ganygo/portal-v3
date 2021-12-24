@@ -1,10 +1,12 @@
 //var loginHelper = require('./login-helper')
+console.log(`config.basePaths:`, config.basePaths)
 module.exports = (app) => {
+
 	firstRoutes(app)
 
 	setRoutes(app, '/api/downloadFile/:func/:param1/:param2/:param3', localApiDownload)
 	setRoutes(app, '/api/:func/:param1/:param2/:param3', localApi)
-	
+
 	setRoutes(app, '/dbapi/downloadFile/:func/:param1/:param2/:param3', localDbApiDownload)
 	setRoutes(app, '/dbapi/:func/:param1/:param2/:param3', localDbApi)
 
@@ -22,25 +24,26 @@ module.exports = (app) => {
 
 function firstRoutes(app) {
 	app.all('/*', (req, res, next) => {
-		req.session.base_uri=getBaseURI(req)
 		next()
 	})
-	app.all('/', (req, res, next) => {
+
+	setRoutes(app, '/', (req, res, next) => {
 		if(req.session.token) {
-			res.redirect('/haham#/dashboard/main?mid=0')
+			res.redirect(req.basePath + '/haham#/dashboard/main?mid=0')
 		} else {
-			res.redirect('/login')
+			res.redirect(req.basePath + '/login')
 		}
 	})
 
-	app.all('/changedb', function(req, res) {
+
+	setRoutes(app, '/changedb', function(req, res) {
 		if(req.query.token)
 			req.session.token = req.query.token
 		let sid = req.query.sid || req.session.sessionId || ''
 
 
 		if(!req.session.token) {
-			res.redirect('/login')
+			res.redirect(req.basePath + '/login')
 		} else {
 			api.request({ endpoint: '/session/changedb', method: 'POST', token: req.session.token || '', body: { db: req.query.db || req.session.dbId || '', sid: sid } }, (err, resp) => {
 				if(!err) {
@@ -52,11 +55,12 @@ function firstRoutes(app) {
 						if(config.ispiyonService.enabled)
 							resp.data.ispiyonServiceUrl = config.ispiyonService.url || ''
 
-						resp.data.login = {
-							url: config.passport_login || ''
-						}
+					resp.data.login = {
+						url: config.passport_login || ''
+					}
 
-					res.render('_common/passport', { data: resp.data })
+					resp.data.basePath=req.basePath
+					res.render('_common/passport', { data: resp.data, basePath:req.basePath })
 
 				} else {
 					errorPage(req, res, err)
@@ -66,11 +70,12 @@ function firstRoutes(app) {
 	})
 	
 
-	app.all('/login', function(req, res) {
+	setRoutes(app, '/login', function(req, res) {
 		try {
 			if(!req.query.auth) {
-			
-				res.redirect(`${config.passport_login}?ret=//${getBaseURI(req)}`)
+				// let retUrl=req.query.ret || `//${getBaseURI(req)}`
+				let retUrl=`//${getBaseURI(req)}`
+				res.redirect(`${config.passport_login}?ret=${retUrl}`)
 			} else {
 				let auth = JSON.parse(decodeURIComponent(req.query.auth))
 
@@ -89,11 +94,11 @@ function firstRoutes(app) {
 							if(config.ispiyonService.enabled)
 								resp.data.ispiyonServiceUrl = config.ispiyonService.url || ''
 
-							resp.data.login = {
-								url: config.passport_login || ''
-							}
-
-						res.render('_common/passport', { data: resp.data })
+						resp.data.login = {
+							url: config.passport_login || ''
+						}
+						resp.data.basePath=req.basePath
+						res.render('_common/passport', { data: resp.data, basePath:req.basePath })
 
 					} else {
 						errorPage(req, res, err)
@@ -106,16 +111,16 @@ function firstRoutes(app) {
 
 	})
 
-	app.all('/logout', function(req, res) {
+	setRoutes(app, '/logout', function(req, res) {
 		if((req.session.token || '') == '') {
-			res.redirect('/')
+			res.redirect(req.basePath + '/')
 		} else {
 			req.session.token = null
 			req.session.dbId = ''
 			req.session.dbName = ''
 			req.session.username = ''
 			req.session.role = ''
-			res.redirect('/')
+			res.redirect(req.basePath + '/')
 		}
 	})
 
@@ -124,7 +129,7 @@ function firstRoutes(app) {
 
 function showReqObject(key, req, level = 0) {
 	if(level > 3) return
-	if(key.substr(0, 1) == '_' || key=='stack') return
+	if(key.substr(0, 1) == '_' || key == 'stack') return
 
 	if(req == null) {
 		console.log(`${'. '.repeat(level)}${key}: ${req}`)
@@ -156,22 +161,32 @@ function showReqObject(key, req, level = 0) {
 
 
 function setRoutes(app, route, cb1, cb2) {
-	let dizi = route.split('/:')
-	let yol = ''
-	dizi.forEach((e, index) => {
-		if(index > 0) {
-			yol += `/:${e}`
-			if(cb1 != undefined && cb2 == undefined) {
-				app.all(yol, cb1)
-			} else if(cb1 != undefined && cb2 != undefined) {
-				app.all(yol, cb1, cb2)
+	let params = route.split('/:')
+	config.basePaths.forEach((p) => {
+		let yol = p
+
+		params.forEach((e, index) => {
+			yol +=index==0?e:`/:${e}`
+
+			if(cb2 != undefined) {
+				app.all(yol, function(req, res, next) {
+					req.basePath = p
+					req.urlPath = req.path.substr(req.basePath.length)
+					cb1(req, res, next)
+				}, cb2)
+			} else {
+				app.all(yol, function(req, res, next) {
+					req.basePath = p
+					req.urlPath = req.path.substr(req.basePath.length)
+					cb1(req, res, next)
+				})
 			}
 
-		} else {
-			yol += e
-		}
+
+		})
 	})
 }
+
 
 function localApi(req, res) {
 	api.request(req, (err, data) => {
@@ -184,7 +199,7 @@ function localApi(req, res) {
 }
 
 function localApiDownload(req, res) {
-	api.downloadFile(req,res, (err, data) => {
+	api.downloadFile(req, res, (err, data) => {
 		if(err) {
 			res.status(403).send(err.message)
 		}
@@ -218,8 +233,8 @@ function localDbApiDownload(req, res) {
 		endpoint += '/' + req.params[key]
 	})
 	req.endpoint = endpoint
-	console.log(`localDbApiDownload req.endpoint:`,req.endpoint)
-	api.downloadFile(req,res, (err, data) => {
+	console.log(`localDbApiDownload req.endpoint:`, req.endpoint)
+	api.downloadFile(req, res, (err, data) => {
 		if(err) {
 			res.status(403).send(err.message)
 		}
@@ -227,7 +242,10 @@ function localDbApiDownload(req, res) {
 }
 
 function pageRoutes(app) {
-	setRoutes(app, '/:page/:func/:param1/:param2/:param3', (req, res) => {
+	setRoutes(app, '/:page/:func/:param1/:param2/:param3', pageRoutesFunc)
+
+
+	function pageRoutesFunc(req, res) {
 		let pageFileName = path.join(__root, 'pages', req.params.page, `${req.params.page}.js`)
 		if(!fs.existsSync(pageFileName))
 			return errorPage404(req, res)
@@ -261,11 +279,15 @@ function pageRoutes(app) {
 				return errorPage(req, res, err)
 			}
 		})
-	})
+	}
 }
 
 function setGeneralParams(req, res, data, cb) {
-	data.base_uri = getBaseURI(req)
+	data.urlPath = req.urlPath
+	data.basePath = req.basePath
+	data.currentPath = req.path
+	data.referer = req.referer
+
 	data.session = req.session || {}
 	data.dbId = (req.session || {}).dbId || ''
 	data.dbName = (req.session || {}).dbName || ''

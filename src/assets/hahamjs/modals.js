@@ -85,7 +85,7 @@ function logout() {
 	confirmX('Programdan çıkmak istiyor musunuz?', (resp) => {
 		if(resp) {
 			localStorage.removeItem('global')
-			window.location.href = `/logout`
+			window.location.href = `${global.basePath}/logout`
 		}
 	})
 }
@@ -181,38 +181,38 @@ function modalFormOptions() {
 		s += '?'
 	}
 	s += `&module=${hashObj.module}`
-	window.location.href = s
+	window.location.href = global.basePath + s
 }
 
-function modalFormOptions_OK() {
-	var data = { page: {} }
-	data.page[windowPathToFieldName()] = { programs: [null] }
-	$(".programRow").each(function() {
-		if(this.checked) {
-			var prg = JSON.parse(decodeURIComponent(this.value))
+// function modalFormOptions_OK() {
+// 	var data = { page: {} }
+// 	data.page[windowPathToFieldName()] = { programs: [null] }
+// 	$(".programRow").each(function() {
+// 		if(this.checked) {
+// 			var prg = JSON.parse(decodeURIComponent(this.value))
 
-			data.page[windowPathToFieldName()].programs.push({ _id: prg._id, type: prg.type, name: prg.name })
-		}
-	})
+// 			data.page[windowPathToFieldName()].programs.push({ _id: prg._id, type: prg.type, name: prg.name })
+// 		}
+// 	})
 
 
-	$.ajax({
-		url: `/dbapi/settings`,
-		data: data,
-		type: 'PUT',
-		dataType: 'json',
-		success: function(result) {
-			if(result.success) {
-				window.location.href = `/general/login/passport?r=${window.location.href}`
-			} else {
-				showError(result.error)
-			}
-		},
-		error: function(err) {
-			showError(err)
-		}
-	})
-}
+// 	$.ajax({
+// 		url: `/dbapi/settings`,
+// 		data: data,
+// 		type: 'PUT',
+// 		dataType: 'json',
+// 		success: function(result) {
+// 			if(result.success) {
+// 				window.location.href = `/general/login/passport?r=${window.location.href}`
+// 			} else {
+// 				showError(result.error)
+// 			}
+// 		},
+// 		error: function(err) {
+// 			showError(err)
+// 		}
+// 	})
+// }
 
 function addModalsToDocument(parentId = 'body') {
 	$(document).ready(() => {

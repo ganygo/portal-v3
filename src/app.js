@@ -15,7 +15,7 @@ var cors = require('cors')
 app.use(cors())
 // var flash = require('connect-flash')
 
-app.use(favicon(path.join(__dirname, 'assets/img/brand/favicon/favicon.ico')))
+app.use(favicon(path.join(__dirname, 'assets/img/brand/web-icon.png')))
 
 app.engine('ejs', engine)
 app.set('views', path.join(__dirname, 'pages'))
@@ -27,7 +27,11 @@ app.use(logger('dev'))
 app.use(bodyParser.json({ limit: "500mb" }))
 app.use(bodyParser.urlencoded({ limit: "500mb", extended: true, parameterLimit: 50000 }))
 
-app.use(express.static(path.join(__dirname, 'assets'), { maxAge: (60 * 1000 * 60 * 24 * 30) }))
+config.basePaths.forEach((p) => {
+	app.use(p,express.static(path.join(__dirname, 'assets'), { maxAge: (60 * 1000 * 60 * 24 * 30) }))
+})
+
+
 
 app.use(cookieParser())
 //app.use(methodOverride())

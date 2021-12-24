@@ -135,7 +135,7 @@ function generatePage(divId, pageJson, callback) {
 			if(err.code == 'SESSION_NOT_FOUND') {
 				confirmX('Oturum sonlandırılmış. Yeniden giriş yapmak istiyor musunuz?', (answer) => {
 					if(answer) {
-						window.location.href = `/login?ret=${window.location.href}`
+						window.location.href = `${global.basePath}/login?ret=${window.location.href}`
 
 					}
 					if(callback)

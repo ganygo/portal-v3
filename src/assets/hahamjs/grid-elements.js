@@ -161,7 +161,7 @@ function gridButtonPanel(parentId, item, insideOfModal, cb) {
 			item.panelButtons[key].class += ' me-2'
 			item.panelButtons[key].type = 'button'
 			if(!item.panelButtons[key].href && item.panelButtons[key].dataSource) {
-				item.panelButtons[key].href = `javascript:runPanelButtons('${item.panelButtons[key].dataSource.url}','${item.panelButtons[key].dataSource.method}')`
+				item.panelButtons[key].href = `javascript:runPanelButtons('${global.basePath}${item.panelButtons[key].dataSource.url}','${item.panelButtons[key].dataSource.method}')`
 			}
 
 			frm_Button(parentId, item.panelButtons[key], () => {

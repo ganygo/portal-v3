@@ -1,5 +1,5 @@
 <% layout('./layouts/plain') %>
-<script type="text/javascript" src="<%- assetVersion('/hahamjs/helper.js') %>"></script>
+<script type="text/javascript" src="<%- basePath || '' %><%- assetVersion('/hahamjs/helper.js') %>"></script>
 <style type="text/css">
 body {
 	background-color: #212121 !important;
@@ -10,7 +10,7 @@ body {
 		<nav class="navbar static-top">
 			<div class="container">
 				<div class="float-left" style="width: 50%;">
-					<a href="/" class="mb-4">
+					<a href="<%- basePath || '' %>/" class="mb-4">
 						<span class="text-orange">Gany</span>
 						<span class="text-primary">Go</span>
 					</a>
@@ -49,7 +49,7 @@ if(data.token) {
 
 	var q = getAllUrlParams()
 	// setTimeout(() => {
-		window.location.href = '/haham#/dashboard/main?mid=0'
+		window.location.href = '<%- basePath || ''%>/haham#/dashboard/main?mid=0'
 	// }, 1000)
 }
 </script>
