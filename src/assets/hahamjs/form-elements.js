@@ -95,6 +95,8 @@ function frm_Group(input, item) {
 }
 
 function frm_FormHtml(parentId, item, cb) {
+	console.log(`frm_FormHtml item:`, item)
+
 	let html = ''
 	if(item.html) {
 		html = replaceUrlCurlyBracket(item.html, item) || ''
@@ -102,20 +104,21 @@ function frm_FormHtml(parentId, item, cb) {
 		html = item.value
 	}
 
-	if($(parentId).hasClass('print')){
+
+	if($(parentId).hasClass('print')) {
 		let iframe = document.createElement('iframe')
 		iframe.style.display = 'block'
 		iframe.style.border = 'none'
 		iframe.style.height = '86vh'
 		iframe.style.width = '100%'
-	
+
 		document.querySelector(parentId).appendChild(iframe)
 		iframe.contentWindow.document.open()
 		iframe.contentWindow.document.write(html)
 		iframe.contentWindow.document.close()
-	}else{
+	} else {
 		let s = frm_GInput(html, item)
-		document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s,item))
+		document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s, item))
 	}
 	cb()
 }
@@ -186,6 +189,17 @@ function frm_TextareaBox(parentId, item, cb) {
 	let textAreaValue = item.value != undefined ? item.value : ''
 	if(item.encoding == 'base64') {
 		textAreaValue = b64DecodeUnicode(item.value != undefined ? item.value : '')
+	}
+
+	document.querySelector(`${parentId} #${item.id}-textarea`).onkeydown = function(e) {
+		if(e.keyCode === 9) {
+			let val = this.value
+			let start = this.selectionStart
+			let end = this.selectionEnd
+			this.value = val.substring(0, start) + '\t' + val.substring(end)
+			this.selectionStart = this.selectionEnd = start + 1
+			return false
+		}
 	}
 
 	$(`${parentId} #${item.id}-textarea`).val(textAreaValue)

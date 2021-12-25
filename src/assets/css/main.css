@@ -8913,3 +8913,9 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background-color: #555; }
+
+textarea,
+pre {
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4; }
