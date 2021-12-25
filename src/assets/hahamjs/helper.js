@@ -300,46 +300,58 @@ function loadCardCollapses() {
 }
 
 
-function getAjax(url, labelStr = '{name}', exceptId = '', cb) {
-
+function postMan(url, options, cb) {
+	if(url.startsWith('/api') || url.startsWith('/dbapi')){
+		url=global.basePath + url
+	}
 	$.ajax({
 		url: url,
-		type: 'GET',
-		dataType: 'json',
+		type: options.method || options.type || 'GET',
+		dataType: options.dataType || 'json',
+		data: options.data || {},
 		success: function(result) {
-			if(result.success) {
-				let dizi = []
+			if(result.success != undefined) {
+				if(result.success) {
+					cb(null, result.data)
+				} else {
+					cb(result.error)
+				}
+			} else {
+				cb(null, result)
+			}
+		},
+		error: function(err) {
+			cb(err)
+		}
+	})
+}
 
-				if(result.data) {
-					if(result.data.docs != undefined) {
-						result.data.docs.forEach((e) => {
+function getAjax(url, labelStr = '${name}', exceptId = '', cb) {
+	postMan(url, { type: 'GET', dataType: 'json' }, (err, data) => {
+		if(!err) {
+			let dizi = []
+			if(data) {
+				if(data.docs != undefined) {
+					data.docs.forEach((e) => {
+						let text = replaceUrlCurlyBracket(labelStr, e)
+						dizi.push({ label: text, value: text, obj: e })
+					})
+				} else {
+					if(Array.isArray(data)) {
+						data.forEach((e) => {
 							let text = replaceUrlCurlyBracket(labelStr, e)
 							dizi.push({ label: text, value: text, obj: e })
 						})
 					} else {
-						if(Array.isArray(result.data)) {
-							result.data.forEach((e) => {
-								let text = replaceUrlCurlyBracket(labelStr, e)
-								dizi.push({ label: text, value: text, obj: e })
-							})
-						} else {
-							let text = replaceUrlCurlyBracket(labelStr, result.data)
-							dizi.push({ label: text, value: text, obj: result.data })
-						}
+						let text = replaceUrlCurlyBracket(labelStr, data)
+						dizi.push({ label: text, value: text, obj: data })
 					}
 				}
-
-
-				if(cb)
-					cb(null, dizi)
-			} else {
-				if(cb)
-					cb(result.error)
 			}
-		},
-		error: function(err) {
-			if(cb)
-				cb(err)
+
+			if(cb) cb(null, dizi)
+		} else {
+			if(cb) cb(err)
 		}
 	})
 }
@@ -725,31 +737,14 @@ function getRemoteData(item, cb) {
 	if((url || '') == '')
 		return cb(null, data)
 
-	$.ajax({
-		url: url,
-		type: item.dataSource.method || 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result.success == undefined) {
-				if(Array.isArray(result)) {
-					data = result
-				} else {
-					data = result
-				}
-				cb(null, data)
-			} else if(result.success) {
-				data = result.data
-				cb(null, data)
-			} else {
-				cb(result.error)
-			}
-		},
-		error: function(err) {
+	postMan(url,{type:item.dataSource.method || 'GET',dataType:'json'},(err,data)=>{
+		if(!err){
+			cb(null, data)
+		}else{
 			console.error(`getRemoteData error err:`, err)
 			cb(err)
 		}
 	})
-
 }
 
 
@@ -835,25 +830,15 @@ function formSave(dataSource, formData) {
 		pageSettings.setItem('lastRecord', formData)
 	}
 
-	$.ajax({
-		url: url,
-		type: method,
-		data: formData,
-		dataType: 'json',
-		success: function(result) {
-			if(result.success) {
-				if(hashObj.func == 'index') {
-					alertX('Kayıt başarılı :-)')
-				} else {
-					let h = Object.assign({}, hashObj, { func: 'index', query: { page: 1 } })
-					setHashObject(h)
-				}
-
+	postMan(url, { type: method, data: formData, dataType: 'json' }, (err, data) => {
+		if(!err) {
+			if(hashObj.func == 'index') {
+				alertX('Kayıt başarılı :-)')
 			} else {
-				showError(result.error)
+				let h = Object.assign({}, hashObj, { func: 'index', query: { page: 1 } })
+				setHashObject(h)
 			}
-		},
-		error: function(err) {
+		} else {
 			showError(err)
 		}
 	})
@@ -1364,34 +1349,23 @@ function runProgram(_id, type) {
 }
 
 function runProgramAjax(data) {
-	$.ajax({
-		url: `/dbapi/programs/run/${programId}`,
-		data: data,
-		type: 'POST',
-		dataType: "json",
-		success: function(result) {
-			if(result.success) {
-				if(typeof result.data == 'string') {
-					if(programType == 'file-exporter') {
-						download(`data:application/file;base64,${btoa2(result.data)}`, `export_${(new Date()).yyyymmddhhmmss()}.csv`, 'application/file')
-						return
-					} else if(programType == 'connector-exporter') {
-						alertX(result.data, 'Bilgi', () => {
-							window.onhashchange()
-						})
-					} else {
-						alertX(result.data, 'Bilgi', () => {
-							window.onhashchange()
-						})
-					}
+console.log(`runProgramAjax programId:`,programId)
+	postMan(`/dbapi/programs/run/${programId}`, { type: 'POST', dataType: 'json', data: data }, (err, data) => {
+		if(!err) {
+			console.log(`runProgramAjax data:`,data)
+			if(typeof data == 'string') {
+				if(programType == 'file-exporter') {
+					download(`data:application/file;base64,${btoa2(data)}`, `export_${(new Date()).yyyymmddhhmmss()}.csv`, 'application/file')
+					return
+				} else if(programType == 'connector-exporter') {
+					alertX(data, 'Bilgi', () => {	window.onhashchange()	})
+				} else {
+					alertX(data, 'Bilgi', () => {	window.onhashchange()	})
 				}
-
-
-			} else {
-				showError(result.error)
+			}else{
+				alertX(data, 'Bilgi', () => {	window.onhashchange()	})
 			}
-		},
-		error: function(err) {
+		} else {
 			showError(err)
 		}
 	})
@@ -1409,23 +1383,13 @@ function runPanelButtons(url, method) {
 	if(list.length == 0)
 		return alertX('Hiç kayıt seçilmemiş')
 	let data = { list: list }
-	$.ajax({
-		url: url,
-		data: data,
-		type: 'POST',
-		dataType: "json",
-		success: function(result) {
-			if(result.success) {
-				alertX(result.data, () => {
-					window.onhashchange()
 
-				})
-
-			} else {
-				showError(result.error)
-			}
-		},
-		error: function(err) {
+	postMan(url, { type: 'POST', dataType: 'json', data: data }, (err, data) => {
+		if(!err) {
+			alertX(data, () => {
+				window.onhashchange()
+			})
+		} else {
 			showError(err)
 		}
 	})
@@ -1595,19 +1559,10 @@ function formCalculation(divId, calcUrl) {
 		$(this).val(convertNumber(sbuf))
 	})
 	let formData = getFormData(`${divId}`)
-	$.ajax({
-		url: calcUrl,
-		type: 'POST',
-		data: formData,
-		dataType: 'json',
-		success: function(result) {
-			if(result.success) {
-				setFormData(divId, result.data)
-			} else {
-				showError(result.error)
-			}
-		},
-		error: function(err) {
+	postMan(calcUrl,{type:'POST',dataType:'json',data:formData},(err,data)=>{
+		if(!err){
+			setFormData(divId, data)
+		}else{
 			showError(err)
 		}
 	})

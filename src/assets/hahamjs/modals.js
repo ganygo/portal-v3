@@ -163,12 +163,12 @@ function alertX(message, title = '', type = 'info', cb) {
 
 	$('#modalMessage').modal('show')
 	$('#modalMessage').on('hidden.bs.modal', function(e) {
-		if(cb)
-			cb('ok')
+		if(cb)	cb('ok')
 	})
 }
 
 function showError(err) {
+	console.log(`showError err:`,err)
 	alertX(`${err.code || err.name}<br>${err.message || err.name}`, 'Hata', 'danger')
 }
 

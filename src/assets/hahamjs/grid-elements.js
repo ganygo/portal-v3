@@ -1355,19 +1355,11 @@ function gridDeleteItem(rowIndex, tableId) {
 	url = replaceUrlCurlyBracket(url, listItem)
 
 	confirmX(soru, 'danger', (answer) => {
-		if(!answer)
-			return
-		$.ajax({
-			url: url,
-			type: 'DELETE',
-			success: function(result) {
-				if(result.success) {
-					window.onhashchange()
-				} else {
-					showError(result.error)
-				}
-			},
-			error: function(err) {
+		if(!answer) return
+		postMan(url, { type: 'DELETE' }, (err, data) => {
+			if(!err) {
+				window.onhashchange()
+			} else {
 				showError(err)
 			}
 		})
@@ -1443,27 +1435,17 @@ function gridCopyItem(rowIndex, tableId) {
 	copyX({
 		newName: { title: `Yeni ${nameTitle}`, type: 'string', value: `${name}`, placeholder: `${placeholder}` }
 	}, 'Kopya oluştur', (answer, formData) => {
-		if(!answer)
-			return
-		$.ajax({
-			url: url,
-			data: formData,
-			type: 'POST',
-			success: function(result) {
-				if(result.success) {
-					if(result.data['newName']) {
-						alertX(`Yeni ad/kod:<br> <b>${result.data['newName']}</b>`, 'Kopyalama başarılı', (answer) => {
-							window.onhashchange()
-						})
-					} else {
+		if(!answer) return
+		postMan(url, { type: 'POST', dataType: 'json', data: formData }, (err, data) => {
+			if(!err) {
+				if(data.newName) {
+					alertX(`Yeni ad/kod:<br> <b>${data.newName}</b>`, 'Kopyalama başarılı', (answer) => {
 						window.onhashchange()
-					}
-
+					})
 				} else {
-					showError(result.error)
+					window.onhashchange()
 				}
-			},
-			error: function(err) {
+			} else {
 				showError(err)
 			}
 		})
