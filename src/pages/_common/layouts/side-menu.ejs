@@ -1,10 +1,19 @@
-<!-- <nav class="nav nav-pills flex-column bg-dark text-white" id="sidenavAccordion"> -->
 <nav class="nav nav-pills flex-column w-100">
 	<div id="leftMenu"></div>
-	<hr class="w-100 mt-3" style="border-top: 1px solid #fd7e144d;">
-	<a id="tawkto" class="nav-link" href="javascript:openInNewTab('https://tawk.to/chat/5f4bbf07cc6a6a5947b01c77/default');">
-		<i class="fas fa-medkit"></i> Destek216
+	<hr class="w-100 mt-3">
+	<%
+		let supportText=`<i class="fab fa-whatsapp fs-125"></i> Destek`
+		let supportHref=`javascript:openInNewTab('https://api.whatsapp.com/send/?phone=905533521042&text=destek+almak+istiyorum');`
+		if(typeof config.customization.support!='undefined'){
+			supportText=config.customization.support.text || supportText
+			supportHref=config.customization.support.href || supportHref
+		}
+	%>
+	<a id="support-link" class="nav-link d-flex align-items-center" href="<%- supportHref %>">
+		<%- supportText %>
 	</a>
+	
+	
 </nav>
 
 <script type="text/javascript">

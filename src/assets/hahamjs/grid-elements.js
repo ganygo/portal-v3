@@ -5,23 +5,22 @@ function grid(parentId, item, insideOfModal, cb) {
 	item = gridDefaults(item, insideOfModal)
 
 	let s = `<div class="${item.col || 'col-12'} p-1">`
-	s += `<div id="buttonPanel${item.id}" class="button-bar mt-4 mt-md-0 p-1 rounded justify-content-start" role="toolbar" aria-label="Toolbar with button groups"></div>`
 	if(item.options.show.infoRow) {
 		s += `
-		<div class="border p-1">
-		<div class="d-md-flex pt-1 px-1">
-		<div class="d-md-flex flex-fill m-0 p-0 mt-1 mb-1">
-		${item.options.show.filter?'<a class="btn btn-secondary btn-sm me-md-3" style="max-height: 28px;color: white;text-shadow: 1px 1px 2px var(--bs-dark);" data-bs-toggle="collapse" href="#filterRow" role="button" aria-expanded="false" aria-controls="filterRow" title="Filtre satırını göster/gizle"><i class="fas fa-filter"></i></a>':''}
-		${item.options.show.pageSize?gridPageSize(item ):''}
-		${item.options.show.pageCount?gridPageCount(item ):''}
-		</div>
-		${item.options.show.pagerButtons?'<div class="float-right">' + gridPagerButtons(item ) + '</div>':''}
-		</div>
-		</div>
+			<div class="d-md-flex px-1 align-items-end">
+				<div id="buttonPanel${item.id}" class="button-bar"></div>
+				<div class="pagination-info flex-fill d-md-inline-flex align-items-end me-4 justify-content-end">
+				${item.options.show.pageSize?gridPageSize(item ):''}
+				${item.options.show.pageCount?gridPageCount(item ):''}
+				</div>
+			${item.options.show.pagerButtons?gridPagerButtons(item ):''}
+			</div>
 		`
+	}else{
+		s += `<div id="buttonPanel${item.id}" class="button-bar"></div>`
 	}
 	s += `
-	<div id="${item.id}" level="${item.level}" data-type="${item.dataType}" data-field="${item.field || ''}" class="table-responsive p-0 ${item.options.show.infoRow?'mt-1':''}">
+	<div id="${item.id}" level="${item.level}" data-type="${item.dataType}" data-field="${item.field || ''}" class="table-responsive p-0 ${item.class || ''} ${item.options.show.infoRow?'mt-1':''}">
 	<table id="table${item.id}" class="table table-striped border m-0 haham-table ${item.level>0 ?'table-bordered':''}"  cellspacing="0">
 	<tbody></tbody>
 	</table>
@@ -30,16 +29,12 @@ function grid(parentId, item, insideOfModal, cb) {
 
 	if(item.options.show.infoRow) {
 		s += `
-		<div class="border p-1">
-		<div class="d-md-flex pt-1 px-1">
-		<div class="d-md-flex flex-fill m-0 p-0 mt-1 mb-1">
-		<div class="">
-		<a class="btn btn-success btn-sm" href="javascript:gridCSVExport('${item.id}')" title="CSV indir"><i class="far fa-file-excel"></i><i class="ms-2 fas fa-download"></i></a>
-		</div>
-		${item.options.show.pageCount?gridPageCount(item ):''}
-		</div>
-		${item.options.show.pagerButtons?'<div class="float-right">' + gridPagerButtons(item ) + '</div>':''}
-		</div>
+		<div class="d-md-flex mt-1 px-1 align-items-end">
+			<div class=""><a class="btn btn-success btn-sm d-none d-md-block" href="javascript:gridCSVExport('${item.id}')" title="CSV indir"><i class="far fa-file-excel"></i><i class="ms-2 fas fa-download"></i></a>	</div>
+			<div class="pagination-info flex-fill d-md-inline-flex align-items-end me-2 justify-content-end">
+				${item.options.show.pageCount?gridPageCount(item ):''}
+			</div>
+			${item.options.show.pagerButtons?gridPagerButtons(item ):''}
 		</div>
 		`
 	}
@@ -142,7 +137,7 @@ function gridButtonPanel(parentId, item, insideOfModal, cb) {
 							break
 					}
 				}
-				s += `<a class="${e.class || 'btn btn-primary'} me-2" href="javascript:runProgram('${e.program._id}','${e.program.type}')" title="${e.text || text}">${icon!=''?'<i class="' + icon + '"></i>':''} ${text}</a>`
+				s += `<a class="${e.class || 'btn btn-primary'} text-white stroke me-2" href="javascript:runProgram('${e.program._id}','${e.program.type}')" title="${e.text || text}">${icon!=''?'<i class="' + icon + '"></i>':''} ${text}</a>`
 			}
 		})
 	}
@@ -832,6 +827,8 @@ function gridHeader(parentId, item, insideOfModal, cb) {
 		s += `<th style="width: 30px;"><input class="grid-checkbox" type="checkbox" value="true" name="selectAll${item.id}" id="selectAll${item.id}" title="Tümünü seç"></th>`
 	}
 
+
+	let filterBtn=item.options.show.filterRow?'<a class="grid-filter-button collapsed" data-bs-toggle="collapse" href="#filterRow" role="button" aria-expanded="false" aria-controls="filterRow" title="Filtre satırını göster/gizle"><i class="fas fa-filter"></i></a>':''
 	Object.keys(item.fields).forEach((key) => {
 		let field = item.fields[key]
 		let cls = ''
@@ -855,7 +852,11 @@ function gridHeader(parentId, item, insideOfModal, cb) {
 		if(field.visible === false) {
 			cls += ' hidden'
 		}
-		s += `<th class="${cls}" style="${field.width?'width:' + field.width + ';min-width:' + field.width + ';':''}">${field.icon?'<i class="' + field.icon + '"></i> ':''}${itemLabelCaption(field)}</th>`
+		
+		s += `<th class="${cls}" style="${field.width?'width:' + field.width + ';min-width:' + field.width + ';':''}">${filterBtn}${field.icon?'<i class="' + field.icon + '"></i> ':''}${itemLabelCaption(field)}</th>`
+		if(cls.indexOf('hidden')<0 && filterBtn!=''){
+			filterBtn=''
+		}
 	})
 
 	if(item.options.buttonCount > 0) {
@@ -879,7 +880,12 @@ function gridFilterRow(parentId, item, insideOfModal, cb) {
 	if(item.options.show.filterRow !== true) {
 		return cb()
 	}
-	document.querySelector(`${parentId}`).insertAdjacentHTML('beforeend', `<tr id="filterRow" class="text-nowrap collapse">${item.options.selection===true?'<th></th>':''}</tr>`)
+	let cleanFilters=item.options.show.filter?`<a class="grid-filter-cleaner" href="javascript:gridCleanRowFilters('${parentId} #filterRow')" title="Satır filtrelerini temizle"><span class="fa-stack">
+  <i class="fas fa-filter fa-stack-1x"></i>
+  <i class="fas fa-slash fa-stack-1x"></i>
+</span></a>`:''
+
+	document.querySelector(`${parentId}`).insertAdjacentHTML('beforeend', `<tr id="filterRow" class="text-nowrap collapse">${item.options.selection===true?'<th>' + cleanFilters + '</th>':''}</tr>`)
 
 	let dizi = Object.keys(item.fields)
 	let index = 0
@@ -894,6 +900,8 @@ function gridFilterRow(parentId, item, insideOfModal, cb) {
 		document.querySelector(`${parentId} #filterRow`).insertAdjacentHTML('beforeend', `<th id="filterCol${index}" ${field.visible===false?'class="hidden"':''}></th>`)
 
 		if(field.filter && field.visible !== false) {
+			if(field.filterField)
+				field.field=field.filterField
 			field.filterField = field.filterField || dizi[index]
 			field.id = generateFormId(`${item.id}_filter_${field.filterField}`)
 			field.prefix = generateFormId(`${item.id}_filter`)
@@ -902,6 +910,7 @@ function gridFilterRow(parentId, item, insideOfModal, cb) {
 			field.noGroup = true
 			//field.placeholder=field.placeholder || ' '
 			field.showAll = true
+
 			if((hashObj.query[field.filterField] || '') != '') {
 				field.value = hashObj.query[field.filterField]
 			}
@@ -919,6 +928,47 @@ function gridFilterRow(parentId, item, insideOfModal, cb) {
 		document.querySelector(`${parentId} #filterRow`).insertAdjacentHTML('beforeend', `<th class="border-start">&nbsp;</th>`)
 		cb()
 	})
+}
+
+
+
+function gridCleanRowFilters(divId){
+	let elements = document.querySelector(divId).querySelectorAll(`input, select`)
+	let index = 0
+	let h = getHashObject()
+	let tazele=false
+	$(divId).collapse('hide')
+	while(index < elements.length) {
+		let el=elements[index]
+		let field=el.getAttribute('data-field') || ''
+		if(el.tagName=='SELECT'){
+			if(el.options.length>0)
+				el.selectedIndex=0
+		}else{
+			if(el.type == 'checkbox') {
+				el.checked=false
+			}else{
+				el.value=''
+			}
+		}
+		if(field && h.query[field]!=undefined){
+			h.query[field]=undefined
+			delete h.query[field]
+			tazele=true
+		}
+		index++
+	}
+	
+	if(tazele){
+		setTimeout(()=>{
+			if(h.query.page) {
+				h.query.page = 1
+			}
+			setHashObject(h)
+		},200)
+	}
+	
+	// document.querySelector(divId).classList.remove('show')
 }
 
 function filterControl(parentId, filterRowDivId, field, cb) {
@@ -1043,27 +1093,25 @@ function buttonRowCell(listItem, rowIndex, item) {
 
 function gridPageSize(item) {
 
-	let s = `<div class="align-items-center" style="display: inline-flex">
-	Sayfada
-	<select class="form-control input-inline input-sm ms-1" id="pageSize${item.id}">
+	let s = `Sayfada
+	<select class="form-control w-auto mx-1 p-0" id="pageSize${item.id}">
 	<option value="10" ${item.value.pageSize==10?'selected':''}>10</option>
 	<option value="20" ${item.value.pageSize==20?'selected':''}>20</option>
 	<option value="50" ${item.value.pageSize==50?'selected':''}>50</option>
 	<option value="100" ${item.value.pageSize==100?'selected':''}>100</option>
 	<option value="250" ${item.value.pageSize==250?'selected':''}>250</option>
 	<option value="500" ${item.value.pageSize==500?'selected':''}>500</option>
-	</select>
-	</div>`
+	</select>`
 
 	return s
 }
 
 function gridPageCount(item) {
-	let s = `<div class="mt-1 ms-2" style="display: inline-block">`
+	let s = `<div class="">`
 	if(item.value.pageSize > 0 && item.value.recordCount > 0) {
-		s += `${((item.value.page-1)*item.value.pageSize)+1} - ${(item.value.page*item.value.pageSize<item.value.recordCount)?item.value.page*item.value.pageSize:item.value.recordCount} arası, Toplam: ${item.value.recordCount} kayit, ${item.value.pageCount} sayfa`
+		s += `${((item.value.page-1)*item.value.pageSize)+1} - ${(item.value.page*item.value.pageSize<item.value.recordCount)?item.value.page*item.value.pageSize:item.value.recordCount} arası, <b>${item.value.recordCount}</b> kayıt, ${item.value.pageCount} sayfa`
 	} else {
-		s += `Toplam: ${item.value.recordCount} kayit`
+		s += ` <b>${item.value.recordCount}</b> kayıt`
 	}
 	s += `</div>`
 
@@ -1077,7 +1125,7 @@ function gridPagerButtons(item) {
 		return ''
 
 	let s = `
-	<ul class="pagination mb-1">`
+	<ul class="pagination m-0">`
 	if(item.value.page > 1) {
 		s += `<li class="page-item"><a class="page-link" href="${menuLink(hashObj.path,pageNo(1))}">|&lt;</a></li>
 		<li class="page-item"><a class="page-link" href="${menuLink(hashObj.path,pageNo(item.value.page-1))}">&lt;</a></li>`
@@ -1229,8 +1277,6 @@ function gridModalEditRow(tableId, rowIndex, insideOfModal) {
 
 	$(`#modalRow .modal-footer`).html(`<a class="btn btn-primary" href="javascript:gridModalOK('${tableId}',${rowIndex},${insideOfModal})" title="Kaydet"><i class="fas fa-check"></i> Tamam</a><button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Vazgeç</button>`)
 
-
-
 	$(`#modalRow`).modal('show')
 
 }
@@ -1252,13 +1298,14 @@ function gridModalOK(tableId, rowIndex, insideOfModal) {
 }
 
 function grid_onchange(item) {
+	let onchange =''
 	try {
 		if(!item)
 			return
 		if(document.querySelector(`${item.pageFormId} #${item.id}`)) {
 			if(document.querySelector(`${item.pageFormId} #${item.id}`).item) {
 				if(item.onchange) {
-					let onchange = item.onchange
+					onchange = item.onchange
 					if(onchange.indexOf('this.value') > -1) {
 						onchange = onchange.replace('this.value', `document.querySelector('${item.pageFormId} #${item.id}').item.value`)
 						eval(onchange)
@@ -1272,7 +1319,7 @@ function grid_onchange(item) {
 			}
 		}
 	} catch (tryErr) {
-		alertX(`${tryErr.name || ''} - ${tryErr.message || ''}`, 'Hata', 'danger')
+		alertX(`<tt>${tryErr.name || ''} - ${tryErr.message || ''}\nFunction: <b>grid_onchange</b>\nid: <b>${item.id}</b>\nonchange: <b>${onchange}</b>\n</tt>`, 'Custom Script Hatası', 'danger')
 	}
 }
 

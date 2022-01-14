@@ -1,5 +1,5 @@
 <% layout('./layouts/plain') %>
-<script type="text/javascript" src="<%- basePath || '' %><%- assetVersion('/hahamjs/helper.js') %>"></script>
+<script type="text/javascript" src="<%- basePath + assetVersion('/hahamjs/helper.js') %>"></script>
 <style type="text/css">
 body {
 	background-color: #212121 !important;
@@ -40,16 +40,21 @@ var data = <%- JSON.stringify(data) %>
 data.status='<%- config.status || '' %>'
 
 if((localStorage.getItem('global') || '') == '') {
-	localStorage.clear()
+	localStorage.removeItem('global')
 }
 
 if(data.token) {
 	global=Object.assign({},global,(data || {}))
 	localStorage.setItem('global', JSON.stringify(global || {}))
 
-	var q = getAllUrlParams()
-	// setTimeout(() => {
+	let q = getAllUrlParams()
+	console.log(`q:`,q)
+	if(q.ret){
+		window.location.href = q.ret
+	}else{
 		window.location.href = '<%- basePath || ''%>/haham#/dashboard/main?mid=0'
+	}
+	// setTimeout(() => {
 	// }, 1000)
 }
 </script>

@@ -7,32 +7,60 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 	<meta name="description" content="" />
 	<meta name="author" content="" />
-	<title>GanyGO</title>
-	<link rel="icon" href="<%- basePath %><%- assetVersion('/img/brand/web-icon.png') %>" type="image/png">
+	<title>
+		<%- config.customization.title || 'GanyGO' %>
+	</title>
+	<link rel="icon" href="<%- config.customization.icon || (basePath + assetVersion('/img/brand/web-icon.png')) %>" type="image/png">
 	<link rel="stylesheet" type="text/css" href="<%- basePath %>/vendor/css/fontawesome.v5.8.2.min.css">
-	<link rel="stylesheet" type="text/css" href="<%- basePath %>/vendor/css/ganyfonts.css">
 	<link rel="stylesheet" type="text/css" href="<%- basePath %>/vendor/css/jquery-ui.v1.12.1.min.css">
 	<script type="text/javascript" src="<%- basePath %>/vendor/js/jquery.v3.4.1.min.js"></script>
 	<script type="text/javascript" src="<%- basePath %>/vendor/js/jquery-ui.v1.12.1.min.js"></script>
 	<link href="<%- basePath %>/vendor/css/js-snackbar.css" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="<%- basePath %>/vendor/js/js-snackbar.js"></script>
 	<script type="text/javascript" src="<%- basePath %>/vendor/js/moment-2.29.1.min.js"></script>
-	<script type="text/javascript" src="<%- basePath %>/vendor/js/socket.io.min.js"></script>
-	<script type="text/javascript" src="<%- basePath %><%- assetVersion('/vendor/js/FileSaver.js') %>"></script>
-	<script type="text/javascript" src="<%- basePath %><%- assetVersion('/hahamjs/dbtypes.js') %>"></script>
-	<script type="text/javascript" src="<%- basePath %><%- assetVersion('/hahamjs/utils.js') %>"></script>
-	<script type="text/javascript" src="<%- basePath %><%- assetVersion('/hahamjs/modals.js') %>"></script>
-	<script type="text/javascript" src="<%- basePath %><%- assetVersion('/hahamjs/helper.js') %>"></script>
-	<script type="text/javascript" src="<%- basePath %><%- assetVersion('/hahamjs/form-elements.js') %>"></script>
-	<script type="text/javascript" src="<%- basePath %><%- assetVersion('/hahamjs/grid-elements.js') %>"></script>
-	<script type="text/javascript" src="<%- basePath %><%- assetVersion('/hahamjs/haham.js') %>"></script>
-	<link href="<%- basePath %><%- assetVersion('/css/main.css') %>" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="<%- basePath %>/vendor/js/socket.io.js"></script>
+	<script type="text/javascript" src="<%- basePath + assetVersion('/vendor/js/FileSaver.js') %>"></script>
+	<script type="text/javascript" src="<%- basePath + assetVersion('/hahamjs/dbtypes.js') %>"></script>
+	<script type="text/javascript" src="<%- basePath + assetVersion('/hahamjs/utils.js') %>"></script>
+	<script type="text/javascript" src="<%- basePath + assetVersion('/hahamjs/modals.js') %>"></script>
+	<script type="text/javascript" src="<%- basePath + assetVersion('/hahamjs/helper.js') %>"></script>
+	<script type="text/javascript" src="<%- basePath + assetVersion('/hahamjs/form-elements.js') %>"></script>
+	<script type="text/javascript" src="<%- basePath + assetVersion('/hahamjs/grid-elements.js') %>"></script>
+	<script type="text/javascript" src="<%- basePath + assetVersion('/hahamjs/haham.js') %>"></script>
+	<link href="<%- config.customization['main.css'] || (basePath + assetVersion(`/css/main.css`)) %>" rel="stylesheet" type="text/css" />
+	<script type="text/javascript">
+	if(localStorage.getItem('theme')==null){
+		if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+				localStorage.setItem('theme','dark')
+		}else{
+				localStorage.setItem('theme','light')
+		}
+	}
+		
+
+	function changeColorScheme(theme){
+		if(theme)
+			localStorage.setItem('theme',theme)
+
+		if(localStorage.getItem('theme') == 'dark') {
+			document.documentElement.classList.remove('light')
+			document.documentElement.classList.add('dark')
+		} else {
+			document.documentElement.classList.remove('dark')
+			document.documentElement.classList.add('light')
+		}
+	}
+
+	changeColorScheme()
+
+	
+	</script>
 </head>
 
 <body id="page-top">
 	<%- body %>
 	<script type="text/javascript" src="<%- basePath %>/vendor/js/bootstrap.bundle.v5.1.0.min.js"></script>
-	<script type="text/javascript" src="<%- basePath %><%- assetVersion('/js/scripts.js') %>"></script>
+	<script type="text/javascript" src="<%- basePath + assetVersion('/js/scripts.js') %>"></script>
 </body>
 
 </html>

@@ -2,9 +2,9 @@
 <div id="app" class="">
 	<header id="top-panel" class="d-flex">
 		<div class="d-flex align-items-center">
-			<a class="btn btn-sm border ms-3 me-2 mb-1 d-none d-md-block" href="javascript:toggleMenu('show')" title="Menü göster/gizle"><i class="fas fa-bars"></i></a>
+			<a class="menu-toggle-button ms-3 me-2 d-none d-md-block" href="javascript:toggleMenu('show')" title="Menü göster/gizle"><i class="fas fa-bars"></i></a>
 			<a href="<%- basePath %>/haham#/dashboard/main?mid=0" class="ms-1 me-auto">
-				<img class="logo" src="/img/brand/logo.png">
+				<img class="logo" src="<%- basePath %>/img/brand/logo-white.png">
 			</a>
 		</div>
 		<div class="flex-fill d-flex align-items-center justify-content-end">
@@ -12,22 +12,22 @@
 				<li class="nav-item dropdown" id="alertsDropdown">
 					<a class="nav-link dropdown-toggle" href="#" id="alertsDropdownBtn" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 						<i class="fas fa-bell fa-fw font-size-150"></i>
-						<span id="unread-notification-count" class="badge badge-danger badge-counter"></span>
+						<span id="unread-notification-count" class="badge badge-danger badge-counter">45</span>
 					</a>
-					<div class="dropdown-menu dropdown-menu-md-end bg-dark" aria-labelledby="alertsDropdownBtn">
-						<h6 class="dropdown-header text-light">
+					<div class="dropdown-menu dropdown-menu-md-end" aria-labelledby="alertsDropdownBtn">
+						<h6 class="dropdown-header">
 							Bildirim Merkezi
 						</h6>
 						<div id="last-notifications">
 						</div>
-						<a class="dropdown-item text-center small text-gray-500" href="#/me/notifications">Tüm bildirimleri göster</a>
+						<a class="dropdown-item text-center small" href="#/me/notifications">Tüm bildirimleri göster</a>
 					</div>
 				</li>
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" id="databasesDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Veri Ambarları">
 						<i class="fas fa-database font-size-150"></i>
 					</a>
-					<div id="dbList" class="dropdown-menu dropdown-menu-end bg-dark" aria-labelledby="databasesDropdown">
+					<div id="dbList" class="dropdown-menu dropdown-menu-end" aria-labelledby="databasesDropdown">
 						<% if(typeof session.databases!='undefined'){ %>
 						<% session.databases.forEach((e)=>{%>
 						<% if(e._id.toString()== dbId.toString()){%>
@@ -46,24 +46,29 @@
 					<a class="nav-link dropdown-toggle" id="userDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Kullanıcı işlemleri">
 						<i class="fas fa-user font-size-150"></i>
 					</a>
-					<div class="dropdown-menu dropdown-menu-end bg-dark" aria-labelledby="userDropdown">
+					<div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
 						<a class="dropdown-item" href="#/me/profile">Profilim</a>
+						<div class="dropdown-divider"></div>
+						<div class="px-1 d-flex justify-content-between">
+							<a class="dropdown-item" href="javascript:changeColorScheme('light')"><i class="fas fa-sun"></i> Light</a>
+							<a class="dropdown-item" href="javascript:changeColorScheme('dark')"><i class="fas fa-moon"></i> Dark</a>
+						</div>
 						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" href="javascript:logout();">Çıkış</a>
 					</div>
 				</li>
 			</ul>
-			<a class="btn btn-sm border ms-3 me-2 d-block d-md-none" href="javascript:toggleMenu('show')" title="Menü göster/gizle"><i class="fas fa-bars"></i></a>
+			<a class="menu-toggle-button ms-3 me-2 d-block d-md-none" href="javascript:toggleMenu('show')" title="Menü göster/gizle"><i class="fas fa-bars"></i></a>
 		</div>
 	</header>
 	<div id="main-content">
-		<div id="side-menu" class="bg-dark collapse show" style="">
+		<div id="side-menu" class="collapse show" style="">
 			<%- partial('side-menu') %>
 		</div>
 		<div id="right-side" class="">
-			<main class="">
-				<div id="title-panel" class="d-flex justify-content-between mt-0 mb-0 px-2 py-1 border-bottom">
-					<h1 id="pageTitle" class="m-0 mt-1 page-title">...</h1>
+			<main class="bg-white">
+				<div id="title-panel" class="d-flex justify-content-between align-items-center mt-0 mb-0 px-2 py-1">
+					<div id="pageTitle" class="m-0 page-title">...</div>
 					<div id="headerButtons" class="d-flex"></div>
 				</div>
 				<%- body %>

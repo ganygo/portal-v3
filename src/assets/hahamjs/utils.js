@@ -16,15 +16,23 @@ Date.prototype.hhmmss = function() {
 	return (HH[1] ? HH : "0" + HH[0]) + ':' + (min[1] ? min : "0" + min[0]) + ':' + (sec[1] ? sec : "0" + sec[0])
 }
 
-Date.prototype.yyyymmddhhmmss = function() {
-	let yyyy = this.getFullYear().toString()
-	let mm = (this.getMonth() + 1).toString()
-	let dd = this.getDate().toString()
-	let HH = this.getHours().toString()
-	let min = this.getMinutes().toString()
-	let sec = this.getSeconds().toString()
-	return yyyy + '-' + (mm[1] ? mm : "0" + mm[0]) + '-' + (dd[1] ? dd : "0" + dd[0]) + ' ' + (HH[1] ? HH : "0" + HH[0]) + ':' + (min[1] ? min : "0" + min[0]) + ':' + (sec[1] ? sec : "0" + sec[0])
+Date.prototype.yyyymmddhhmmss = function(middleChar=' ',addRemoveTimeOffset=false) {
+	let d=new Date(this.valueOf())
+	if(addRemoveTimeOffset){
+		d.setMinutes(d.getMinutes() + (new Date()).getTimezoneOffset() * -1)
+	}
+	return `${d.getFullYear()}-${(d.getMonth()+1).toDigit(2)}-${d.getDate().toDigit(2)}${middleChar}${d.getHours().toDigit(2)}:${d.getMinutes().toDigit(2)}:${d.getSeconds().toDigit(2)}`
 }
+
+// Date.prototype.yyyymmddhhmmss = function() {
+// 	let yyyy = this.getFullYear().toString()
+// 	let mm = (this.getMonth() + 1).toString()
+// 	let dd = this.getDate().toString()
+// 	let HH = this.getHours().toString()
+// 	let min = this.getMinutes().toString()
+// 	let sec = this.getSeconds().toString()
+// 	return yyyy + '-' + (mm[1] ? mm : "0" + mm[0]) + '-' + (dd[1] ? dd : "0" + dd[0]) + ' ' + (HH[1] ? HH : "0" + HH[0]) + ':' + (min[1] ? min : "0" + min[0]) + ':' + (sec[1] ? sec : "0" + sec[0])
+// }
 
 Date.prototype.hhmm = function() {
 
@@ -408,37 +416,31 @@ String.prototype.padding = function(n, c) {
 }
 
 
-// function htmlEval(exp, values={}) {
-// 	if((exp || '') == '')
-// 		return ''
-// 	exp=exp.replaceAll('${','{').replaceAll('{','${')
-// 	let code=`(function(){
-// 	`
-// 	Object.keys(values).forEach((key)=>{
-// 		code+=`let ${key}=${JSON.stringify(values[key])}\n`
-// 	})
+var colors={
+	reset : '\x1b[0m',
+	black : '\x1b[30m',
+	red : '\x1b[31m',
+	green : '\x1b[32m',
+	yellow : '\x1b[33m',
+	blue : '\x1b[34m',
+	magenta : '\x1b[35m',
+	cyan : '\x1b[36m',
+	white : '\x1b[37m',
 
-// 	code+=`return \`${exp}\`
-// 	})()`
-
-// 	return code
-// }
-
-
-// function htmlEval11(html) {
-// 	let s1 = html.indexOf('`', 0)
-// 	let s2 = html.indexOf('`', s1 + 2)
-// 	while(s1 > -1 && s2 > s1) {
-// 		let kodParcasi = html.substr(s1, s2 - s1 + 1)
-// 		try {
-// 			let sbuf = eval(kodParcasi)
-// 			html = html.replace(kodParcasi, sbuf)
-// 		} catch {}
-
-// 		s1 = html.indexOf('`', s2 + 1)
-// 		s2 = html.indexOf('`', s1 + 2)
-// 	}
+	bgBlack : '\x1b[40m',
+	bgRed : '\x1b[41m',
+	bgGreen : '\x1b[42m',
+	bgYellow : '\x1b[43m',
+	bgBlue : '\x1b[44m',
+	bgMagenta : '\x1b[45m',
+	bgCyan : '\x1b[46m',
+	bgWhite : '\x1b[47m'
+}
+Object.keys(colors).forEach((key)=>{
+String.prototype.__defineGetter__(key, function(){ return colors[key] + this + '\x1b[39m'})	
+})
 
 
-// 	return html
-// }
+
+
+

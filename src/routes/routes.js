@@ -1,5 +1,5 @@
 //var loginHelper = require('./login-helper')
-console.log(`config.basePaths:`, config.basePaths)
+
 module.exports = (app) => {
 
 	firstRoutes(app)

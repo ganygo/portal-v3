@@ -35,7 +35,8 @@ module.exports = () => {
 				rejectUnauthorized: false,
 				dataType: 'json',
 				dataAsQueryString: (req.method || 'GET') == 'GET' ? true : false,
-				data: data
+				data: data,
+				timeout:120000
 			}
 
 			urllib.request(url, options, (error, body, response) => {

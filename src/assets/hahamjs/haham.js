@@ -5,7 +5,7 @@ let bSayfaAciliyor = false
 
 
 function findPageObject() {
-	document.title = hashObj.title + ' - GanyGO'
+	changeDocumentTitle(hashObj.title)
 	$('#pageTitle').html(`<i class="${hashObj.icon}"></i> ${hashObj.breadCrumbsHtml}`)
 	var sayfa = getPropertyByKeyPath(global.pages, hashObj.pathKey)
 	if(!sayfa)
@@ -36,6 +36,19 @@ function findPageObject() {
 	return resp
 }
 
+function changeDocumentTitle(title){
+	let brand=''
+	let ayraclar=[' - ',' | ',' . ']
+	let sep=''
+	ayraclar.forEach((e)=>{ if(document.title.indexOf(e)>-1) sep=e })
+	if(sep==''){
+		brand=document.title
+		sep=' - '
+	}else{
+		brand=document.title.split(sep)[1]
+	}
+	document.title = `${hashObj.title}${sep}${brand}`
+}
 
 
 function publishPage(divId, before, after) {
@@ -166,12 +179,12 @@ function headerButtons(divId, pageSubObj) {
 	} else {
 		if(pageSubObj.type == 'form') {
 
-			hbtn = `<button id="headerButtonSave" class="btn btn-outline-primary btn-form-header ms-2" title="Kaydet"><i class="fas fa-save"></i></button>
+			hbtn = `<button id="headerButtonSave" class="btn btn-outline-light btn-form-header ms-2" title="Kaydet"><i class="fas fa-save"></i></button>
 			<a href="javascript:history.back(-1)" class="btn btn-outline-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
 
 			if(pageSubObj.options) {
 				if(pageSubObj.options.mode == 'view') {
-					hbtn = `<a href="javascript:history.back(-1)" class="btn btn-outline-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
+					hbtn = `<a href="javascript:history.back(-1)" class="btn btn-outline-dark btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
 				}
 			}
 		}
@@ -348,6 +361,19 @@ function generateControl(divId, item, data, insideOfModal, callback) {
 			item.value = getPropertyByKeyPath(data, item.field, item.value) || ''
 			frm_Label(divId, item, cb)
 			break
+		case 'info':
+		case 'alert':
+		case 'warning':
+		case 'danger':
+		case 'check':
+		case 'success':
+		case 'light':
+		case 'dark':
+		case 'primary':
+		case 'secondary':
+			item.value = getPropertyByKeyPath(data, item.field, item.value) || ''
+			frm_Alert(divId, item, cb)
+			break
 		case 'remotelookup':
 			item.value = getPropertyByKeyPath(data, item.field, item.value)
 			if(item.lookupTextField) {
@@ -394,7 +420,8 @@ function generateControl(divId, item, data, insideOfModal, callback) {
 		case 'filter':
 
 			if(item.fields) {
-				document.querySelector(divId).insertAdjacentHTML('beforeend', `<div class="col-12 p-0"><div id="filterForm" class="row m-0"></div></div>`)
+				let btnShowHide=`<a id="btnShowHideFilterForm" href="#filterForm" class="stroke-white btn-collapse collapsed" data-bs-toggle="collapse" aria-expanded="false" aria-controls="filterForm" title="Göster/gizle" ><i class="fas fa-caret-square-up"></i></a>`
+				document.querySelector(divId).insertAdjacentHTML('beforeend', `<div class="col-12 p-0 position-relative">${btnShowHide}<div id="filterForm" class="row m-0 card-collapse collapse"></div></div>`)
 
 				let dizi = Object.keys(item.fields)
 				let index = 0

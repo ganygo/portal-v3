@@ -22,11 +22,13 @@ var global = {
 	status: '',
 	basePath: ''
 }
+var staticValues={}
 
 function initHahamGlobals() {
 	try {
 		if(localStorage.getItem('global')) {
 			global = Object.assign({}, global, JSON.parse(localStorage.getItem('global')))
+			staticValues=global.staticValues
 		}
 	} catch (e) {
 		localStorage.removeItem('global')
@@ -160,26 +162,18 @@ function getPageInfos(h = null) {
 			}
 			breadCrumbs.push({ icon: '', text: p.funcTitle })
 		}
-		let sbuf = ''
-		sbuf = breadCrumbs.length > 0 ? breadCrumbs[0].text : ''
-		p.breadCrumbs += sbuf
-		p.breadCrumbsHtml += breadCrumbs.length == 1 ? `<span class="font-weight-bold text-orange">${breadCrumbs[0].text}</span>` : sbuf
+		let seperator=' \\ '
 
-		sbuf = breadCrumbs.length > 1 ? ' \\ ' + breadCrumbs[1].text : ''
-		p.breadCrumbs += sbuf
-		p.breadCrumbsHtml += breadCrumbs.length == 2 ? ` \\ <span class="font-weight-bold text-orange">${breadCrumbs[1].text}</span>` : sbuf
-
-		sbuf = breadCrumbs.length > 2 ? ' \\ ' + breadCrumbs[2].text : ''
-		p.breadCrumbs += sbuf
-		p.breadCrumbsHtml += breadCrumbs.length == 3 ? ` \\ <span class="font-weight-bold text-orange">${breadCrumbs[2].text}</span>` : sbuf
-
-		sbuf = breadCrumbs.length > 3 ? ' \\ ' + breadCrumbs[3].text : ''
-		p.breadCrumbs += sbuf
-		p.breadCrumbsHtml += breadCrumbs.length == 4 ? ` \\ <span class="font-weight-bold text-orange">${breadCrumbs[3].text}</span>` : sbuf
-
-		sbuf = breadCrumbs.length > 4 ? ' \\ ' + breadCrumbs[4].text : ''
-		p.breadCrumbs += sbuf
-		p.breadCrumbsHtml += breadCrumbs.length == 5 ? ` \\ <span class="font-weight-bold text-orange">${breadCrumbs[4].text}</span>` : sbuf
+		breadCrumbs.forEach((e,index)=>{
+			if(index==breadCrumbs.length-1){
+				p.breadCrumbsHtml +=`<span class="font-weight-bold active">${e.text}</span>`
+				p.breadCrumbs += e
+			}else{
+				p.breadCrumbsHtml +=e.text + seperator
+				p.breadCrumbs +=e.text + seperator
+			}
+		})
+		
 
 	}
 	return p
@@ -297,6 +291,8 @@ function loadCardCollapses() {
 	$('.modal .card-collapse').on('hide.bs.collapse', (e) => {
 		pageSettings.setItem(`collapse_${e.target.id}`, e.type)
 	})
+
+	
 }
 
 
@@ -309,6 +305,7 @@ function postMan(url, options, cb) {
 		type: options.method || options.type || 'GET',
 		dataType: options.dataType || 'json',
 		data: options.data || {},
+		timeout:120000,
 		success: function(result) {
 			if(result.success != undefined) {
 				if(result.success) {
@@ -321,6 +318,8 @@ function postMan(url, options, cb) {
 			}
 		},
 		error: function(err) {
+			console.log(`postMan Hata url:`,url)
+			console.log(`postMan Hata err:`,err)
 			cb(err)
 		}
 	})
@@ -980,6 +979,8 @@ function runFilter(selector, prefix = '') {
 
 
 
+
+
 function menuLink(path, filter) {
 	let s = `#${path}`
 
@@ -1349,7 +1350,6 @@ function runProgram(_id, type) {
 }
 
 function runProgramAjax(data) {
-console.log(`runProgramAjax programId:`,programId)
 	postMan(`/dbapi/programs/run/${programId}`, { type: 'POST', dataType: 'json', data: data }, (err, data) => {
 		if(!err) {
 			console.log(`runProgramAjax data:`,data)
@@ -1455,11 +1455,21 @@ function initIspiyonService() {
 	if(!global.ispiyonServiceUrl)
 		return
 	let socket = io(global.ispiyonServiceUrl, {
-		reconnectionDelayMax: 10000
+		reconnection:false,
+		reconnectionDelay:120000,
+		reconnectionDelayMax: 300000
 	})
 	socket.on('connect', () => {
 		socket.emit('I_AM_HERE', global.token, global.dbId)
 
+	})
+
+	socket.on('error', function(err) {
+	  console.log('socket io hatasi');
+	})
+
+	socket.on('connect_error', function(err) {
+	  console.log('Error connecting to server');
 	})
 
 	socket.on('TOTAL_UNREAD', (count, lastNotifications) => {

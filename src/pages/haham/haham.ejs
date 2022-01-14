@@ -7,11 +7,17 @@
 	.view-plain {
 		
 	}
+
+
 </style>
-<form class="row m-0">
+<form class="row m-0 mx-1">
 	<div id="mainCtrl" class="px-0 pt-2"></div>
 </form>
 <script type="text/javascript">
+
+
+
+
 var mainDivId = '#mainCtrl'
 if(window.location.hash == '') {
 	window.location.hash = '/dashboard/main?mid=0'
@@ -19,7 +25,6 @@ if(window.location.hash == '') {
 }
 
 $(document).ready(() => {
-
 	sayfayiGoster()
 	window.onhashchange = () => {
 		hashObj = getHashObject()
@@ -47,9 +52,9 @@ function sayfayiGoster() {
 
 function toggleMenu(status) {
 	if(status == 'show') {
-		$('#menu-side').toggle(0)
+		$('#side-menu').toggle(0)
 	} else if(window.innerWidth < 1000) {
-		$('#menu-side').hide()
+		$('#side-menu').hide()
 
 	}
 }
@@ -98,7 +103,8 @@ function viewStylePrint(divId) {
 	$('#side-menu').css('margin-top', '0px')
 	$('#right-side footer').hide()
 	$('#right-side footer').removeClass('d-flex')
-	
+	$('#right-side').css('height','100%')
+	$('#right-side main').css('height','calc(100% - 50px)')
 	$(divId).addClass('print')
 
 
@@ -106,7 +112,7 @@ function viewStylePrint(divId) {
 
 	if(!document.querySelector('#printButtonPanel')) {
 
-		let s = `<div id="printButtonPanel" class="row m-0 border">
+		let s = `<div id="printButtonPanel" class="row m-0 border bg-white bg-opacity-50">
 		<div class="col-12 p-2">
 		<a class="btn btn-primary ms-3 mt-2" href="javascript:frameYazdir('${divId} iframe')"><i class="fas fa-print"></i> Yazdır</a>
 		<a class="btn btn-dark ms-3 mt-2" href="javascript:pencereyiKapat()"><i class="fas fa-times"></i> Kapat</a>

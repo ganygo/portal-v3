@@ -125,7 +125,7 @@ function frm_FormHtml(parentId, item, cb) {
 
 function frm_Label(parentId, item, cb) {
 
-	let s = frm_GInput(`<label level="${item.level || ''}" data-type="${item.dataType}" data-field="${item.field || ''}"  id="${item.id}" class="m-0 p-0 ${item.class || ''}" title="${item.title || item.text || ''}">${itemLabelCaption(item, (item.value || item.text || ''))}</label>`, item)
+	let s = frm_Group(`<label level="${item.level || ''}" data-type="${item.dataType}" data-field="${item.field || ''}"  id="${item.id}" class="m-0 p-0  ${item.class || ''}" title="${item.title || item.text || ''}">${itemLabelCaption(item, (item.value || item.text || ''))}</label>`, item)
 
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 
@@ -134,6 +134,19 @@ function frm_Label(parentId, item, cb) {
 
 	cb()
 }
+
+function frm_Alert(parentId, item, cb) {
+
+	let s = frm_Group(`<label level="${item.level || ''}" data-type="${item.dataType}" data-field="${item.field || ''}"  id="${item.id}" class="m-0 alert alert-info alert-${item.type} small w-100 p-1 my-1 ${item.class || ''}" title="${item.title || item.text || ''}">${item.value || item.text || ''}</label>`, item)
+
+	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
+
+	if(item.id && item.value)
+		$(`${parentId} #${item.id}`).val(item.value)
+
+	cb()
+}
+
 
 function frm_TextBox(parentId, item, cb) {
 	let s = frm_GInput(`<input type="text" level="${item.level || ''}" data-type="${item.dataType}" data-field="${item.field || ''}"  class="form-control ${item.class || ''}" id="${item.id}" name="${item.name}" placeholder="${item.placeholder || ' '}" title="${item.title || item.text || ''}" ${item.required?'required="required"':''} ${item.readonly==true?'readonly':''} onchange="${item.onchange || ''}" autocomplete="off_${moment().format('YYYYMMDDHHmmss')}" value="${item.value!=undefined?item.value:''}">`, item)
@@ -162,8 +175,15 @@ function frm_Button(parentId, item, cb) {
 		label = `<i class="${item.icon}"></i> ${label}`
 	}
 
-
-	let s = `<a class="${item.class || 'btn btn-info'}" level="${item.level || ''}" data-type="${item.dataType}" data-field="${item.field || ''}"   id="${item.id || ''}" href="${item.href || (item.value || '')}" target="${item.target || ''}" title="${titleText.replaceAll('"','\'')}">${label}</a>`
+	let href=`${item.href || (item.value || '')}`
+	if(href.length>2){
+		if(global.basePath!='' && href[0]=='/' && href[1]!='/'){
+			href=global.basePath+href
+		}
+	}
+	console.log(`frm_Button item:`, item)
+	console.log(`frm_Button href:`, href)
+	let s = `<a class="${item.class || 'btn btn-info'}" level="${item.level || ''}" data-type="${item.dataType}" data-field="${item.field || ''}"   id="${item.id || ''}" href="${href}" target="${item.target || ''}" title="${titleText.replaceAll('"','\'')}">${label}</a>`
 
 	if(item.noGroup !== true) {
 		s = `<div class="${item.col || 'col-12'} p-1 ${item.visible===false?'hidden':''}">

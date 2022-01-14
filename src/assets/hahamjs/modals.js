@@ -14,27 +14,27 @@ function openUrl(url, _id, target, popup) {
 }
 
 function openInNewTab(url) {
-	var win = window.open(url, '_blank')
+	let win = window.open(url, '_blank')
 	win.focus()
 	return win
 }
 
 function popupCenter(url, title, w, h, isDialog = false) {
-	var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : window.screenX
-	var dualScreenTop = window.screenTop != undefined ? window.screenTop : window.screenY
+	let dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : window.screenX
+	let dualScreenTop = window.screenTop != undefined ? window.screenTop : window.screenY
 
-	var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width
-	var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height
+	let width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width
+	let height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height
 
-	var systemZoom = width / window.screen.availWidth
-	var left = (width - w) / 2 / systemZoom + dualScreenLeft
-	var top = (height - h) / 2 / systemZoom + dualScreenTop
+	let systemZoom = width / window.screen.availWidth
+	let left = (width - w) / 2 / systemZoom + dualScreenLeft
+	let top = (height - h) / 2 / systemZoom + dualScreenTop
 	if(!isDialog) {
-		var newWindow = window.open(url, title, 'scrollbars=yes, width=' + w / systemZoom + ', height=' + h / systemZoom + ', top=' + top + ', left=' + left)
+		let newWindow = window.open(url, title, 'scrollbars=yes, width=' + w / systemZoom + ', height=' + h / systemZoom + ', top=' + top + ', left=' + left)
 		if(window.focus)
 			newWindow.focus()
 	} else {
-		var newWindow = openDialog(url, title, 'scrollbars=yes, width=' + w / systemZoom + ', height=' + h / systemZoom + ', top=' + top + ', left=' + left)
+		let newWindow = openDialog(url, title, 'scrollbars=yes, width=' + w / systemZoom + ', height=' + h / systemZoom + ', top=' + top + ', left=' + left)
 		if(window.focus)
 			newWindow.focus()
 	}
@@ -49,9 +49,9 @@ function copyX(fields, title, cb = null) {
 	copyX_cb = cb
 
 	$('#modalCopyLabel').html(title)
-	var s = ``
+	let s = ``
 	Object.keys(fields).forEach((key) => {
-		var field = fields[key]
+		let field = fields[key]
 		s += `<div class="form-group">
 		<label class="m-0 p-0">${field.title || ''}</label>
 		<input type="text" class="form-control ${field.class || ''}" id="modalCopyField-${generateFormId(key)}" placeholder="${ field.placeholder || field.title || ''}" ${field.readonly==true?'readonly':''} autocomplete="off" autofill="off" spellcheck="false" value="${field.value}">
@@ -66,9 +66,9 @@ function copyX(fields, title, cb = null) {
 function modalCopyOk() {
 	$('#modalCopy').modal('hide')
 	if(copyX_cb) {
-		var formData = {}
+		let formData = {}
 		Object.keys(copyX_fields).forEach((key) => {
-			var field = copyX_fields[key]
+			let field = copyX_fields[key]
 			formData[key] = $(`#modalCopyField-${generateFormId(key)}`).val()
 		})
 		formData = listObjectToObject(clone(formData))
@@ -174,22 +174,30 @@ function showError(err) {
 
 
 function modalFormOptions() {
-	var s = global.formOptionsLink
+	if((global.formOptionsLink || '')==''){
+		console.log('global.formOptionsLink bos olamaz.')
+		return
+	}
+	let s = global.formOptionsLink
 	if(s.indexOf('?') > -1) {
 		s += '&'
 	} else {
 		s += '?'
 	}
 	s += `&module=${hashObj.module}`
-	window.location.href = global.basePath + s
+	window.location.hash=s
+}
+
+function reloadHaham(){
+	location.href=global.basePath + '/changedb?ret=' + encodeURIComponent2(location.href)
 }
 
 // function modalFormOptions_OK() {
-// 	var data = { page: {} }
+// 	let data = { page: {} }
 // 	data.page[windowPathToFieldName()] = { programs: [null] }
 // 	$(".programRow").each(function() {
 // 		if(this.checked) {
-// 			var prg = JSON.parse(decodeURIComponent(this.value))
+// 			let prg = JSON.parse(decodeURIComponent(this.value))
 
 // 			data.page[windowPathToFieldName()].programs.push({ _id: prg._id, type: prg.type, name: prg.name })
 // 		}
@@ -219,7 +227,7 @@ function addModalsToDocument(parentId = 'body') {
 		if(!document.querySelector(`${parentId} #modalFormOptions`)) {
 			document.querySelector(parentId).insertAdjacentHTML('beforeend', `
 		<div class="modal" id="modalFormOptions" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="true" aria-labelledby="modalFormOptionsLabel" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+			<div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
 				<div class="modal-content">
 					<div class="modal-header p-2 ">
 						<label class="modal-title" id="modalFormOptionsLabel"><i class="fas fa-cogs"></i> Form Options</label>
@@ -250,7 +258,7 @@ function addModalsToDocument(parentId = 'body') {
 		if(!document.querySelector(`${parentId} #modalMessage`)) {
 			document.querySelector(parentId).insertAdjacentHTML('beforeend', `
 		<div class="modal" id="modalMessage" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="true" aria-labelledby="modalMessageLabel" aria-hidden="true" style="z-index: 1051">
-			<div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+			<div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
 				<div class="modal-content">
 					<div id="modalMessageHeader" class="modal-header p-2 ">
 						<label class="modal-title" id="modalMessageLabel"></label>
@@ -270,7 +278,7 @@ function addModalsToDocument(parentId = 'body') {
 		if(!document.querySelector(`${parentId} #modalConfirm`)) {
 			document.querySelector(parentId).insertAdjacentHTML('beforeend', `
 		<div class="modal" id="modalConfirm" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="true" aria-labelledby="modalConfirmLabel" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+			<div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
 				<div class="modal-content">
 					<div class="modal-header modal-body row align-items-center p-3" style="overflow: auto;">
 						<div class="col-md-2 icon" style="font-size:16pt;">
@@ -292,7 +300,7 @@ function addModalsToDocument(parentId = 'body') {
 		if(!document.querySelector(`${parentId} #modalCopy`)) {
 			document.querySelector(parentId).insertAdjacentHTML('beforeend', `
 		<div class="modal" id="modalCopy" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="true" aria-labelledby="modalCopyLabel" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+			<div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
 				<div class="modal-content">
 					<div id="modalCopyHeader" class="modal-header p-2 ">
 						<label class="modal-title"><i class="fas fa-copy"></i> <span id="modalCopyLabel"></span></label>
@@ -314,24 +322,27 @@ function addModalsToDocument(parentId = 'body') {
 
 		if(!document.querySelector(`${parentId} #modalRow`)) {
 			document.querySelector(parentId).insertAdjacentHTML('beforeend', `
-		<div class="modal" id="modalRow" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="true" aria-labelledby="modalRowLabel" aria-hidden="true">
-			<div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered" role="document">
+		<div class="modal" id="modalRow" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="modalRowLabel" aria-hidden="true">
+			<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
 				<div class="modal-content">
-					<form>
 					<div id="modalRowHeader" class="modal-header p-2 ">
 						<label class="modal-title"></label>
 						<button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					
-					<div class="modal-body p-1" style="overflow: auto;">
-						
+					
+					
+					<div class="modal-body p-1">
+					<form>
+
+					</form>	
 					</div>
 
 					<div class="modal-footer">
 						<a href="javascript:modalRowOk()" id="modalRowOk" class="btn btn-primary">Tamam</a>
 						<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Vazgeç</button>
 					</div>
-					</form>
+					
 				</div>
 			</div>
 		</div>
