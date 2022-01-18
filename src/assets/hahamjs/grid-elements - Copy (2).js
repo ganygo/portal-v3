@@ -4,49 +4,42 @@ var rootGridId = 1
 function grid(parentId, item, insideOfModal, cb) {
 	item = gridDefaults(item, insideOfModal)
 
-	let s = `<div class="${item.col || 'col-12'} p-1">
-<div id="${item.id}" level="${item.level}" data-type="${item.dataType}" data-field="${item.field || ''}" class="table-responsive p-0 ${item.class || ''} ${item.options.show.infoRow?'mt-0':''}">
-	`
+	let s = `<div class="${item.col || 'col-12'} p-1">`
 	if(item.options.show.infoRow) {
 		s += `
-			<div class="grid-top-panel d-md-flex px-1 align-items-end">
-				<div id="buttonPanel${item.id}" class="button-bar d-flex w-100"></div>
-				<div class="pagination-info flex-fill d-inline-flex align-items-end ms-0 mt-3 mt-md-0 justify-content-between justify-content-md-end w-100 w-md-auto">
-					<div class="input-group w-auto m-0 me-2" title="Sayfadaki kayıt sayısı" style="max-width: 220px;">
-						${item.options.show.pageSize?gridPageSize(item ):''}
-						${item.options.show.pageCount?gridPageCount(item ):''}
-						
-					</div>
-					${item.options.show.pagerButtons?gridPagerButtons(item ):''}
-					</div>
+			<div class="d-md-flex px-1 align-items-end">
+				<div id="buttonPanel${item.id}" class="button-bar"></div>
+				<div class="pagination-info flex-fill d-md-inline-flex align-items-end ms-2 justify-content-start">
+				${item.options.show.pageSize?gridPageSize(item ):''}
+				${item.options.show.pageCount?gridPageCount(item ):''}
+				</div>
+			${item.options.show.pagerButtons?gridPagerButtons(item ):''}
 			</div>
 		`
 	} else {
 		s += `<div id="buttonPanel${item.id}" class="button-bar"></div>`
 	}
 	s += `
-	
+	<div id="${item.id}" level="${item.level}" data-type="${item.dataType}" data-field="${item.field || ''}" class="table-responsive p-0 ${item.class || ''} ${item.options.show.infoRow?'mt-1':''}">
 	<table id="table${item.id}" class="table table-striped border m-0 haham-table ${item.level>0 ?'table-bordered':''}"  cellspacing="0">
 	<tbody></tbody>
 	</table>
-	
+	</div>
 	`
 
 	if(item.options.show.infoRow) {
 		s += `
-		<div class="grid-bottom-panel d-md-flex px-1 align-items-end">
+		<div class="d-md-flex mt-1 px-1 align-items-end">
 			<div class=""><a class="btn btn-success btn-sm d-none d-md-block" href="javascript:gridCSVExport('${item.id}')" title="CSV indir"><i class="far fa-file-excel"></i></a>	</div>
-			<div class="pagination-info flex-fill d-inline-flex align-items-end ms-0 justify-content-between justify-content-md-end w-100 w-md-auto">
-				<div class="input-group w-auto m-0 me-2" title="Sayfadaki kayıt sayısı" style="max-width: 150px;">				
-					${item.options.show.pageCount?gridPageCount(item ):''}
-				</div>
-				${item.options.show.pagerButtons?gridPagerButtons(item ):''}
+			<div class="pagination-info flex-fill d-md-inline-flex align-items-end ms-2 justify-content-start">
+				${item.options.show.pageCount?gridPageCount(item ):''}
 			</div>
+			${item.options.show.pagerButtons?gridPagerButtons(item ):''}
 		</div>
 		`
 	}
 
-	s += `</div> </div>`
+	s += `</div>`
 	document.querySelector(parentId).insertAdjacentHTML('beforeend', htmlEval(s))
 
 	document.querySelector(`${parentId} #${item.id}`).item = item
@@ -58,9 +51,6 @@ function grid(parentId, item, insideOfModal, cb) {
 
 
 	gridButtonPanel(`${parentId} #buttonPanel${item.id}`, item, insideOfModal, () => {
-		if($(`${parentId} #buttonPanel${item.id}`).html()==''){
-			item.options.selection=false
-		}
 		gridHeader(`${parentId} #${item.id}`, item, insideOfModal, () => {
 			gridBody(`${parentId} #${item.id}`, item, insideOfModal, () => {
 
@@ -221,7 +211,7 @@ function gridBody(parentId, item, insideOfModal, cb) {
 				s += gridBody_Cell(field, listItem, insideOfModal)
 			})
 			if(item.options.buttonCount > 0) {
-				s += `<td class="border-start text-center text-nowrap pt-0 pb-1 px-1">${buttonRowCell(listItem,index,item )}</td>`
+				s += `<td class="border-start text-center text-nowrap p-0">${buttonRowCell(listItem,index,item )}</td>`
 			}
 			s += `</tr>`
 		})
@@ -420,17 +410,12 @@ function gridSatirDuzenle(tableId, rowIndex, insideOfModal) {
 				//td.innerHTML = editRow.detail.cells[cellIndex].innerHTML
 				td.classList.add('hidden')
 			}
-			
+			if(editRow.detail.cells[cellIndex].querySelector(`input`)) {
+				field.value = editRow.detail.cells[cellIndex].querySelector(`input`).value
+			}
 			if(field.type == 'boolean') {
 				//field.class='grid-checkbox'
-				if(editRow.detail.cells[cellIndex].querySelector(`input[type="checkbox"]`)) {
-					field.value = editRow.detail.cells[cellIndex].querySelector(`input[type="checkbox"]`).checked==true?true:false
-				}
 				field.value = field.value.toString() === 'true' ? true : false
-			}else{
-				if(editRow.detail.cells[cellIndex].querySelector(`input`)) {
-					field.value = editRow.detail.cells[cellIndex].querySelector(`input`).value
-				}
 			}
 
 			field.valueText = editRow.detail.cells[cellIndex].innerText
@@ -541,7 +526,7 @@ function gridBody_Cell(field, listItem, insideOfModal) {
 			// }
 			tdClass = field.class || 'text-center'
 			itemValue = (itemValue || '').toString() === 'true' ? true : false
-			td = itemValue ? '<i class="fas fa-check-square text-primary font-size-150 align-middle"></i>' : '<i class="far fa-square text-dark font-size-150 align-middle"></i>'
+			td = itemValue ? '<i class="fas fa-check-square text-primary font-size-150"></i>' : '<i class="far fa-square text-dark font-size-150"></i>'
 			// td = `
 			// <div class="form-switch  m-0  p-0 ms-3 ps-3">
 			// 	<input type="checkbox" class="${swClass}" value="true" ${itemValue?'checked':''} disabled />
@@ -624,11 +609,7 @@ function gridBody_Cell(field, listItem, insideOfModal) {
 							dataType: field.dataType || '',
 							field: `${prefix}.${field.field}.${index}.${k}`
 						}
-						if(field.dataType=='boolean'){
-							td += `<input type="checkbox" class="d-none" name="${p.name}" value="true" data-type="${p.dataType}" data-field="${p.field}" ${p.value==true?'checked':''} />`
-						}else{
-							td += `<input type="hidden" name="${p.name}" value="${p.value}" data-type="${p.dataType}" data-field="${p.field}" />`	
-						}
+						td += `<input type="hidden" name="${p.name}" value="${p.value}" data-type="${p.dataType}" data-field="${p.field}" />`
 					})
 				} else {
 					let p = {
@@ -637,12 +618,7 @@ function gridBody_Cell(field, listItem, insideOfModal) {
 						dataType: field.dataType || '',
 						field: `${prefix}.${field.field}.${index}`
 					}
-					if(field.dataType=='boolean'){
-						td += `<input type="checkbox" class="d-none" name="${p.name}" value="true" data-type="${p.dataType}" data-field="${p.field}" ${p.value==true?'checked':''} />`
-					}else{
-						td += `<input type="hidden" name="${p.name}" value="${p.value}" data-type="${p.dataType}" data-field="${p.field}" />`	
-					}
-					
+					td += `<input type="hidden" name="${p.name}" value="${p.value}" data-type="${p.dataType}" data-field="${p.field}" />`
 				}
 			})
 		} else if(typeof itemValue == 'object') {
@@ -655,11 +631,7 @@ function gridBody_Cell(field, listItem, insideOfModal) {
 					dataType: field.dataType || '',
 					field: `${prefix}.${field.field}.${e}`
 				}
-				if(field.dataType=='boolean'){
-					td += `<input type="checkbox" class="d-none" name="${p.name}" value="true" data-type="${p.dataType}" data-field="${p.field}" ${p.value==true?'checked':''} />`
-				}else{
-					td += `<input type="hidden" name="${p.name}" value="${p.value}" data-type="${p.dataType}" data-field="${p.field}" />`	
-				}
+				td += `<input type="hidden" name="${p.name}" value="${p.value}" data-type="${p.dataType}" data-field="${p.field}" />`
 			})
 
 		} else {
@@ -669,11 +641,7 @@ function gridBody_Cell(field, listItem, insideOfModal) {
 				dataType: field.dataType || '',
 				field: `${prefix}.${field.field}`
 			}
-			if(field.dataType=='boolean'){
-				td += `<input type="checkbox" class="d-none" name="${p.name}" value="true" data-type="${p.dataType}" data-field="${p.field}" ${p.value==true?'checked':''} />`
-			}else{
-				td += `<input type="hidden" name="${p.name}" value="${p.value}" data-type="${p.dataType}" data-field="${p.field}" />`	
-			}
+			td += `<input type="hidden" name="${p.name}" value="${p.value}" data-type="${p.dataType}" data-field="${p.field}" />`
 		}
 	}
 
@@ -698,8 +666,128 @@ function cellFormatNumber(fieldType, deger, precision) {
 	return s
 }
 
+function gridButtonOptions(item, insideOfModal) {
+	let options = item.options || {}
+	let buttonCount = 0
+	let currentPath = window.location.pathname
+	let defaultButtons = {
+		add: [false, ''],
+		copy: [false, ''],
+		view: [false, ''],
+		print: [false, ''],
+		edit: [false, ''],
+		delete: [false, '']
+	}
+	if(options.buttons == undefined) {
+		options.buttons = defaultButtons
+	} else {
+		options.buttons = Object.assign({}, defaultButtons, options.buttons)
+		Object.keys(options.buttons).forEach((key) => {
+			if(typeof options.buttons[key] == 'boolean') {
+				options.buttons[key] = [options.buttons[key], '']
+			} else if(Array.isArray(options.buttons[key])) {
+				if(options.buttons[key].length < 2)
+					options.buttons[key].push('')
+			}
+		})
+	}
+	let q = {}
+	if(hashObj.query.mid)
+		q = { mid: hashObj.query.mid }
+	if(options.queryValues) {
+		q = hashObj.query
+	} else {
 
+	}
+	if(options.buttons.add[0] == true && options.buttons.add[1] == '') {
+		if(item.level == 0) {
+			options.buttons.add[1] = `<a href="${menuLink(hashObj.path + '/addnew',q)}" class="btn btn-primary  btn-sm far fa-plus-square" target="_self"  title="Yeni Ekle"></a>`
+		} else {
+			if(item.modal && !item.insideOfModal) {
+				// let switchButton = `<div class="form-switch  text-center  m-0  p-0 ms-3 ps-3">
+				// <input type="checkbox" class="form-check-input switch-cyan" id="showHideModal_${item.id}" value="true" onchange="console.log($('#showHideModal_${item.id}').val())" />
+				// </div>`
+				let switchButton = `<div class="form-switch  text-center  m-0  p-0 ms-3 ps-3">
+				<input type="checkbox" id="gridShowHideModalSwith_${item.id}" class="form-check-input switch-cyan" value="true" onchange="gridShowHideModalButtons('${item.id}',this.checked)" title="Modal çalışma On/Off"/>
+				</div>`
 
+				options.buttons.add[1] = `<div class="d-flex justify-content-between px-2">
+					${switchButton}
+					<a href="javascript:gridModalAddRow('#${item.id}',${insideOfModal})" class="btn btn-primary  btn-sm far fa-plus-square grid-modal-mode-on" target="_self"  title="Yeni Ekle (modal)"></a>
+				</div>`
+				// options.buttons.add[1] = `<a href="javascript:gridModalAddRow('#${item.id}',${insideOfModal})" class="btn btn-primary  btn-sm far fa-plus-square" target="_self"  title="Yeni Ekle (modal)"></a>`
+			} else {
+				options.buttons.add[1] = ``
+			}
+		}
+	}
+
+	if(options.buttons.copy[0] == true && options.buttons.copy[1] == '') {
+		options.buttons.copy[1] = `<a href="javascript:gridCopyItem(\$\{rowIndex\},'#${item.id}')" class="btn btn-grid-row btn-success " title="Kopyala"><i class="fas fa-copy"></i></a>`
+	}
+
+	if(options.buttons.print[0] == true && options.buttons.print[1] == '') {
+		let q2 = clone(q)
+		q2['view'] = 'print'
+
+		if(hashObj.settings.print) {
+			if(hashObj.settings.print.form) {
+				q2['designId'] = hashObj.settings.print.form._id
+			}
+		}
+
+		options.buttons.print[1] = `<a href="javascript:popupCenter('${menuLink(hashObj.path + '/print/\$\{_id\}',q2)}','Yazdır','900','600')" class="btn btn-grid-row btn-info " title="Yazdır"><i class="fas fa-print"></i></a>`
+	}
+
+	if(options.buttons.view[0] == true && options.buttons.view[1] == '') {
+		options.buttons.view[1] = `<a href="${menuLink(hashObj.path + '/view/\$\{_id\}',q)}" class="btn btn-info btn-grid-row fas fa-eye" title="İncele"></a>`
+	}
+
+	if(options.buttons.edit[0] == true && options.buttons.edit[1] == '') {
+		if(item.level == 0) {
+			options.buttons.edit[1] = `<a href="${menuLink(hashObj.path + '/edit/\$\{_id\}',q)}" class="btn btn-primary btn-grid-row fas fa-edit" target="_self"  title="Düzenle"></a>`
+		} else {
+			if(!insideOfModal) {
+				options.buttons.edit[1] = `<a href="javascript:gridSatirDuzenle('#${item.id}',\$\{rowIndex\},${insideOfModal})" class="btn btn-info btn-grid-row fas fa-edit grid-modal-mode-off" title="Satır Düzenle"></a>`
+				if(item.modal) {
+					options.buttons.edit[1] += `<a href="javascript:gridModalEditRow('#${item.id}',\$\{rowIndex\},${insideOfModal})" class="btn btn-success btn-grid-row fas fa-window-restore grid-modal-mode-on" title="Modal Düzenle"></a>`
+				}
+			} else {
+				options.buttons.edit[1] = `<a href="javascript:gridSatirDuzenle('#modalRow #${item.id}',\$\{rowIndex\},${insideOfModal})" class="btn btn-info btn-grid-row fas fa-edit" title="Satır Düzenle"></a>`
+			}
+		}
+	}
+
+	if(options.buttons.delete[0] == true && options.buttons.delete[1] == '') {
+		if(item.level == 0) {
+			options.buttons.delete[1] = `<a href="javascript:gridDeleteItem(\$\{rowIndex\},'#${item.id}')" class="btn btn-danger btn-grid-row fas fa-trash-alt" title="Sil"></a>`
+		} else {
+			if(!insideOfModal) {
+				options.buttons.delete[1] = `<a href="javascript:gridSatirSil('#${item.id}',\$\{rowIndex\},${insideOfModal})" class="btn btn-danger btn-grid-row fas fa-trash-alt" title="Sil"></a>`
+			} else {
+				options.buttons.delete[1] = `<a href="javascript:gridSatirSil('#modalRow #${item.id}',\$\{rowIndex\},${insideOfModal})" class="btn btn-danger btn-grid-row fas fa-trash-alt" title="Sil"></a>`
+			}
+		}
+	}
+
+	Object.keys(options.buttons).forEach((key) => {
+		buttonCount += options.buttons[key][0] ? 1 : 0
+	})
+	if(buttonCount > 1 && options.buttons.add[0])
+		buttonCount--
+
+	buttonCount = buttonCount > 4 ? 4 : buttonCount
+
+	if(item.level == 0) {
+		options.buttonWidth = `${buttonCount*45+10}px`
+	} else {
+		options.buttonWidth = `${2*45+10}px`
+	}
+	item.options = options
+	item.options.buttonCount = buttonCount
+
+	return item
+}
 
 function gridShowHideModalButtons(parentId, checked) {
 	pageSettings.setItem(`showHideModalButtons_${parentId}`, checked)
@@ -797,7 +885,7 @@ function gridFilterRow(parentId, item, insideOfModal, cb) {
   <i class="fas fa-slash fa-stack-1x"></i>
 </span></a>` : ''
 
-	document.querySelector(`${parentId}`).insertAdjacentHTML('beforeend', `<tr id="filterRow" class="text-nowrap collapse">${item.options.selection===true?'<th></th>':''}</tr>`)
+	document.querySelector(`${parentId}`).insertAdjacentHTML('beforeend', `<tr id="filterRow" class="text-nowrap collapse">${item.options.selection===true?'<th>' + cleanFilters + '</th>':''}</tr>`)
 
 	let dizi = Object.keys(item.fields)
 	let index = 0
@@ -809,7 +897,7 @@ function gridFilterRow(parentId, item, insideOfModal, cb) {
 		let field = Object.assign({}, item.fields[dizi[index]])
 
 		field.filter = field.filter == undefined ? item.options.filter : field.filter
-		
+		document.querySelector(`${parentId} #filterRow`).insertAdjacentHTML('beforeend', `<th id="filterCol${index}" ${field.visible===false?'class="hidden"':''}></th>`)
 
 		if(field.filter && field.visible !== false) {
 			if(field.filterField)
@@ -826,21 +914,11 @@ function gridFilterRow(parentId, item, insideOfModal, cb) {
 			if((hashObj.query[field.filterField] || '') != '') {
 				field.value = hashObj.query[field.filterField]
 			}
-			if(cleanFilters!=''){
-				document.querySelector(`${parentId} #filterRow`).insertAdjacentHTML('beforeend', `<th ${field.visible===false?'class="hidden"':''}><div class="d-flex" id="filterCol${index}"></div></th>`)
-				document.querySelector(`${parentId} #filterRow #filterCol${index}`).insertAdjacentHTML('afterbegin', cleanFilters)
-				cleanFilters=''
-				field.class = 'grid-filter d-flex-fill'
-			}else{
-				document.querySelector(`${parentId} #filterRow`).insertAdjacentHTML('beforeend', `<th id="filterCol${index}" ${field.visible===false?'class="hidden"':''}></th>`)
-			}
-			
 			filterControl(`${parentId} #filterRow #filterCol${index}`, `${parentId} #filterRow`, field, () => {
 				index++
 				setTimeout(calistir, 0, cb1)
 			})
 		} else {
-			document.querySelector(`${parentId} #filterRow`).insertAdjacentHTML('beforeend', `<th id="filterCol${index}" ${field.visible===false?'class="hidden"':''}></th>`)
 			index++
 			setTimeout(calistir, 0, cb1)
 		}
@@ -891,171 +969,6 @@ function gridCleanRowFilters(divId) {
 	}
 
 	// document.querySelector(divId).classList.remove('show')
-}
-
-
-
-function gridButtonOptions(item, insideOfModal) {
-	let options = item.options || {}
-	let buttonCount = 0
-	let currentPath = window.location.pathname
-
-	let defaultButtons = {
-		add: [false, '', 'primary'],
-		copy: [false, '', 'success'],
-		view: [false, '', 'info'],
-		print: [false, 'info', ],
-		edit: [false, 'primary'],
-		delete: [false, 'danger']
-	}
-	if(options.groupedButtons == undefined) {
-		options.groupedButtons = {}
-	}
-
-	if(options.buttons == undefined) {
-		options.buttons = defaultButtons
-	} else {
-		options.buttons = Object.assign({}, defaultButtons, options.buttons)
-		Object.keys(options.buttons).forEach((key) => {
-			if(typeof options.buttons[key] == 'boolean') {
-				options.buttons[key] = [options.buttons[key], '']
-			} else if(Array.isArray(options.buttons[key])) {
-				if(options.buttons[key].length < 2)
-					options.buttons[key].push('')
-			}
-		})
-	}
-	let q = {}
-	if(hashObj.query.mid)
-		q = { mid: hashObj.query.mid }
-	if(options.queryValues) {
-		q = hashObj.query
-	} else {
-
-	}
-	if(options.buttons.add[0] == true && options.buttons.add[1] == '') {
-		if(item.level == 0) {
-			options.buttons.add[1] = `<a href="${menuLink(hashObj.path + '/addnew',q)}" class="btn btn-primary btn-sm far fa-plus-square" target="_self"  title="Yeni Ekle"></a>`
-		} else {
-			if(item.modal && !item.insideOfModal) {
-				let switchButton = `<div class="form-switch  text-center  m-0  p-0 ms-3 ps-3">
-				<input type="checkbox" id="gridShowHideModalSwith_${item.id}" class="form-check-input switch-cyan" value="true" onchange="gridShowHideModalButtons('${item.id}',this.checked)" title="Modal çalışma On/Off"/>
-				</div>`
-
-				options.buttons.add[1] = `<div class="d-flex justify-content-between px-2">
-					${switchButton}
-					<a href="javascript:gridModalAddRow('#${item.id}',${insideOfModal})" class="btn btn-primary  btn-sm far fa-plus-square grid-modal-mode-on" target="_self"  title="Yeni Ekle (modal)"></a>
-				</div>`
-			} else {
-				options.buttons.add[1] = ``
-			}
-		}
-	}
-
-	if(options.buttons.copy[0] == true && options.buttons.copy[1] == '') {
-		options.buttons.copy[1] = `<a class="btn btn-success btn-grid-row" href="javascript:gridCopyItem(\$\{rowIndex\},'#${item.id}')" title="Kopyala"><i class="fas fa-copy"></i></a>`
-	}
-	if(options.buttons.copy[0] == true)
-		options.groupedButtons.copy = `<a class="dropdown-item bg-success" href="javascript:gridCopyItem(\$\{rowIndex\},'#${item.id}')" title="Kopyala"><i class="fas fa-copy"></i></a>`
-
-
-	if(options.buttons.print[0] == true && options.buttons.print[1] == '') {
-		let q2 = clone(q)
-		q2['view'] = 'print'
-
-		if(hashObj.settings.print) {
-			if(hashObj.settings.print.form) {
-				q2['designId'] = hashObj.settings.print.form._id
-			}
-		}
-
-		options.buttons.print[1] = `<a href="javascript:popupCenter('${menuLink(hashObj.path + '/print/\$\{_id\}',q2)}','Yazdır','900','600')" class="btn btn-info btn-grid-row" title="Yazdır"><i class="fas fa-print"></i></a>`
-		options.groupedButtons.print = `<a href="javascript:popupCenter('${menuLink(hashObj.path + '/print/\$\{_id\}',q2)}','Yazdır','900','600')" class="dropdown-item bg-info" title="Yazdır"><i class="fas fa-print"></i></a>`
-	}
-
-	if(options.buttons.view[0] == true && options.buttons.view[1] == '') {
-		options.buttons.view[1] = `<a href="${menuLink(hashObj.path + '/view/\$\{_id\}',q)}" class="btn btn-info btn-grid-row" title="İncele"><i class="fas fa-eye"></i></a>`
-	}
-
-	if(options.buttons.view[0] == true)
-		options.groupedButtons.view = `<a href="${menuLink(hashObj.path + '/view/\$\{_id\}',q)}" class="dropdown-item bg-info" title="İncele"><i class="fas fa-eye"></i></a>`
-
-
-	if(options.buttons.edit[0] == true && options.buttons.edit[1] == '') {
-		if(item.level == 0) {
-			options.buttons.edit[1] = `<a href="${menuLink(hashObj.path + '/edit/\$\{_id\}',q)}" class="btn btn-primary btn-grid-row" target="_self"  title="Düzenle"><i class="fas fa-edit"></i></a>`
-		} else {
-			if(!insideOfModal) {
-				options.buttons.edit[1] = `<a href="javascript:gridSatirDuzenle('#${item.id}', \$\{rowIndex\}, ${insideOfModal})" class="btn btn-info btn-grid-row fas fa-edit grid-modal-mode-off" title="Satır Düzenle"></a>`
-				if(item.modal) {
-					options.buttons.edit[1] += `<a href="javascript:gridModalEditRow('#${item.id}', \$\{rowIndex\}, ${insideOfModal})" class="btn btn-success btn-grid-row fas fa-window-restore grid-modal-mode-on" title="Modal Düzenle"></a>`
-				}
-			} else {
-				options.buttons.edit[1] = `<a href="javascript:gridSatirDuzenle('#modalRow #${item.id}', \$\{rowIndex\}, ${insideOfModal})" class="btn btn-info btn-grid-row fas fa-edit" title="Satır Düzenle"></a>`
-			}
-		}
-	}
-
-
-	if(options.buttons.delete[0] == true && options.buttons.delete[1] == '') {
-		if(item.level == 0) {
-			options.buttons.delete[1] = `<a href="javascript:gridDeleteItem(\$\{rowIndex\},'#${item.id}')" class="btn btn-danger btn-grid-row" title="Sil"><i class="fas fa-trash-alt"></i></a>`
-			options.groupedButtons.delete = `<a href="javascript:gridDeleteItem(\$\{rowIndex\},'#${item.id}')" class="dropdown-item bg-danger" title="Sil"><i class="fas fa-trash-alt"></i></a>`
-		} else {
-			if(!insideOfModal) {
-				options.buttons.delete[1] = `<a href="javascript:gridSatirSil('#${item.id}',\$\{rowIndex\},${insideOfModal})" class="btn btn-danger btn-grid-row fas fa-trash-alt" title="Sil"></a>`
-			} else {
-				options.buttons.delete[1] = `<a href="javascript:gridSatirSil('#modalRow #${item.id}',\$\{rowIndex\},${insideOfModal})" class="btn btn-danger btn-grid-row fas fa-trash-alt" title="Sil"></a>`
-			}
-		}
-	}
-
-	Object.keys(options.buttons).forEach((key) => {
-		buttonCount += options.buttons[key][0] ? 1 : 0
-	})
-	if(buttonCount > 1 && options.buttons.add[0])
-		buttonCount--
-
-	buttonCount = buttonCount > 4 ? 4 : buttonCount
-
-	// if(item.level == 0) {
-	// 	options.buttonWidth = `${buttonCount*45+10}px`
-	// } else {
-	// 	options.buttonWidth = `${2*45+10}px`
-	// }
-	options.buttonWidth = '0'
-	item.options = options
-	item.options.buttonCount = buttonCount
-
-	return item
-}
-
-
-function buttonRowCell(listItem, rowIndex, item) {
-	let s = `<div class="d-flex align-items-center">`
-	let grpButtons = Object.keys(item.options.groupedButtons) || []
-	listItem['rowIndex'] = rowIndex
-	Object.keys(item.options.buttons).forEach((key) => {
-		if(key != 'add' && grpButtons.includes(key) == false) {
-			if(item.options.buttons[key][0]) {
-				s += htmlEval(item.options.buttons[key][1], listItem)
-			}
-
-		}
-	})
-	if(grpButtons.length > 0) {
-		s += `
-			<div class="dropdown grid-dropdown">
-				<a class="btn btn-secondary btn-grid-row dropdown-toggle" id="dropBtn${rowIndex}" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-ellipsis-h"></i></a>
-			  <ul class="dropdown-menu" aria-labelledby="dropBtn${rowIndex}">`
-		grpButtons.forEach((key) => {
-			s += '<li>' + htmlEval(item.options.groupedButtons[key], listItem) + '</li>'
-		})
-		s += `</ul></div>`
-	}
-
-	s += `</div>`
-	return s
 }
 
 function filterControl(parentId, filterRowDivId, field, cb) {
@@ -1172,31 +1085,73 @@ function filterFormButton(divId) {
 	return s
 }
 
-function gridPagerButtons(item) {
-	if(!item.value.page)
-		return ''
-
-	let s = `<ul class="haham-table pagination m-0">`
-	s += `<li class="page-item"><a class="page-link ${item.value.page<=1?'disabled':''}" href="${menuLink(hashObj.path,pageNo(item.value.page-1))}"><i class="far fa-hand-point-left"></i></a></li>`
-
-	let sayfalar = pagination(item.value.page, item.value.pageCount)
-	sayfalar.forEach((e) => {
-		let sbuf=e
-		if(e.toString().length>3){
-			sbuf=`<div class="sigdir">${e}</div>`	
-		}
-		
-		//let sbuf=e
-		if(e == item.value.page.toString()) {
-			s += `<li class="page-item d-none d-md-block active"><span class="page-link">${sbuf}</span></li>`
-		} else if(e == '...') {
-			s += `<li class="page-item d-none d-md-block"><span class="page-link">...</span></li>`
-		} else {
-			s += `<li class="page-item d-none d-md-block"><a class="page-link" href="${menuLink(hashObj.path,pageNo(e))}">${sbuf}</a></li>`
+function buttonRowCell(listItem, rowIndex, item) {
+	let s = ``
+	listItem['rowIndex'] = rowIndex
+	Object.keys(item.options.buttons).forEach((key) => {
+		if(key != 'add') {
+			s += `${item.options.buttons[key][0]?htmlEval(item.options.buttons[key][1],listItem):''}`
 		}
 	})
 
-	s += `<li class="page-item"><a class="page-link ${item.value.page>=item.value.pageCount?'disabled':''}" href="${menuLink(hashObj.path,pageNo(item.value.page+1))}"><i class="far fa-hand-point-right"></i></a></li>`
+	return s
+}
+
+function gridPageSize(item) {
+
+	let s = `Sayfada
+	<select class="form-control w-auto mx-1 p-0" id="pageSize${item.id}">
+	<option value="10" ${item.value.pageSize==10?'selected':''}>10</option>
+	<option value="20" ${item.value.pageSize==20?'selected':''}>20</option>
+	<option value="50" ${item.value.pageSize==50?'selected':''}>50</option>
+	<option value="100" ${item.value.pageSize==100?'selected':''}>100</option>
+	<option value="250" ${item.value.pageSize==250?'selected':''}>250</option>
+	<option value="500" ${item.value.pageSize==500?'selected':''}>500</option>
+	</select>`
+
+	return s
+}
+
+function gridPageCount(item) {
+	let s = `<div class="">`
+	if(item.value.pageSize > 0 && item.value.recordCount > 0) {
+		s += `${((item.value.page-1)*item.value.pageSize)+1} - ${(item.value.page*item.value.pageSize<item.value.recordCount)?item.value.page*item.value.pageSize:item.value.recordCount} arası, <b>${item.value.recordCount}</b> kayıt, ${item.value.pageCount} sayfa`
+	} else {
+		s += ` <b>${item.value.recordCount}</b> kayıt`
+	}
+	s += `</div>`
+
+	return s
+}
+
+function gridPagerButtons(item) {
+	if(!item.value.page)
+		return ''
+	if((item.value.pageCount || 0) <= 1)
+		return ''
+
+	let s = `
+	<ul class="pagination m-0">`
+	if(item.value.page > 1) {
+		s += `<li class="page-item"><a class="page-link" href="${menuLink(hashObj.path,pageNo(1))}">|&lt;</a></li>
+		<li class="page-item"><a class="page-link" href="${menuLink(hashObj.path,pageNo(item.value.page-1))}">&lt;</a></li>`
+	}
+
+	let sayfalar = pagination(item.value.page, item.value.pageCount)
+	sayfalar.forEach((e) => {
+		if(e == item.value.page.toString()) {
+			s += `<li class="page-item active"><span class="page-link">${item.value.page}</span></li>`
+		} else if(e == '...') {
+			s += `<li class="page-item"><span class="page-link">...</span></li>`
+		} else {
+			s += `<li class="page-item"><a class="page-link" href="${menuLink(hashObj.path,pageNo(e))}">${e}</a></li>`
+		}
+	})
+
+	if(item.value.page < item.value.pageCount) {
+		s += `<li class="page-item"><a class="page-link" href="${menuLink(hashObj.path,pageNo(item.value.page+1))}">&gt;</a></li>
+		<li class="page-item"><a class="page-link" href="${menuLink(hashObj.path,pageNo(item.value.pageCount))}">&gt;|</a></li>`
+	}
 
 	s += `</ul>`
 	return s
@@ -1206,65 +1161,6 @@ function gridPagerButtons(item) {
 		query['page'] = page
 		return query
 	}
-}
-
-function pagination(page, total) {
-	let sayfalar=[]
-	let btnMax=6
-	let lamda=2
-	if(total>0){
-		if(total<=btnMax){
-			for(let i=1;i<=total;i++) sayfalar.push(i)
-		}else{
-			if(page>1){
-				sayfalar.push(1)
-			}
-
-			if(page==1){
-				for(let i=page;i<=page+lamda+1;i++) sayfalar.push(i)
-			}else	if(page+lamda<total){
-				for(let i=page;i<=page+lamda;i++) sayfalar.push(i)
-			}else{
-				for(let i=total-(lamda+1);i<total;i++) sayfalar.push(i)
-			}
-
-			if(total>1)
-				sayfalar.push(total)
-		}
-	}
-	return sayfalar
-}
-
-function gridPageSize(item) {
-	let s = `
-
-  <span class="input-group-text"><i class="fas fa-list"></i></span>
-  <select class="form-control p-0" id="pageSize${item.id}">
-	<option value="10" ${item.value.pageSize==10?'selected':''}>10</option>
-	<option value="20" ${item.value.pageSize==20?'selected':''}>20</option>
-	<option value="50" ${item.value.pageSize==50?'selected':''}>50</option>
-	<option value="100" ${item.value.pageSize==100?'selected':''}>100</option>
-	<option value="250" ${item.value.pageSize==250?'selected':''}>250</option>
-	<option value="500" ${item.value.pageSize==500?'selected':''}>500</option>
-	</select>
-
-	`
-	return s
-}
-
-function gridPageCount(item) {
-	let rec1=((item.value.page-1)*item.value.pageSize)+1
-	let rec2=(item.value.page*item.value.pageSize<item.value.recordCount)?item.value.page*item.value.pageSize:item.value.recordCount
-
-	let s = `` // <div class="input-group w-auto m-0 me-2" style="max-width:150px;">`
-	if(item.value.pageSize > 0 && item.value.recordCount > 0) {
-		s += `<input class="form-control p-0 ps-2" value="${rec1} - ${rec2}" readonly style="min-width:90px;" >	`
-	} 
-s += `<input class="form-control p-0 ps-1 bold pe-2 text-end" value="${item.value.recordCount}" readonly>`
-
-//	s += `</div>`
-
-	return s
 }
 
 function gridDefaults(item, insideOfModal) {

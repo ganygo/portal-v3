@@ -253,7 +253,7 @@ function generateControl(divId, item, data, insideOfModal, callback) {
 
 	item.insideOfModal = insideOfModal
 
-
+	
 	switch ((item.type || '').toLowerCase()) {
 
 		case 'hidden':
@@ -434,8 +434,16 @@ function generateControl(divId, item, data, insideOfModal, callback) {
 						item.fields[key].value = hashObj.query[key] || item.fields[key].value || ''
 						item.fields[key].showAll = true
 						item.fields[key].class = 'my-3 my-md-0'
-
-						generateControl('#filterForm', item.fields[key], data, insideOfModal, () => {
+						let filterItem=item.fields[key]
+						generateControl('#filterForm', filterItem, data, insideOfModal, () => {
+							if(['lookup','boolean','remotelookup','date','time'].includes(filterItem.type.toLowerCase())){
+								$(`${divId} #${filterItem.id}`).on('change', () => {
+									if(document.querySelector('#filterForm')) {
+										keyupTimer=0
+										runFilter('#filterForm')
+									}
+								})
+							}
 							index++
 							setTimeout(calistir1, 0, cb1)
 						})
@@ -726,7 +734,8 @@ function widgetPrefixDuzelt11112(itemWidget, valueObj) {
 
 
 function filterFormButton(divId) {
-	var s = `
+	return ''
+	let s = `
 	<div class="col text-end p-1 pt-2 ">
 	<a href="javascript:runFilter('${divId}')" class="btn btn-outline-primary text-nowrap filter-button" title="Filtrele" ><i class="fas fa-sync-alt"><i class="fas fa-filter ms-2"></i></i></a>
 	</div>

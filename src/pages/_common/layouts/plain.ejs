@@ -29,38 +29,15 @@
 	<script type="text/javascript" src="<%- basePath + assetVersion('/hahamjs/haham.js') %>"></script>
 	<link href="<%- config.customization['main.css'] || (basePath + assetVersion(`/css/main.css`)) %>" rel="stylesheet" type="text/css" />
 	<script type="text/javascript">
-	if(localStorage.getItem('theme')==null){
-		if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-				localStorage.setItem('theme','dark')
-		}else{
-				localStorage.setItem('theme','light')
-		}
-	}
-		
-
-	function changeColorScheme(theme){
-		if(theme)
-			localStorage.setItem('theme',theme)
-
-		if(localStorage.getItem('theme') == 'dark') {
-			document.documentElement.classList.remove('light')
-			document.documentElement.classList.add('dark')
-		} else {
-			document.documentElement.classList.remove('dark')
-			document.documentElement.classList.add('light')
-		}
-	}
-
-	changeColorScheme()
+	
 
 	
 	</script>
 </head>
 
-<body id="page-top">
+<body>
 	<%- body %>
 	<script type="text/javascript" src="<%- basePath %>/vendor/js/bootstrap.bundle.v5.1.0.min.js"></script>
 	<script type="text/javascript" src="<%- basePath + assetVersion('/js/scripts.js') %>"></script>
 </body>
-
 </html>

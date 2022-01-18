@@ -36,15 +36,7 @@ $(document).ready(function(){
 
 })
 
-function scrollToTop() {
-	document.querySelector('#right-side').scrollTop=0;
-	// var body = document.body
-	// var html = document.documentElement
-	// body.scrollLeft = 0
-	// body.scrollTop = 0
-	// html.scrollLeft = 0
-	// html.scrollTop = 0
-}
+
 
 function enterNext(bu){
 	

@@ -178,6 +178,7 @@ function modalFormOptions() {
 		console.log('global.formOptionsLink bos olamaz.')
 		return
 	}
+	let title=document.title.split(' - ')[0]
 	let s = global.formOptionsLink
 	if(s.indexOf('?') > -1) {
 		s += '&'
@@ -185,6 +186,7 @@ function modalFormOptions() {
 		s += '?'
 	}
 	s += `&module=${hashObj.module}`
+	// popupCenter(s+'&view=plain',title,'900','600')
 	window.location.hash=s
 }
 

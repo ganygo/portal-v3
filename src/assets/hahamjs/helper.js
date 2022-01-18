@@ -22,13 +22,13 @@ var global = {
 	status: '',
 	basePath: ''
 }
-var staticValues={}
+var staticValues = {}
 
 function initHahamGlobals() {
 	try {
 		if(localStorage.getItem('global')) {
 			global = Object.assign({}, global, JSON.parse(localStorage.getItem('global')))
-			staticValues=global.staticValues
+			staticValues = global.staticValues
 		}
 	} catch (e) {
 		localStorage.removeItem('global')
@@ -162,18 +162,11 @@ function getPageInfos(h = null) {
 			}
 			breadCrumbs.push({ icon: '', text: p.funcTitle })
 		}
-		let seperator=' \\ '
+		let seperator = ' / '
 
-		breadCrumbs.forEach((e,index)=>{
-			if(index==breadCrumbs.length-1){
-				p.breadCrumbsHtml +=`<span class="font-weight-bold active">${e.text}</span>`
-				p.breadCrumbs += e
-			}else{
-				p.breadCrumbsHtml +=e.text + seperator
-				p.breadCrumbs +=e.text + seperator
-			}
-		})
-		
+		p.breadCrumbs=breadCrumbs.join(seperator)
+
+		p.breadCrumbsHtml=`<span class="mx-1 ellipsis">${breadCrumbs.slice(0,-1).map((e)=>e.text).join(seperator)}${breadCrumbs.length>1?seperator:''}</span><span class="active me-3">${breadCrumbs[breadCrumbs.length-1].text}</span>`
 
 	}
 	return p
@@ -292,20 +285,20 @@ function loadCardCollapses() {
 		pageSettings.setItem(`collapse_${e.target.id}`, e.type)
 	})
 
-	
+
 }
 
 
 function postMan(url, options, cb) {
-	if(url.startsWith('/api') || url.startsWith('/dbapi')){
-		url=global.basePath + url
+	if(url.startsWith('/api') || url.startsWith('/dbapi')) {
+		url = global.basePath + url
 	}
 	$.ajax({
 		url: url,
 		type: options.method || options.type || 'GET',
 		dataType: options.dataType || 'json',
 		data: options.data || {},
-		timeout:120000,
+		timeout: 120000,
 		success: function(result) {
 			if(result.success != undefined) {
 				if(result.success) {
@@ -318,11 +311,26 @@ function postMan(url, options, cb) {
 			}
 		},
 		error: function(err) {
-			console.log(`postMan Hata url:`,url)
-			console.log(`postMan Hata err:`,err)
+			console.log(`postMan Hata url:`, url)
+			console.log(`postMan Hata err:`, err)
 			cb(err)
 		}
 	})
+}
+
+function htmlEval(html, values = {}, bracketDollar = true) {
+	let code = ''
+	try {
+		
+		Object.keys(values).forEach((key) => {
+			if(key!='class')
+				code += `let ${key}=${JSON.stringify(values[key])}\n`
+		})
+		code += `return \`${html}\``
+		let f = new Function(code)
+		return f()
+	} catch (tryErr) {}
+	return html
 }
 
 function getAjax(url, labelStr = '${name}', exceptId = '', cb) {
@@ -391,7 +399,7 @@ function remoteLookupAutocomplete(locals) {
 		return
 	}
 
-	let labelStr = (locals.dataSource.label || '{name}')
+	let labelStr = (locals.dataSource.label || '${name}')
 	let valueText = locals.valueText || ''
 
 
@@ -736,10 +744,10 @@ function getRemoteData(item, cb) {
 	if((url || '') == '')
 		return cb(null, data)
 
-	postMan(url,{type:item.dataSource.method || 'GET',dataType:'json'},(err,data)=>{
-		if(!err){
+	postMan(url, { type: item.dataSource.method || 'GET', dataType: 'json' }, (err, data) => {
+		if(!err) {
 			cb(null, data)
-		}else{
+		} else {
 			console.error(`getRemoteData error err:`, err)
 			cb(err)
 		}
@@ -896,13 +904,13 @@ function refreshRemoteList(remoteList) {
 		})
 
 		let url = `${remoteList[e].dataSource.url.split('?')[0]}/${idList.join(',')}`
-		getAjax(url, remoteList[e].dataSource.label || '{name}', '', (err, dizi) => {
+		getAjax(url, remoteList[e].dataSource.label || '${name}', '', (err, dizi) => {
 			if(!err) {
 
 				Object.keys(remoteList[e].list).forEach((key) => {
 					dizi.forEach((d) => {
 						if(d.obj._id == key) {
-							$(remoteList[e].list[key].cellId).html(replaceUrlCurlyBracket((remoteList[e].dataSource.label || '{name}'), d.obj))
+							$(remoteList[e].list[key].cellId).html(replaceUrlCurlyBracket((remoteList[e].dataSource.label || '${name}'), d.obj))
 							if(remoteList[e].list[key].lookupTextField) {
 
 								$(`input[name="${remoteList[e].list[key].lookupTextField}"]`).val(d.value)
@@ -919,19 +927,28 @@ function refreshRemoteList(remoteList) {
 }
 
 var keyupTimer = 0
+var timerActive = false
 
 function runTimer(selector, prefix = '') {
-	if(keyupTimer == 0)
+	console.log(`keyupTimer:`, keyupTimer)
+	if(keyupTimer == 0) {
+		timerActive = false
 		return
+	}
 
-	if(keyupTimer >= 2) {
+	if(keyupTimer >= 3) {
 		keyupTimer = 0
+		timerActive = false
 		runFilter(selector, prefix)
 	} else {
-		keyupTimer++
+		timerActive = true
 		setTimeout(() => {
+			keyupTimer++
+
 			runTimer(selector, prefix)
-		}, 1000)
+
+
+		}, 800)
 	}
 }
 
@@ -1352,18 +1369,18 @@ function runProgram(_id, type) {
 function runProgramAjax(data) {
 	postMan(`/dbapi/programs/run/${programId}`, { type: 'POST', dataType: 'json', data: data }, (err, data) => {
 		if(!err) {
-			console.log(`runProgramAjax data:`,data)
+			console.log(`runProgramAjax data:`, data)
 			if(typeof data == 'string') {
 				if(programType == 'file-exporter') {
 					download(`data:application/file;base64,${btoa2(data)}`, `export_${(new Date()).yyyymmddhhmmss()}.csv`, 'application/file')
 					return
 				} else if(programType == 'connector-exporter') {
-					alertX(data, 'Bilgi', () => {	window.onhashchange()	})
+					alertX(data, 'Bilgi', () => { window.onhashchange() })
 				} else {
-					alertX(data, 'Bilgi', () => {	window.onhashchange()	})
+					alertX(data, 'Bilgi', () => { window.onhashchange() })
 				}
-			}else{
-				alertX(data, 'Bilgi', () => {	window.onhashchange()	})
+			} else {
+				alertX(data, 'Bilgi', () => { window.onhashchange() })
 			}
 		} else {
 			showError(err)
@@ -1455,8 +1472,8 @@ function initIspiyonService() {
 	if(!global.ispiyonServiceUrl)
 		return
 	let socket = io(global.ispiyonServiceUrl, {
-		reconnection:false,
-		reconnectionDelay:120000,
+		reconnection: false,
+		reconnectionDelay: 120000,
 		reconnectionDelayMax: 300000
 	})
 	socket.on('connect', () => {
@@ -1465,11 +1482,11 @@ function initIspiyonService() {
 	})
 
 	socket.on('error', function(err) {
-	  console.log('socket io hatasi');
+		console.log('socket io hatasi');
 	})
 
 	socket.on('connect_error', function(err) {
-	  console.log('Error connecting to server');
+		console.log('Error connecting to server');
 	})
 
 	socket.on('TOTAL_UNREAD', (count, lastNotifications) => {
@@ -1569,10 +1586,10 @@ function formCalculation(divId, calcUrl) {
 		$(this).val(convertNumber(sbuf))
 	})
 	let formData = getFormData(`${divId}`)
-	postMan(calcUrl,{type:'POST',dataType:'json',data:formData},(err,data)=>{
-		if(!err){
+	postMan(calcUrl, { type: 'POST', dataType: 'json', data: formData }, (err, data) => {
+		if(!err) {
 			setFormData(divId, data)
-		}else{
+		} else {
 			showError(err)
 		}
 	})
@@ -1655,21 +1672,31 @@ function calculate(formula, values) {
 	return eval(code)
 }
 
-function htmlEval(html, values = {}, bracketDollar = true) {
-	try {
-		let code = ''
-		Object.keys(values).forEach((key) => {
-			code += `let ${key}=${JSON.stringify(values[key])}\n`
-		})
-		code += `return \`${html}\``
-		let f = new Function(code)
-		return f()
-	} catch (tryErr) {
-		// if(global.status==='development'){
-		// 	console.log('htmlEval error:',tryErr)
-		// 	console.log('htmlEval html:',html)
-		// 	console.log('htmlEval values:',values)
-		// }
-	}
-	return html
+
+
+function scrollToTop() {
+	document.querySelector('#right-side').scrollTop = 0;
 }
+
+if(localStorage.getItem('theme') == null) {
+	if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+		localStorage.setItem('theme', 'dark')
+	} else {
+		localStorage.setItem('theme', 'light')
+	}
+}
+
+function changeColorScheme(theme) {
+	if(theme)
+		localStorage.setItem('theme', theme)
+
+	if(localStorage.getItem('theme') == 'dark') {
+		document.documentElement.classList.remove('light')
+		document.documentElement.classList.add('dark')
+	} else {
+		document.documentElement.classList.remove('dark')
+		document.documentElement.classList.add('light')
+	}
+}
+
+changeColorScheme()

@@ -231,45 +231,26 @@ function whatDecimalPointer() {
 	return n;
 }
 
-function pagination(c, m) {
-	let current = Number(c),
-		last = Number(m),
-		delta = 2,
-		left = current - delta,
-		right = current + delta + 1,
-		range = [],
-		rangeWithDots = [],
-		l;
-
-	for(let i = 1; i <= last; i++) {
-		if(i == 1 || i == last || i >= left && i < right) {
-			range.push(i)
-		}
-	}
-
-
-	for(let i of range) {
-		if(l) {
-			if(i - l == 2) {
-				rangeWithDots.push(l + 1)
-			} else if(i - l != 1) {
-				rangeWithDots.push('...')
-			}
-		}
-		rangeWithDots.push(i)
-
-
-		l = i;
-	}
-
-	return rangeWithDots;
-}
-
 
 String.prototype.replaceAll = function(search, replacement) {
 	let target = this
 	return target.split(search).join(replacement)
 }
+
+String.prototype.trUpper = function(){
+let string = this
+let letters = { "i": "İ", "ş": "Ş", "ğ": "Ğ", "ü": "Ü", "ö": "Ö", "ç": "Ç", "ı": "I" }
+string = string.replace(/(([iışğüçö]))/g, (letter)=>letters[letter])
+return string.toUpperCase();
+}
+
+String.prototype.trLower = function(){
+let string = this
+let letters = { "İ": "i", "I": "ı", "Ş": "ş", "Ğ": "ğ", "Ü": "ü", "Ö": "ö", "Ç": "ç" }
+string = string.replace(/(([İIŞĞÜÇÖ]))/g, (letter)=>letters[letter])
+return string.toLowerCase()
+}
+
 
 function uuidv4() {
 	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
