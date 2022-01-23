@@ -1053,6 +1053,9 @@ function getUrlParameter(name, query = null) {
 }
 
 function generateLeftMenu(leftMenu) {
+	if(!hashObj)
+		return
+	
 	let mid = (hashObj.query || {}).mid || '0'
 
 	let s = ``

@@ -5,14 +5,14 @@ function grid(parentId, item, insideOfModal, cb) {
 	item = gridDefaults(item, insideOfModal)
 
 	let s = `<div class="${item.col || 'col-12'} p-1">
-<div id="${item.id}" level="${item.level}" data-type="${item.dataType}" data-field="${item.field || ''}" class="table-responsive p-0 ${item.class || ''} ${item.options.show.infoRow?'mt-0':''}">
+<div id="${item.id}" level="${item.level}" data-type="${item.dataType}" data-field="${item.field || ''}" class=" p-0 ${item.class || ''} ${item.options.show.infoRow?'mt-0':''}">
 	`
 	if(item.options.show.infoRow) {
 		s += `
-			<div class="grid-top-panel d-md-flex px-1 align-items-end">
+			<div class="grid-top-panel d-md-flex align-items-end">
 				<div id="buttonPanel${item.id}" class="button-bar d-flex w-100"></div>
-				<div class="pagination-info flex-fill d-inline-flex align-items-end ms-0 mt-3 mt-md-0 justify-content-between justify-content-md-end w-100 w-md-auto">
-					<div class="input-group w-auto m-0 me-2" title="Sayfadaki kayıt sayısı" style="max-width: 220px;">
+				<div class="pagination-info flex-fill d-inline-flex align-items-end ms-0 mt-3 mt-md-0 justify-content-end w-100 w-md-auto">
+					<div class="input-group w-auto m-0" title="Sayfadaki kayıt sayısı" style="max-width: 220px;">
 						${item.options.show.pageSize?gridPageSize(item ):''}
 						${item.options.show.pageCount?gridPageCount(item ):''}
 						
@@ -25,19 +25,19 @@ function grid(parentId, item, insideOfModal, cb) {
 		s += `<div id="buttonPanel${item.id}" class="button-bar"></div>`
 	}
 	s += `
-	
+	<div class="table-responsive">
 	<table id="table${item.id}" class="table table-striped border m-0 haham-table ${item.level>0 ?'table-bordered':''}"  cellspacing="0">
 	<tbody></tbody>
 	</table>
-	
+	</div>
 	`
 
 	if(item.options.show.infoRow) {
 		s += `
-		<div class="grid-bottom-panel d-md-flex px-1 align-items-end">
+		<div class="grid-bottom-panel d-md-flex align-items-end">
 			<div class=""><a class="btn btn-success btn-sm d-none d-md-block" href="javascript:gridCSVExport('${item.id}')" title="CSV indir"><i class="far fa-file-excel"></i></a>	</div>
-			<div class="pagination-info flex-fill d-inline-flex align-items-end ms-0 justify-content-between justify-content-md-end w-100 w-md-auto">
-				<div class="input-group w-auto m-0 me-2" title="Sayfadaki kayıt sayısı" style="max-width: 150px;">				
+			<div class="pagination-info flex-fill d-inline-flex align-items-end ms-0 justify-content-end w-100 w-md-auto">
+				<div class="input-group w-auto m-0" title="Sayfadaki kayıt sayısı" style="max-width: 150px;">				
 					${item.options.show.pageCount?gridPageCount(item ):''}
 				</div>
 				${item.options.show.pagerButtons?gridPagerButtons(item ):''}
@@ -251,6 +251,104 @@ function gridBody(parentId, item, insideOfModal, cb) {
 	if(cb) {
 		cb()
 	}
+}
+
+function gridPagerButtons(item) {
+	if(!item.value.page)
+		return ''
+	if(item.value.pageCount<=1)
+		return ''
+	let s = `<ul class="haham-table pagination m-0 ms-2">`
+	s += `<li class="page-item"><a class="page-link ${item.value.page<=1?'disabled':''}" href="${menuLink(hashObj.path,pageNo(item.value.page-1))}"><i class="fas fa-angle-left"></i></a></li>`
+
+	let sayfalar = pagination(item.value.page, item.value.pageCount)
+	sayfalar.forEach((e) => {
+		let sbuf=e
+		if(e.toString().length>3){
+			sbuf=`<div class="sigdir">${e}</div>`	
+		}
+		
+		//let sbuf=e
+		if(e == item.value.page.toString()) {
+			s += `<li class="page-item d-none d-md-block active"><span class="page-link">${sbuf}</span></li>`
+		} else if(e == '...') {
+			s += `<li class="page-item d-none d-md-block"><span class="page-link">...</span></li>`
+		} else {
+			s += `<li class="page-item d-none d-md-block"><a class="page-link" href="${menuLink(hashObj.path,pageNo(e))}">${sbuf}</a></li>`
+		}
+	})
+
+	s += `<li class="page-item"><a class="page-link ${item.value.page>=item.value.pageCount?'disabled':''}" href="${menuLink(hashObj.path,pageNo(item.value.page+1))}"><i class="fas fa-angle-right"></i></a></li>`
+
+	s += `</ul>`
+	return s
+
+	function pageNo(page) {
+		let query = clone(hashObj.query)
+		query['page'] = page
+		return query
+	}
+}
+
+function pagination(page, total) {
+	let sayfalar=[]
+	let btnMax=6
+	let lamda=2
+	if(total>0){
+		if(total<=btnMax){
+			for(let i=1;i<=total;i++) sayfalar.push(i)
+		}else{
+			if(page>1){
+				sayfalar.push(1)
+			}
+
+			if(page==1){
+				for(let i=page;i<=page+lamda+1;i++) sayfalar.push(i)
+			}else	if(page+lamda<total){
+				for(let i=page;i<=page+lamda;i++) sayfalar.push(i)
+			}else{
+				for(let i=total-(lamda+1);i<total;i++) sayfalar.push(i)
+			}
+
+			if(total>1)
+				sayfalar.push(total)
+		}
+	}
+	return sayfalar
+}
+
+function gridPageSize(item) {
+	if(item.value.recordCount<=0)
+		return ''
+	let s = `
+
+  <span class="input-group-text"><i class="fas fa-list"></i></span>
+  <select class="form-control p-0" id="pageSize${item.id}" style="max-width:50px;">
+	<option value="10" ${item.value.pageSize==10?'selected':''}>10</option>
+	<option value="20" ${item.value.pageSize==20?'selected':''}>20</option>
+	<option value="50" ${item.value.pageSize==50?'selected':''}>50</option>
+	<option value="100" ${item.value.pageSize==100?'selected':''}>100</option>
+	<option value="250" ${item.value.pageSize==250?'selected':''}>250</option>
+	<option value="500" ${item.value.pageSize==500?'selected':''}>500</option>
+	</select>
+
+	`
+	return s
+}
+
+function gridPageCount(item) {
+	if(item.value.recordCount<=0)
+		return ''
+	let rec1=((item.value.page-1)*item.value.pageSize)+1
+	let rec2=(item.value.page*item.value.pageSize<item.value.recordCount)?item.value.page*item.value.pageSize:item.value.recordCount
+
+	let s = ``
+	if(item.value.pageCount > 1 && item.value.pageSize > 0 && item.value.recordCount > 0) {
+		s += `<input class="form-control p-0 ps-2" value="${rec1} - ${rec2}" readonly style="min-width:90px;" >	`
+	} 
+	s += `<input class="form-control p-0 ps-1 bold pe-2 text-end" value="${item.value.recordCount}" readonly  style="max-width:60px;">`
+
+	return s
 }
 
 function gridYeniSatir(parentId, insideOfModal) {
@@ -1172,100 +1270,7 @@ function filterFormButton(divId) {
 	return s
 }
 
-function gridPagerButtons(item) {
-	if(!item.value.page)
-		return ''
 
-	let s = `<ul class="haham-table pagination m-0">`
-	s += `<li class="page-item"><a class="page-link ${item.value.page<=1?'disabled':''}" href="${menuLink(hashObj.path,pageNo(item.value.page-1))}"><i class="far fa-hand-point-left"></i></a></li>`
-
-	let sayfalar = pagination(item.value.page, item.value.pageCount)
-	sayfalar.forEach((e) => {
-		let sbuf=e
-		if(e.toString().length>3){
-			sbuf=`<div class="sigdir">${e}</div>`	
-		}
-		
-		//let sbuf=e
-		if(e == item.value.page.toString()) {
-			s += `<li class="page-item d-none d-md-block active"><span class="page-link">${sbuf}</span></li>`
-		} else if(e == '...') {
-			s += `<li class="page-item d-none d-md-block"><span class="page-link">...</span></li>`
-		} else {
-			s += `<li class="page-item d-none d-md-block"><a class="page-link" href="${menuLink(hashObj.path,pageNo(e))}">${sbuf}</a></li>`
-		}
-	})
-
-	s += `<li class="page-item"><a class="page-link ${item.value.page>=item.value.pageCount?'disabled':''}" href="${menuLink(hashObj.path,pageNo(item.value.page+1))}"><i class="far fa-hand-point-right"></i></a></li>`
-
-	s += `</ul>`
-	return s
-
-	function pageNo(page) {
-		let query = clone(hashObj.query)
-		query['page'] = page
-		return query
-	}
-}
-
-function pagination(page, total) {
-	let sayfalar=[]
-	let btnMax=6
-	let lamda=2
-	if(total>0){
-		if(total<=btnMax){
-			for(let i=1;i<=total;i++) sayfalar.push(i)
-		}else{
-			if(page>1){
-				sayfalar.push(1)
-			}
-
-			if(page==1){
-				for(let i=page;i<=page+lamda+1;i++) sayfalar.push(i)
-			}else	if(page+lamda<total){
-				for(let i=page;i<=page+lamda;i++) sayfalar.push(i)
-			}else{
-				for(let i=total-(lamda+1);i<total;i++) sayfalar.push(i)
-			}
-
-			if(total>1)
-				sayfalar.push(total)
-		}
-	}
-	return sayfalar
-}
-
-function gridPageSize(item) {
-	let s = `
-
-  <span class="input-group-text"><i class="fas fa-list"></i></span>
-  <select class="form-control p-0" id="pageSize${item.id}">
-	<option value="10" ${item.value.pageSize==10?'selected':''}>10</option>
-	<option value="20" ${item.value.pageSize==20?'selected':''}>20</option>
-	<option value="50" ${item.value.pageSize==50?'selected':''}>50</option>
-	<option value="100" ${item.value.pageSize==100?'selected':''}>100</option>
-	<option value="250" ${item.value.pageSize==250?'selected':''}>250</option>
-	<option value="500" ${item.value.pageSize==500?'selected':''}>500</option>
-	</select>
-
-	`
-	return s
-}
-
-function gridPageCount(item) {
-	let rec1=((item.value.page-1)*item.value.pageSize)+1
-	let rec2=(item.value.page*item.value.pageSize<item.value.recordCount)?item.value.page*item.value.pageSize:item.value.recordCount
-
-	let s = `` // <div class="input-group w-auto m-0 me-2" style="max-width:150px;">`
-	if(item.value.pageSize > 0 && item.value.recordCount > 0) {
-		s += `<input class="form-control p-0 ps-2" value="${rec1} - ${rec2}" readonly style="min-width:90px;" >	`
-	} 
-s += `<input class="form-control p-0 ps-1 bold pe-2 text-end" value="${item.value.recordCount}" readonly>`
-
-//	s += `</div>`
-
-	return s
-}
 
 function gridDefaults(item, insideOfModal) {
 	if(item.level == undefined)
