@@ -1,6 +1,21 @@
 <% layout('../_common/layouts/general') %>
 <style type="text/css">
+	.yeni-animasyon {
+		animation-duration: 1s;
+		animation-name: yeniUyari;
+		animation-iteration-count: 5;
+	}
 
+	@keyframes yeniUyari {
+	  0% {
+	    box-shadow: 0px 0px 10px 12px yellowgreen;
+	    transform: scale(3.0);
+	  }
+	  100% {
+			box-shadow: initial;
+			transform: initial;
+	  }
+	}
 </style>
 <script type="text/javascript">
 
