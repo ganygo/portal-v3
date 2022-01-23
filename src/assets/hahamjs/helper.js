@@ -1474,6 +1474,7 @@ moment.updateLocale('en', {
 function initIspiyonService() {
 	if(!global.ispiyonServiceUrl)
 		return
+	try{
 	let socket = io(global.ispiyonServiceUrl, {
 		reconnection: false,
 		reconnectionDelay: 120000,
@@ -1537,6 +1538,7 @@ function initIspiyonService() {
 		})
 
 	})
+	}catch{}
 }
 
 function notificationItem(id, notifyDate, text, status, icon) {

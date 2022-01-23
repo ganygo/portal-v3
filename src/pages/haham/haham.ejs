@@ -16,7 +16,9 @@ if(window.location.hash == '') {
 }
 
 $(document).ready(() => {
+
 	sayfayiGoster()
+	
 	window.onhashchange = () => {
 		hashObj = getHashObject()
 
@@ -25,6 +27,8 @@ $(document).ready(() => {
 })
 
 function sayfayiGoster() {
+	if(hashObj==undefined)
+		return
 	publishPage(mainDivId,
 		() => { //before
 			anotherViewStyle(mainDivId)
