@@ -95,7 +95,6 @@ function frm_Group(input, item) {
 }
 
 function frm_FormHtml(parentId, item, cb) {
-	console.log(`frm_FormHtml item:`, item)
 
 	let html = ''
 	if(item.html) {
@@ -181,8 +180,6 @@ function frm_Button(parentId, item, cb) {
 			href=global.basePath+href
 		}
 	}
-	console.log(`frm_Button item:`, item)
-	console.log(`frm_Button href:`, href)
 	let s = `<a class="${item.class || 'btn btn-info'}" level="${item.level || ''}" data-type="${item.dataType}" data-field="${item.field || ''}"   id="${item.id || ''}" href="${href}" target="${item.target || ''}" title="${titleText.replaceAll('"','\'')}">${label}</a>`
 
 	if(item.noGroup !== true) {

@@ -1312,7 +1312,9 @@ function programButtons1111(panelButtons = '') {
 }
 
 function programFileUploaderChangeEvent() {
+
 	$("#fileUpload").change(function() {
+		console.log(`fileUpload change calisti:`)
 		let reader = new FileReader()
 		let fileIndex = 0
 		let files = this.files
@@ -1346,6 +1348,7 @@ var programType = ''
 
 document.addEventListener('file-upload-finished', function(event) {
 	let data = { files: event.detail }
+	console.log(`document.addEventListener('file-upload-finished' data:`,data)
 	runProgramAjax(data)
 })
 

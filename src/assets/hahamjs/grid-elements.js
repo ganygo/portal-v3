@@ -51,13 +51,14 @@ function grid(parentId, item, insideOfModal, cb) {
 
 	document.querySelector(`${parentId} #${item.id}`).item = item
 
-	if(item.level == 0) {
-		programFileUploaderChangeEvent()
-	}
+	
 
 
 
 	gridButtonPanel(`${parentId} #buttonPanel${item.id}`, item, insideOfModal, () => {
+		if(item.level == 0) {
+			programFileUploaderChangeEvent()
+		}
 		if($(`${parentId} #buttonPanel${item.id}`).html()==''){
 			item.options.selection=false
 		}
@@ -802,21 +803,7 @@ function cellFormatNumber(fieldType, deger, precision) {
 function gridShowHideModalButtons(parentId, checked) {
 	pageSettings.setItem(`showHideModalButtons_${parentId}`, checked)
 
-	// let modeOnElements=document.getElementsByClassName('grid-modal-mode-on')
-	// console.log(`modeOnElements.length:`,modeOnElements.length)
-	// let i=0
-	// while(i<modeOnElements.length){
-	// 	modeOnElements[i].style.visibility=checked?'visible':'collapse'
-	// 	i++
-	// }
-
-	// let modeOffElements=document.getElementsByClassName('grid-modal-mode-off')
-	// console.log(`modeOffElements.length:`,modeOffElements.length)
-	// i=0
-	// while(i<modeOffElements.length){
-	// 	modeOffElements[i].style.visibility=checked?'collapse':'visible'
-	// 	i++
-	// }
+	
 
 	if(checked) {
 
