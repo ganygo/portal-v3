@@ -177,7 +177,7 @@ function headerButtons(divId, pageSubObj) {
 	if(hashObj.query.view === 'plain') {
 		hbtn = `<a class="btn btn-dark btn-form-header ms-2" href="javascript:pencereyiKapat()"><i class="fas fa-times"></i> Kapat</a>`
 	} else {
-		if(pageSubObj.type == 'form') {
+		if(pageSubObj.type == 'form' && pageSubObj.dataSource) {
 
 			hbtn = `<button id="headerButtonSave" class="btn btn-outline-light btn-form-header ms-2" title="Kaydet"><i class="fas fa-save"></i></button>
 			<a href="javascript:history.back(-1)" class="btn btn-outline-dark  btn-form-header ms-2" title="Vazgeç"><i class="fas fa-reply"></i></a>`
