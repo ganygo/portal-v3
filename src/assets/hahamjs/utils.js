@@ -198,38 +198,28 @@ Number.prototype.formatQuantity = function(c) {
 }
 
 function convertNumber(text) {
-	// try {
 	if(typeof text == 'number')
 		return text
+	
 	text = text || ''
 	let replace = '[^-\\d' + whatDecimalPointer() + ']'
+	
 	let reg = new RegExp(replace, "g")
 
 	text = text.replace(reg, '')
-
-	// if(!isNaN(text)) {
-	// 	return Number(text)
-	// } else {
-	// 	return 0
-	// }
+	text = text.replace(',','.')
 	if(text == '')
 		text = '0'
 	return Number(text)
-	// } catch (err) {
-	// 	console.log(`typeof text:`, typeof text)
-	// 	console.log(`text:`, text)
-	// 	console.log(`error:`, err)
-	// }
 
 }
-
-
 
 function whatDecimalPointer() {
 	let n = 1.1;
 	n = n.toLocaleString().substring(1, 2)
 	return n;
 }
+
 
 
 String.prototype.replaceAll = function(search, replacement) {

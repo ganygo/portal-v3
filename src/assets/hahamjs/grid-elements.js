@@ -781,12 +781,13 @@ function gridBody_Cell(field, listItem, insideOfModal) {
 	return s
 }
 
+
 function cellFormatNumber(fieldType, deger, precision) {
 	if(precision == undefined)
 		precision = 2
 	let bSifirlariGizle = true
 	let s = ``
-	let formatliDeger = convertNumber(deger).formatMoney(precision)
+	let formatliDeger = Number(deger).formatMoney(precision)
 	let bolumler = formatliDeger.split(whatDecimalPointer())
 	let thousand = bolumler[0]
 	let decimal = bolumler.length > 1 ? bolumler[1] : '0'.repeat(precision)
@@ -798,15 +799,10 @@ function cellFormatNumber(fieldType, deger, precision) {
 }
 
 
-
-
 function gridShowHideModalButtons(parentId, checked) {
 	pageSettings.setItem(`showHideModalButtons_${parentId}`, checked)
 
-	
-
 	if(checked) {
-
 		$('.grid-modal-mode-on').show()
 		$('.grid-modal-mode-off').hide()
 	} else {
