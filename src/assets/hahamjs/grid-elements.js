@@ -1637,7 +1637,7 @@ function gridCSVExport(gridId) {
 
 		i++
 	}
-	let fileName = (document.text || '').split('-')[0].trim() + '.csv'
+	let fileName = (document.title || '').split('-')[0].trim() + '.csv'
 
 	let blob = new Blob([String.fromCharCode(0xFEFF), s], { type: "text/plain;charset=utf-8", autoBom: true })
 	saveAs(blob, fileName)
