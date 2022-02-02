@@ -403,11 +403,11 @@ header a:hover {
 .g-input select {
 	border: 1px solid var(--bs-gray);
 	display: block;
-	padding: 8px;
+	padding: 0.5rem;
 	border-radius: 5px;
 	width: 100%;
 	box-sizing: border-box;
-	padding-top: 12px;
+	padding-top: 0.7rem;
 }
 
 .g-input.fill {
@@ -1348,9 +1348,9 @@ textarea.form-control {
 }
 
 .filter-button {
-	height: 2.65rem;
-	margin-top: 0.45rem;
-	padding-top: 0.6rem;
+  height: 2.4rem;
+  margin-top: 0.4rem;
+  padding-top: 0.5rem;
 }
 
 .totalbox-row {

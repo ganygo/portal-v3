@@ -596,22 +596,22 @@ function frm_DateRangeBox(parentId, item, cb) {
 		if(bNoAction)
 			return
 		bNoAction=true
-		cbDate_onchange()
+		cbDate_onchange(`${parentId} #${item.id}`)
 		if(document.querySelector('#filterForm')) {
 			runFilter('#filterForm')
 		}
 		bNoAction=false
 	})
-	$(`${parentId} #${item.id} #date1, ${parentId} #${item.id} #date2`).on('change', () => {
-		if(bNoAction)
-			return
-		bNoAction=true
-		$(`${parentId} #${item.id} #cbDate`).val('')
-		if(document.querySelector('#filterForm')) {
-			runFilter('#filterForm')
-		}
-		bNoAction=false
-	})
+	// $(`${parentId} #${item.id} #date1, ${parentId} #${item.id} #date2`).on('change', () => {
+	// 	if(bNoAction)
+	// 		return
+	// 	bNoAction=true
+	// 	$(`${parentId} #${item.id} #cbDate`).val('')
+	// 	if(document.querySelector('#filterForm')) {
+	// 		runFilter('#filterForm')
+	// 	}
+	// 	bNoAction=false
+	// })
 
 
 	if((hashObj.query.cbDate || '') != '') {
@@ -631,7 +631,7 @@ function frm_DateRangeBox(parentId, item, cb) {
 
 	} else if(pageSettings.getItem('cbDate')) {
 		$(`${parentId} #${item.id} #cbDate`).val(pageSettings.getItem('cbDate'))
-		cbDate_onchange()
+		cbDate_onchange(`${parentId} #${item.id}`)
 
 	} else {
 		if($(`${parentId} #${item.id} #cbDate`).val() == '') {
@@ -642,13 +642,15 @@ function frm_DateRangeBox(parentId, item, cb) {
 
 
 
-	function cbDate_onchange() {
-		let obj = cboEasyDateChange($(`${parentId} #${item.id} #cbDate`).val())
-		$(`${parentId} #${item.id} #date1`).val(obj.date1)
-		$(`${parentId} #${item.id} #date2`).val(obj.date2)
-		if($(`${parentId} #${item.id} #cbDate`).val()!='')
-			pageSettings.setItem('cbDate', $(`${parentId} #${item.id} #cbDate`).val())
-	}
+	
 
 	cb()
+}
+
+function cbDate_onchange(parentId) {
+	let obj = cboEasyDateChange($(`${parentId} #cbDate`).val())
+	$(`${parentId} #date1`).val(obj.date1)
+	$(`${parentId} #date2`).val(obj.date2)
+	if($(`${parentId} #cbDate`).val()!='')
+		pageSettings.setItem('cbDate', $(`${parentId} #cbDate`).val())
 }

@@ -450,7 +450,9 @@ function generateControl(divId, item, data, insideOfModal, callback) {
 					}
 				}
 
-				calistir1(cb)
+				calistir1(()=>{
+					cb()
+				})
 
 			} else {
 				cb()
@@ -734,7 +736,7 @@ function widgetPrefixDuzelt11112(itemWidget, valueObj) {
 
 
 function filterFormButton(divId) {
-	return ''
+	
 	let s = `
 	<div class="col text-end p-1 pt-2 ">
 	<a href="javascript:runFilter('${divId}')" class="btn btn-outline-primary text-nowrap filter-button" title="Filtrele" ><i class="fas fa-sync-alt"><i class="fas fa-filter ms-2"></i></i></a>

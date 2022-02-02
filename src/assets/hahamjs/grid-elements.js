@@ -445,7 +445,7 @@ function editRowCalculation(selector, prefix, fields) {
 					if(['money', 'amount', 'quantity', 'price', 'total'].includes(fields[key].type)) {
 						$(`${selector} #${id}`).val(deger.formatMoney(fields[key].round || 2))
 					} else if(fields[key].type == 'number') {
-						$(`${selector} #${id}`).val(deger.round(3))
+						$(`${selector} #${id}`).val(deger.round(fields[key].round || 3))
 					} else if(fields[key].type == 'total') {
 						$(`${selector} #${id}`).val(deger.formatMoney())
 					} else {

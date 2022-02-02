@@ -22,7 +22,8 @@ $min-contrast-ratio: 4.0;
 
 // $font-family-sans-serif:      system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !default;
 // $font-family-sans-serif:      'Nunito', sans-serif;
-$font-family-sans-serif:      'Roboto', sans-serif;
+// $font-family-sans-serif:      'Roboto', sans-serif;
+$font-family-sans-serif: Open Sans,Helvetica Neue,Arial, sans-serif;
 $font-family-monospace:       SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
 @import "./_base";

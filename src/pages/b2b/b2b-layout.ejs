@@ -1,0 +1,90 @@
+<%layout('../_common/layouts/plain')%>
+<style type="text/css">
+	
+
+</style>
+<div id="app" class="">
+	<header id="top-panel" class="d-flex">
+		<div class="d-flex align-items-center">
+			<a class="menu-toggle-button ms-3 me-2 d-none d-md-block" href="javascript:toggleMenu('show')" title="Menü göster/gizle"><i class="fas fa-bars"></i></a>
+			<a href="<%- basePath %>/haham#/dashboard/main?mid=0" class="ms-1 me-auto">
+				<img class="logo" src="<%- basePath %>/img/brand/logo-white.png">
+			</a>
+		</div>
+		<div class="flex-fill d-flex align-items-center justify-content-end">
+			<ul class="nav">
+				<li class="nav-item dropdown" id="alertsDropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="alertsDropdownBtn" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<i class="fas fa-bell"></i>
+						<span id="unread-notification-count" class="badge badge-danger badge-counter"></span>
+					</a>
+					<div class="dropdown-menu dropdown-menu-md-end" aria-labelledby="alertsDropdownBtn">
+						<h6 class="dropdown-header">
+							Bildirim Merkezi
+						</h6>
+						<div id="last-notifications">
+						</div>
+						<a class="dropdown-item text-center small" href="#/me/notifications">Tüm bildirimleri göster</a>
+					</div>
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" id="databasesDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Veri Ambarları">
+						<i class="fas fa-database"></i>
+					</a>
+					<div id="dbList" class="dropdown-menu dropdown-menu-end" aria-labelledby="databasesDropdown">
+						<% if(typeof session.databases!='undefined'){ %>
+						<% session.databases.forEach((e)=>{%>
+						<% if(e._id.toString()== dbId.toString()){%>
+						<div class="dropdown-item active">
+							<%- e.dbName %>
+						</div>
+						<% }else{ %>
+						<a class="dropdown-item" href="javascript:changedb('<%- `${e._id}` %>')">
+							<%- e.dbName %></a>
+						<% } %>
+						<% }) %>
+						<% } %>
+					</div>
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" id="userDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Kullanıcı işlemleri">
+						<i class="fas fa-user"></i>
+					</a>
+					<div class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+						<a class="dropdown-item" href="#/me/profile">Profilim
+			<div class="ms-1 small text-primary">
+			<%- session.username %>
+			</div>
+						</a>
+						<div class="dropdown-divider"></div>
+						<div class="px-1 d-flex justify-content-between">
+							<a class="dropdown-item" href="javascript:changeColorScheme('light')"><i class="fas fa-sun"></i> Light</a>
+							<a class="dropdown-item" href="javascript:changeColorScheme('dark')"><i class="fas fa-moon"></i> Dark</a>
+						</div>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item" href="javascript:logout();">Çıkış</a>
+					</div>
+				</li>
+			</ul>
+			<a class="menu-toggle-button ms-3 me-2 d-block d-md-none" href="javascript:toggleMenu('show')" title="Menü göster/gizle"><i class="fas fa-bars"></i></a>
+		</div>
+	</header>
+	<div id="main-content">
+		<div id="side-menu" class="collapse show" style="">
+			<%- partial('b2b-menu') %>
+		</div>
+		<div id="right-side" class="">
+			<main class="bg-white">
+				<div id="title-panel" class="d-flex justify-content-between align-items-center mt-0 mb-0 px-2 py-1">
+					<div id="pageTitle" class="m-0 page-title d-flex align-items-center ellipsis">...</div>
+					<div id="headerButtons" class="d-flex"></div>
+				</div>
+				<%- body %>
+			</main>
+			<%- partial('b2b-footer') %>
+		</div>
+	</div>
+</div>
+<a class="scroll-to-top rounded" href="javascript:scrollToTop()">
+	<i class="fas fa-angle-up"></i>
+</a>

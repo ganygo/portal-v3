@@ -250,7 +250,7 @@ function addModalsToDocument(parentId = 'body') {
 					</div>
 					<div class="modal-footer">
 						<a class="btn btn-primary" href="javascript:modalFormOptions_OK()" title="Kaydet"><i class="fas fa-check"></i> Tamam</a>
-						<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Vazgeç</button>
+						<button class="btn btn-dark" type="button" data-bs-dismiss="modal">Vazgeç</button>
 					</div>
 				</div>
 			</div>
@@ -291,7 +291,7 @@ function addModalsToDocument(parentId = 'body') {
 					</div>
 					<div class="modal-footer">
 						<button id="modalConfirmOk" class="btn btn-primary" type="button">Tamam</button>
-						<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Vazgeç</button>
+						<button class="btn btn-dark" type="button" data-bs-dismiss="modal">Vazgeç</button>
 					</div>
 				</div>
 			</div>
@@ -313,7 +313,7 @@ function addModalsToDocument(parentId = 'body') {
 					</div>
 					<div class="modal-footer">
 						<a href="javascript:modalCopyOk()" id="modalCopyOk" class="btn btn-primary">Tamam</a>
-						<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Vazgeç</button>
+						<button class="btn btn-dark" type="button" data-bs-dismiss="modal">Vazgeç</button>
 					</div>
 				</div>
 			</div>
@@ -342,7 +342,7 @@ function addModalsToDocument(parentId = 'body') {
 
 					<div class="modal-footer">
 						<a href="javascript:modalRowOk()" id="modalRowOk" class="btn btn-primary">Tamam</a>
-						<button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Vazgeç</button>
+						<button class="btn btn-dark" type="button" data-bs-dismiss="modal">Vazgeç</button>
 					</div>
 					
 				</div>
